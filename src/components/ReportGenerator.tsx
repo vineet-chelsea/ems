@@ -64,26 +64,188 @@ export function ReportGenerator({ device, availableParameters }: ReportGenerator
     }
   };
 
+  const generateReportData = () => {
+    const now = new Date();
+    const dataPoints: any[] = [];
+    
+    // Calculate date range
+    let startTime: Date;
+    switch (dateRange) {
+      case 'day':
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case 'week':
+        startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case 'month':
+        startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case 'custom':
+        startTime = startDate || new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      default:
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    }
+
+    const endTime = dateRange === 'custom' && endDate ? endDate : now;
+    
+    // Generate data points every 5 seconds
+    const currentTime = new Date(startTime);
+    while (currentTime <= endTime) {
+      const dataPoint: any = {
+        timestamp: format(currentTime, 'yyyy-MM-dd HH:mm:ss')
+      };
+
+      // Add random values for each selected parameter
+      selectedParameters.forEach(paramKey => {
+        const param = availableParameters.find(p => p.key === paramKey);
+        if (param) {
+          // Generate realistic random values based on parameter type
+          let value: number;
+          switch (param.key) {
+            case 'Ptotal':
+              value = Math.random() * 1000 + 500; // 500-1500 kW
+              break;
+            case 'Qtotal':
+              value = Math.random() * 500 + 100; // 100-600 kVAR
+              break;
+            case 'V1':
+            case 'V2':
+            case 'V3':
+              value = Math.random() * 20 + 220; // 220-240 V
+              break;
+            case 'I1':
+            case 'I2':
+            case 'I3':
+              value = Math.random() * 50 + 10; // 10-60 A
+              break;
+            case 'frequency':
+              value = Math.random() * 1 + 49.5; // 49.5-50.5 Hz
+              break;
+            case 'powerFactor':
+              value = Math.random() * 0.3 + 0.7; // 0.7-1.0
+              break;
+            case 'THD_V1':
+            case 'THD_V2':
+            case 'THD_V3':
+              value = Math.random() * 5 + 1; // 1-6%
+              break;
+            case 'THD_I1':
+            case 'THD_I2':
+            case 'THD_I3':
+              value = Math.random() * 10 + 2; // 2-12%
+              break;
+            default:
+              value = Math.random() * 100; // Default random value
+          }
+          dataPoint[param.label] = Number(value.toFixed(2));
+        }
+      });
+
+      dataPoints.push(dataPoint);
+      currentTime.setSeconds(currentTime.getSeconds() + 5); // Add 5 seconds
+    }
+
+    return dataPoints;
+  };
+
+  const createCSVContent = (data: any[]) => {
+    if (data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => row[header]).join(','))
+    ].join('\n');
+    
+    return csvContent;
+  };
+
+  const createExcelContent = (data: any[]) => {
+    // Create a simple tab-separated format for Excel
+    if (data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const content = [
+      headers.join('\t'),
+      ...data.map(row => headers.map(header => row[header]).join('\t'))
+    ].join('\n');
+    
+    return content;
+  };
+
+  const createPDFContent = (data: any[]) => {
+    const reportContent = `
+ENERGY MONITORING REPORT
+========================
+
+Device: ${device.name}
+Report Name: ${reportName}
+Generated: ${format(new Date(), 'PPP pp')}
+Date Range: ${getDateRangeLabel()}
+Parameters: ${selectedParameters.length} selected
+Total Data Points: ${data.length}
+
+SELECTED PARAMETERS:
+${selectedParameters.map(paramKey => {
+  const param = availableParameters.find(p => p.key === paramKey);
+  return param ? `- ${param.label} (${param.unit})` : '';
+}).filter(Boolean).join('\n')}
+
+DATA SUMMARY:
+${data.length > 0 ? `
+First Reading: ${data[0].timestamp}
+Last Reading: ${data[data.length - 1].timestamp}
+Interval: 5 seconds
+` : 'No data available'}
+
+RAW DATA:
+${data.slice(0, 100).map(row => 
+  `${row.timestamp}: ${Object.keys(row).filter(k => k !== 'timestamp').map(k => `${k}=${row[k]}`).join(', ')}`
+).join('\n')}
+
+${data.length > 100 ? `\n... and ${data.length - 100} more records` : ''}
+    `;
+    
+    return reportContent;
+  };
+
   const handleGenerateReport = async () => {
     setIsGenerating(true);
     
-    // Simulate report generation
     setTimeout(() => {
-      // In a real implementation, this would:
-      // 1. Fetch historical data for selected parameters
-      // 2. Generate the report in the selected format
-      // 3. Download the file
+      const data = generateReportData();
+      let content = '';
+      let mimeType = '';
       
-      const fileName = `${reportName}_${format(new Date(), 'yyyy-MM-dd')}.${reportFormat}`;
+      switch (reportFormat) {
+        case 'csv':
+          content = createCSVContent(data);
+          mimeType = 'text/csv';
+          break;
+        case 'excel':
+          content = createExcelContent(data);
+          mimeType = 'application/vnd.ms-excel';
+          break;
+        case 'pdf':
+          content = createPDFContent(data);
+          mimeType = 'text/plain';
+          break;
+      }
       
-      // Create a mock download
+      const fileName = `${reportName}_${format(new Date(), 'yyyy-MM-dd-HHmm')}.${reportFormat === 'excel' ? 'xls' : reportFormat}`;
+      
+      // Create and download the file
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
       const element = document.createElement('a');
-      element.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('Mock report data');
+      element.href = url;
       element.download = fileName;
       element.style.display = 'none';
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
+      URL.revokeObjectURL(url);
       
       setIsGenerating(false);
     }, 2000);
