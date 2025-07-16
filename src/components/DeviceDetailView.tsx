@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Device } from "./EnergyDashboard";
 import { ParameterChart } from "./ParameterChart";
 import { ReportGenerator } from "./ReportGenerator";
+import { PowerQualityDashboard } from "./PowerQualityDashboard";
 
 interface DeviceDetailViewProps {
   device: Device;
@@ -183,6 +184,9 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice }: DeviceDetai
           </TabsList>
 
           <TabsContent value="monitoring" className="space-y-6">
+            {/* Power Quality Performance */}
+            <PowerQualityDashboard device={device} />
+
             {/* Parameter Selection */}
             <Card>
               <CardHeader>
