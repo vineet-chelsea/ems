@@ -7,6 +7,7 @@ import { DeviceCard } from "./DeviceCard";
 import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
 import { AdminPanel } from "./AdminPanel";
+import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -126,6 +127,7 @@ export function EnergyDashboard() {
                 Add Device
               </Button>
             )}
+            <ChangePasswordDialog />
             <Button 
               variant="outline"
               onClick={() => {
