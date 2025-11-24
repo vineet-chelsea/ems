@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { Plus, Activity, Zap, Settings, Download } from "lucide-react";
+import { Plus, Activity, Zap, Settings, LogOut, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeviceCard } from "./DeviceCard";
 import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
+import { AdminPanel } from "./AdminPanel";
+import { useAuth } from "@/contexts/AuthContext";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface Device {
   id: string;
@@ -51,9 +55,16 @@ export function EnergyDashboard() {
   const [devices, setDevices] = useState<Device[]>(mockDevices);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
+  const { user, logout, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
-  const onlineDevices = devices.filter(d => d.status === 'online').length;
-  const totalPower = devices.reduce((sum, device) => sum + (device.parameters.Ptotal || 0), 0);
+  // Filter devices based on user permissions
+  const visibleDevices = isAdmin 
+    ? devices 
+    : devices.filter(d => user?.deviceIds.includes(d.id));
+
+  const onlineDevices = visibleDevices.filter(d => d.status === 'online').length;
+  const totalPower = visibleDevices.reduce((sum, device) => sum + (device.parameters.Ptotal || 0), 0);
 
   const handleAddDevice = (deviceData: { name: string; ipAddress: string; subnetMask: string }) => {
     const newDevice: Device = {
@@ -101,15 +112,31 @@ export function EnergyDashboard() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               Energy Monitoring System
             </h1>
-            <p className="text-muted-foreground mt-1">Monitor and manage your energy devices</p>
+            <p className="text-muted-foreground mt-1">
+              Welcome, {user?.email} ({user?.role})
+            </p>
           </div>
-          <Button 
-            onClick={() => setIsAddDeviceOpen(true)}
-            className="bg-gradient-to-r from-primary to-primary-glow hover:shadow-lg transition-all duration-300"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Device
-          </Button>
+          <div className="flex gap-2">
+            {isAdmin && (
+              <Button 
+                onClick={() => setIsAddDeviceOpen(true)}
+                className="bg-gradient-to-r from-primary to-primary-glow hover:shadow-lg transition-all duration-300"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Device
+              </Button>
+            )}
+            <Button 
+              variant="outline"
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards */}
@@ -122,7 +149,7 @@ export function EnergyDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{onlineDevices}</div>
               <p className="text-xs text-muted-foreground">
-                of {devices.length} total devices
+                of {visibleDevices.length} visible devices
               </p>
             </CardContent>
           </Card>
@@ -154,42 +181,90 @@ export function EnergyDashboard() {
           </Card>
         </div>
 
-        {/* Devices Grid */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Connected Devices</h2>
-          {devices.length === 0 ? (
-            <Card className="text-center py-12">
-              <CardContent>
-                <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No devices connected</h3>
-                <p className="text-muted-foreground mb-4">
-                  Add your first energy monitoring device to get started
-                </p>
-                <Button onClick={() => setIsAddDeviceOpen(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add First Device
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {devices.map((device) => (
-                <DeviceCard 
-                  key={device.id} 
-                  device={device} 
-                  onClick={() => setSelectedDevice(device)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Main Content with Tabs */}
+        {isAdmin ? (
+          <Tabs defaultValue="devices" className="w-full">
+            <TabsList>
+              <TabsTrigger value="devices">
+                <Activity className="w-4 h-4 mr-2" />
+                Devices
+              </TabsTrigger>
+              <TabsTrigger value="users">
+                <Users className="w-4 h-4 mr-2" />
+                User Management
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="devices" className="space-y-4">
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Connected Devices</h2>
+                {visibleDevices.length === 0 ? (
+                  <Card className="text-center py-12">
+                    <CardContent>
+                      <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2">No devices connected</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Add your first energy monitoring device to get started
+                      </p>
+                      <Button onClick={() => setIsAddDeviceOpen(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add First Device
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {visibleDevices.map((device) => (
+                      <DeviceCard 
+                        key={device.id} 
+                        device={device} 
+                        onClick={() => setSelectedDevice(device)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="users">
+              <AdminPanel devices={devices.map(d => ({ id: d.id, name: d.name }))} />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Your Devices</h2>
+            {visibleDevices.length === 0 ? (
+              <Card className="text-center py-12">
+                <CardContent>
+                  <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No devices assigned</h3>
+                  <p className="text-muted-foreground">
+                    Contact your administrator to get access to devices
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {visibleDevices.map((device) => (
+                  <DeviceCard 
+                    key={device.id} 
+                    device={device} 
+                    onClick={() => setSelectedDevice(device)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Add Device Dialog */}
-        <AddDeviceDialog 
-          open={isAddDeviceOpen}
-          onOpenChange={setIsAddDeviceOpen}
-          onAddDevice={handleAddDevice}
-        />
+        {isAdmin && (
+          <AddDeviceDialog 
+            open={isAddDeviceOpen}
+            onOpenChange={setIsAddDeviceOpen}
+            onAddDevice={handleAddDevice}
+          />
+        )}
       </div>
     </div>
   );
