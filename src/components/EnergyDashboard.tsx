@@ -20,6 +20,7 @@ export interface Device {
   subnetMask: string;
   status: 'online' | 'offline' | 'connecting';
   lastSeen: Date;
+  includeInTotalSummary: boolean;
   parameters: {
     [key: string]: number;
   };
@@ -34,6 +35,7 @@ const mockDevices: Device[] = [
     subnetMask: "255.255.255.0",
     status: "online",
     lastSeen: new Date(),
+    includeInTotalSummary: true,
     parameters: {
       V1: 230.5,
       V2: 231.2,
@@ -66,7 +68,9 @@ export function EnergyDashboard() {
     : devices.filter(d => user?.deviceIds.includes(d.id));
 
   const onlineDevices = visibleDevices.filter(d => d.status === 'online').length;
-  const totalPower = visibleDevices.reduce((sum, device) => sum + (device.parameters.Ptotal || 0), 0);
+  const totalPower = visibleDevices
+    .filter(d => d.includeInTotalSummary)
+    .reduce((sum, device) => sum + (device.parameters.Ptotal || 0), 0);
 
   const handleAddDevice = (deviceData: { name: string; ipAddress: string; subnetMask: string }) => {
     const newDevice: Device = {
@@ -77,6 +81,7 @@ export function EnergyDashboard() {
       subnetMask: deviceData.subnetMask,
       status: "connecting",
       lastSeen: new Date(),
+      includeInTotalSummary: true,
       parameters: {}
     };
 
