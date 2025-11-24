@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -302,6 +304,23 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
                     <Label>Subnet Mask</Label>
                     <div className="p-2 bg-muted rounded text-sm">{device.subnetMask}</div>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-lg border border-border">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="includeInTotal" className="text-base">Include in Total Power Summary</Label>
+                    <p className="text-sm text-muted-foreground">
+                      When enabled, this device's power consumption will contribute to the main dashboard's total power calculation
+                    </p>
+                  </div>
+                  <Switch
+                    id="includeInTotal"
+                    checked={device.includeInTotalSummary}
+                    onCheckedChange={(checked) => {
+                      onUpdateDevice({ ...device, includeInTotalSummary: checked });
+                      toast.success(checked ? 'Device included in total summary' : 'Device excluded from total summary');
+                    }}
+                  />
                 </div>
                 
                 <div className="flex gap-2">
