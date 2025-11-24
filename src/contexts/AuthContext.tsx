@@ -18,6 +18,8 @@ interface AuthContextType {
   createUser: (email: string, password: string, role: UserRole, deviceIds: string[]) => boolean;
   updateUserDevices: (userId: string, deviceIds: string[]) => void;
   deleteUser: (userId: string) => void;
+  changePassword: (currentPassword: string, newPassword: string) => boolean;
+  adminResetPassword: (userId: string, newPassword: string) => boolean;
   isAdmin: boolean;
 }
 
@@ -157,6 +159,53 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.success('User deleted successfully');
   };
 
+  const changePassword = (currentPassword: string, newPassword: string): boolean => {
+    if (!user) {
+      toast.error('No user logged in');
+      return false;
+    }
+
+    const storedUsers = localStorage.getItem(STORAGE_KEY);
+    if (!storedUsers) return false;
+
+    const userList = JSON.parse(storedUsers);
+    const currentUser = userList.find((u: any) => u.id === user.id);
+
+    if (!currentUser || currentUser.password !== currentPassword) {
+      toast.error('Current password is incorrect');
+      return false;
+    }
+
+    const updatedUsers = userList.map((u: any) =>
+      u.id === user.id ? { ...u, password: newPassword } : u
+    );
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+    toast.success('Password changed successfully');
+    return true;
+  };
+
+  const adminResetPassword = (userId: string, newPassword: string): boolean => {
+    if (!user || user.role !== 'admin') {
+      toast.error('Only admins can reset passwords');
+      return false;
+    }
+
+    const storedUsers = localStorage.getItem(STORAGE_KEY);
+    if (!storedUsers) return false;
+
+    const userList = JSON.parse(storedUsers);
+    const updatedUsers = userList.map((u: any) =>
+      u.id === userId ? { ...u, password: newPassword } : u
+    );
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+    toast.success('Password reset successfully');
+    return true;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -167,6 +216,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createUser,
         updateUserDevices,
         deleteUser,
+        changePassword,
+        adminResetPassword,
         isAdmin: user?.role === 'admin'
       }}
     >

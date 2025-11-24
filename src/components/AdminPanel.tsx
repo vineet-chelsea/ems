@@ -8,20 +8,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { UserPlus, Trash2, Settings } from 'lucide-react';
+import { UserPlus, Trash2, Settings, KeyRound } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AdminPanelProps {
   devices: Array<{ id: string; name: string }>;
 }
 
 export const AdminPanel = ({ devices }: AdminPanelProps) => {
-  const { users, createUser, updateUserDevices, deleteUser, user } = useAuth();
+  const { users, createUser, updateUserDevices, deleteUser, adminResetPassword, user } = useAuth();
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState<'admin' | 'user'>('user');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedDevices, setSelectedDevices] = useState<string[]>([]);
+  const [resetPasswordUserId, setResetPasswordUserId] = useState<string | null>(null);
+  const [resetPasswordValue, setResetPasswordValue] = useState('');
 
   const handleCreateUser = () => {
     if (newEmail && newPassword) {
@@ -55,6 +58,20 @@ export const AdminPanel = ({ devices }: AdminPanelProps) => {
         ? prev.filter(id => id !== deviceId)
         : [...prev, deviceId]
     );
+  };
+
+  const handleResetPassword = () => {
+    if (!resetPasswordUserId || !resetPasswordValue) return;
+
+    if (resetPasswordValue.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    if (adminResetPassword(resetPasswordUserId, resetPasswordValue)) {
+      setResetPasswordUserId(null);
+      setResetPasswordValue('');
+    }
   };
 
   if (user?.role !== 'admin') {
@@ -150,15 +167,25 @@ export const AdminPanel = ({ devices }: AdminPanelProps) => {
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenDevicePermissions(u.id)}
+                        title="Device Permissions"
                       >
                         <Settings className="h-4 w-4" />
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setResetPasswordUserId(u.id)}
+                      title="Reset Password"
+                    >
+                      <KeyRound className="h-4 w-4" />
+                    </Button>
                     {u.id !== user?.id && (
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => deleteUser(u.id)}
+                        title="Delete User"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -199,6 +226,36 @@ export const AdminPanel = ({ devices }: AdminPanelProps) => {
               )}
               <Button onClick={handleSaveDevicePermissions} className="w-full">
                 Save Permissions
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!resetPasswordUserId} onOpenChange={() => setResetPasswordUserId(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Reset Password</DialogTitle>
+              <DialogDescription>
+                Set a new password for {users.find(u => u.id === resetPasswordUserId)?.email}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-password">New Password</Label>
+                <Input
+                  id="reset-password"
+                  type="password"
+                  value={resetPasswordValue}
+                  onChange={(e) => setResetPasswordValue(e.target.value)}
+                  placeholder="Enter new password"
+                  minLength={6}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Password must be at least 6 characters
+                </p>
+              </div>
+              <Button onClick={handleResetPassword} className="w-full">
+                Reset Password
               </Button>
             </div>
           </DialogContent>
