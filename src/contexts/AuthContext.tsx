@@ -23,6 +23,7 @@ interface AuthContextType {
   recoverAdminPassword: (email: string, recoveryCode: string, newPassword: string) => boolean;
   getRecoveryCode: () => string | null;
   regenerateRecoveryCode: () => string;
+  removeDeviceFromUsers: (deviceId: string) => void;
   isAdmin: boolean;
 }
 
@@ -281,6 +282,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newCode;
   };
 
+  const removeDeviceFromUsers = (deviceId: string) => {
+    const storedUsers = localStorage.getItem(STORAGE_KEY);
+    if (!storedUsers) return;
+
+    const userList = JSON.parse(storedUsers);
+    const updatedUsers = userList.map((u: any) => ({
+      ...u,
+      deviceIds: u.deviceIds.filter((id: string) => id !== deviceId)
+    }));
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+
+    // Update current session if user's devices were affected
+    if (user && user.deviceIds.includes(deviceId)) {
+      const updatedUser = {
+        ...user,
+        deviceIds: user.deviceIds.filter(id => id !== deviceId)
+      };
+      setUser(updatedUser);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -296,6 +321,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         recoverAdminPassword,
         getRecoveryCode,
         regenerateRecoveryCode,
+        removeDeviceFromUsers,
         isAdmin: user?.role === 'admin'
       }}
     >
