@@ -109,6 +109,7 @@ export function EnergyDashboard() {
           setSelectedDevice(updated);
         }}
         onDeleteDevice={handleDeleteDevice}
+        isAdmin={isAdmin}
       />
     );
   }

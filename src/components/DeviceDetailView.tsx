@@ -28,6 +28,7 @@ interface DeviceDetailViewProps {
   onBack: () => void;
   onUpdateDevice: (device: Device) => void;
   onDeleteDevice: (deviceId: string) => void;
+  isAdmin: boolean;
 }
 
 const AVAILABLE_PARAMETERS = [
@@ -49,7 +50,7 @@ const AVAILABLE_PARAMETERS = [
   { key: 'PFavg', label: 'Average Power Factor', unit: '', group: 'Power Factor' },
 ];
 
-export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevice }: DeviceDetailViewProps) {
+export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevice, isAdmin }: DeviceDetailViewProps) {
   const [selectedParameters, setSelectedParameters] = useState<string[]>(['Ptotal', 'V1', 'V2', 'V3']);
   const [deviceName, setDeviceName] = useState(device.name);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -313,43 +314,45 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
                   </Button>
                 </div>
 
-                <div className="pt-6 border-t border-border">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-destructive mb-2">Danger Zone</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Permanently delete this device and all associated historical data. This action cannot be undone.
-                      </p>
-                    </div>
-                    
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive">
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete Device
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will permanently delete the device <strong>{device.name}</strong> and all its historical records from the database. 
-                            This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => onDeleteDevice(device.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
+                {isAdmin && (
+                  <div className="pt-6 border-t border-border">
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-destructive mb-2">Danger Zone</h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Permanently delete this device and all associated historical data. This action cannot be undone.
+                        </p>
+                      </div>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="destructive">
+                            <Trash2 className="w-4 h-4 mr-2" />
                             Delete Device
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently delete the device <strong>{device.name}</strong> and all its historical records from the database. 
+                              This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => onDeleteDevice(device.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete Device
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
