@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Checkbox } from '@/components/ui/checkbox';
 import { UserPlus, Trash2, Settings, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
+import { AdminRecoveryDialog } from './AdminRecoveryDialog';
 
 interface AdminPanelProps {
   devices: Array<{ id: string; name: string }>;
@@ -81,8 +82,13 @@ export const AdminPanel = ({ devices }: AdminPanelProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>User Management</CardTitle>
-        <CardDescription>Create and manage user accounts and device permissions</CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>User Management</CardTitle>
+            <CardDescription>Create and manage user accounts and device permissions</CardDescription>
+          </div>
+          <AdminRecoveryDialog />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
