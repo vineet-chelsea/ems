@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Plus, Activity, Zap, Settings, LogOut, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DeviceCard } from "./DeviceCard";
@@ -56,7 +57,7 @@ export function EnergyDashboard() {
   const [devices, setDevices] = useState<Device[]>(mockDevices);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, removeDeviceFromUsers } = useAuth();
   const navigate = useNavigate();
 
   // Filter devices based on user permissions
@@ -91,6 +92,13 @@ export function EnergyDashboard() {
     }, 2000);
   };
 
+  const handleDeleteDevice = (deviceId: string) => {
+    setDevices(prev => prev.filter(d => d.id !== deviceId));
+    removeDeviceFromUsers(deviceId);
+    setSelectedDevice(null);
+    toast.success('Device and all associated records deleted successfully');
+  };
+
   if (selectedDevice) {
     return (
       <DeviceDetailView 
@@ -100,6 +108,7 @@ export function EnergyDashboard() {
           setDevices(prev => prev.map(d => d.id === updated.id ? updated : d));
           setSelectedDevice(updated);
         }}
+        onDeleteDevice={handleDeleteDevice}
       />
     );
   }
