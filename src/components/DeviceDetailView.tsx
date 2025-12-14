@@ -304,6 +304,10 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
                     <Label>Subnet Mask</Label>
                     <div className="p-2 bg-muted rounded text-sm">{device.subnetMask}</div>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Slave Address</Label>
+                    <div className="p-2 bg-muted rounded text-sm">{device.slaveAddress ?? 1}</div>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between p-4 rounded-lg border border-border">
