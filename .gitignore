@@ -10,7 +10,12 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist-electron
+release
 *.local
+backend/node_modules
+backend/dist
+backend/.env
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +27,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Electron build artifacts
+out
+build
+*.dmg
+*.exe
+*.deb
+*.AppImage
+*.snap

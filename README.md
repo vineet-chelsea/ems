@@ -1,8 +1,88 @@
-# Welcome to your Lovable project
+# Energy Monitoring System
 
-## Project info
+A desktop application for monitoring and managing energy devices (PM5320 power meters) with real-time data visualization, user management, and reporting capabilities.
 
-**URL**: https://lovable.dev/projects/6606e9eb-6051-4057-95ad-346d3203f990
+## Features
+
+- 🖥️ **Desktop Application** - Native Electron app for Windows, macOS, and Linux
+- 📦 **Installer Support** - Create installers for easy distribution
+- 🔄 **Auto-Update** - GitHub releases integration (currently commented, ready to enable)
+- 🚀 **Auto-Start** - Launch on system startup option
+- 👥 **User Management** - Role-based access control (Admin/User)
+- 📊 **Real-time Monitoring** - Live parameter charts and power quality metrics
+- 📈 **Reporting** - Generate reports in PDF, CSV, and Excel formats
+- 🔐 **Secure Authentication** - Password management and recovery
+
+## Quick Start
+
+### Local Development (Recommended for Testing)
+
+**⚠️ Important**: The production config requires 64GB RAM. For local testing, use the local configuration:
+
+```bash
+# Start backend services (local config - scaled down)
+docker-compose -f docker-compose.local.yml up -d
+
+# Install frontend dependencies
+npm install
+
+# Run Electron app in development mode
+npm run electron:dev
+```
+
+See [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md) for local setup details.
+
+### Production Setup (High-Performance Server)
+
+For production servers with 64GB+ RAM:
+
+```bash
+# Start all services (production config)
+docker-compose up -d
+
+# Build and run Electron app
+npm run build:win  # or build:mac, build:linux
+```
+
+### Build for Production
+
+```bash
+# Build for Windows (creates installer)
+npm run build:win
+
+# Build for macOS
+npm run build:mac
+
+# Build for Linux
+npm run build:linux
+```
+
+See [BUILD_INSTRUCTIONS.md](./BUILD_INSTRUCTIONS.md) for detailed build and installation instructions.
+
+## Project Structure
+
+```
+ems/
+├── electron/              # Electron main process
+│   ├── main.ts           # Main process (auto-update, auto-launch)
+│   └── preload.ts        # IPC bridge
+├── src/                  # React application
+│   ├── components/       # UI components
+│   ├── contexts/         # React contexts (Auth)
+│   └── pages/            # Page components
+└── build/                # App icons (create this folder)
+```
+
+## Auto-Update Setup (GitHub Releases)
+
+The auto-update functionality is currently commented out. To enable:
+
+1. Update `package.json` → `build.publish` with your GitHub details
+2. Uncomment auto-updater code in:
+   - `electron/main.ts`
+   - `electron/preload.ts`
+   - `src/components/AutoUpdate.tsx`
+3. Create GitHub releases with version tags
 
 ## How can I edit this code?
 

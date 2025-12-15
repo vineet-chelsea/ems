@@ -19,14 +19,15 @@ const Login = () => {
   const { login, recoverAdminPassword } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
+    const success = await login(email, password);
+    if (success) {
       navigate('/');
     }
   };
 
-  const handleRecovery = (e: React.FormEvent) => {
+  const handleRecovery = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!recoveryCode || !newPassword) {
@@ -34,12 +35,12 @@ const Login = () => {
       return;
     }
 
-    if (recoverAdminPassword(recoveryEmail, recoveryCode, newPassword)) {
+    const success = await recoverAdminPassword(recoveryEmail, recoveryCode, newPassword);
+    if (success) {
       setIsRecoveryOpen(false);
       setRecoveryEmail('');
       setRecoveryCode('');
       setNewPassword('');
-      toast.success('You can now login with your new password');
     }
   };
 

@@ -1,0 +1,52 @@
+services:
+  # Minimal setup for local development - PostgreSQL only (no Kafka, no pgBouncer)
+  # Use this if you're having resource issues or just want to test quickly
+
+  # TimescaleDB (PostgreSQL with time-series extension)
+  postgres:
+    image: timescale/timescaledb:latest-pg16
+    container_name: ems_postgres
+    environment:
+      POSTGRES_DB: ems_db
+      POSTGRES_USER: ems_user
+      POSTGRES_PASSWORD: ems_password
+      POSTGRES_INITDB_ARGS: "-c timescaledb.telemetry_level=off"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/postgresql.local.conf:/etc/postgresql/postgresql.conf:ro
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ems_user -d ems_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Backend API (connects directly to postgres, no Kafka)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ems_backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ems_db
+      DB_USER: ems_user
+      DB_PASSWORD: ems_password
+      PORT: 3001
+      NODE_ENV: development
+      KAFKA_ENABLED: "false"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+

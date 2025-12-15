@@ -27,14 +27,31 @@ export const AdminPanel = ({ devices }: AdminPanelProps) => {
   const [resetPasswordUserId, setResetPasswordUserId] = useState<string | null>(null);
   const [resetPasswordValue, setResetPasswordValue] = useState('');
 
-  const handleCreateUser = () => {
-    if (newEmail && newPassword) {
-      if (createUser(newEmail, newPassword, newRole, [])) {
-        setNewEmail('');
-        setNewPassword('');
-        setNewRole('user');
-        setIsCreateOpen(false);
-      }
+  const handleCreateUser = async () => {
+    if (!newEmail || !newPassword) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    // Validate password length
+    if (newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    const success = await createUser(newEmail, newPassword, newRole, []);
+    if (success) {
+      setNewEmail('');
+      setNewPassword('');
+      setNewRole('user');
+      setIsCreateOpen(false);
     }
   };
 

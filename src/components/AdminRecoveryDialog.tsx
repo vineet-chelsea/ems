@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,12 +12,32 @@ export const AdminRecoveryDialog = () => {
   const { getRecoveryCode, regenerateRecoveryCode, isAdmin } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const loadRecoveryCode = async () => {
+    setLoading(true);
+    try {
+      const code = await getRecoveryCode();
+      setRecoveryCode(code);
+    } catch (error) {
+      // Error already handled in getRecoveryCode
+      setRecoveryCode(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleOpen = () => {
-    const code = getRecoveryCode();
-    setRecoveryCode(code);
     setIsOpen(true);
   };
+
+  // Load recovery code when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      loadRecoveryCode();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const handleCopy = () => {
     if (recoveryCode) {
@@ -26,11 +46,15 @@ export const AdminRecoveryDialog = () => {
     }
   };
 
-  const handleRegenerate = () => {
-    const newCode = regenerateRecoveryCode();
-    if (newCode) {
-      setRecoveryCode(newCode);
-      toast.info('Save this new code in a secure location');
+  const handleRegenerate = async () => {
+    setLoading(true);
+    try {
+      const newCode = await regenerateRecoveryCode();
+      if (newCode) {
+        setRecoveryCode(newCode);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,13 +80,21 @@ export const AdminRecoveryDialog = () => {
         <div className="space-y-4 mt-4">
           <Card className="p-4 bg-muted">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="flex-1">
                 <p className="text-sm text-muted-foreground mb-1">Your Recovery Code</p>
-                <p className="text-2xl font-mono font-bold tracking-wider">{recoveryCode}</p>
+                {loading ? (
+                  <p className="text-2xl font-mono font-bold tracking-wider text-muted-foreground">Loading...</p>
+                ) : recoveryCode ? (
+                  <p className="text-2xl font-mono font-bold tracking-wider">{recoveryCode}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No recovery code found. Generate one below.</p>
+                )}
               </div>
-              <Button variant="ghost" size="icon" onClick={handleCopy}>
-                <Copy className="h-4 w-4" />
-              </Button>
+              {recoveryCode && (
+                <Button variant="ghost" size="icon" onClick={handleCopy}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </Card>
           
