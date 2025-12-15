@@ -132,6 +132,7 @@ export function EnergyDashboard() {
         type: deviceData.type || "PM5320",
         ipAddress: deviceData.ipAddress,
         subnetMask: deviceData.subnetMask,
+        slaveAddress: deviceData.slaveAddress ?? 1,
         status: "connecting",
         includeInTotalSummary: true,
         parameterMappings: deviceData.parameterMappings,

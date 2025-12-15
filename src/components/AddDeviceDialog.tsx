@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Wifi, WifiOff, Loader, CheckCircle, XCircle, Upload, Download, FileSpreadsheet, X } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/services/api";
 import { 
   generateParameterMappingTemplate, 
   parseParameterMappingFile, 
@@ -62,30 +63,23 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
     setPingStatus('testing');
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/devices/test-connection`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-        },
-        body: JSON.stringify({
-          ipAddress: formData.ipAddress,
-          slaveAddress: formData.slaveAddress || 1,
-        }),
-      });
-
-      const data = await response.json();
+      const result = await api.testDeviceConnection(
+        formData.ipAddress,
+        formData.slaveAddress ?? 1
+      );
       
-      if (response.ok && data.success) {
+      if (result.success) {
         setPingStatus('success');
-        toast.success(`Successfully connected to ${formData.ipAddress}`);
+        toast.success(result.message || `Successfully connected to ${formData.ipAddress}`);
       } else {
         setPingStatus('failed');
-        toast.error(data.error || 'Connection test failed');
+        toast.error(result.error || 'Connection test failed');
       }
     } catch (error: any) {
       setPingStatus('failed');
-      toast.error(error.message || 'Failed to test connection');
+      const errorMessage = error.message || 'Failed to test connection';
+      toast.error(errorMessage);
+      console.error('Connection test error:', error);
     }
   };
 
@@ -163,7 +157,7 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
         name: formData.name,
         ipAddress: formData.ipAddress,
         subnetMask: "255.255.255.0",
-        slaveAddress: formData.slaveAddress || 1,
+        slaveAddress: formData.slaveAddress ?? 1,
         type: formData.type,
         parameterMappings: parameterMappingsObj,
       });
