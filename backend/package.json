@@ -8,17 +8,21 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "migrate": "tsx src/db/migrate.ts"
+    "migrate": "tsx src/db/migrate.ts",
+    "setup-db": "powershell -ExecutionPolicy Bypass -File scripts/setup-database-with-password.ps1"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.3",
     "kafkajs": "^2.2.4",
+    "multer": "^2.0.2",
+    "node-cron": "^3.0.3",
     "pg": "^8.11.3",
     "zod": "^3.23.8"
   },

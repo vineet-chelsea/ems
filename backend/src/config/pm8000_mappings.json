@@ -1,0 +1,3061 @@
+[
+  {
+    "parameter": "Active Energy Delivered (Into Load)",
+    "address": 2699,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Received (Out of Load)",
+    "address": 2701,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered + Received",
+    "address": 2703,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered- Received",
+    "address": 2705,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered",
+    "address": 2707,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Received",
+    "address": 2709,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered + Received",
+    "address": 2711,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered - Received",
+    "address": 2713,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered",
+    "address": 2715,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Received",
+    "address": 2717,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered + Received",
+    "address": 2719,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered - Received",
+    "address": 2721,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy in Quadrant I",
+    "address": 2723,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy in Quadrant II",
+    "address": 2725,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy in Quadrant III",
+    "address": 2727,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy in Quadrant IV",
+    "address": 2729,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy in Quadrant I",
+    "address": 2731,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy in Quadrant II",
+    "address": 2733,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy in Quadrant III",
+    "address": 2735,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy in Quadrant IV",
+    "address": 2737,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy in Quadrant I",
+    "address": 2739,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy in Quadrant II",
+    "address": 2741,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy in Quadrant III",
+    "address": 2743,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy in Quadrant IV",
+    "address": 2745,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": ""
+  },
+  {
+    "parameter": "Current A",
+    "address": 2999,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B",
+    "address": 3001,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C",
+    "address": 3003,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current N",
+    "address": 3005,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current G",
+    "address": 3007,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current Avg",
+    "address": 3009,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current Unbalance Worst",
+    "address": 3017,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-B",
+    "address": 3019,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-C",
+    "address": 3021,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-A",
+    "address": 3023,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage L-L Avg",
+    "address": 3025,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N",
+    "address": 3027,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N",
+    "address": 3029,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N",
+    "address": 3031,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage L-N Avg",
+    "address": 3035,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance L-N Worst",
+    "address": 3051,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power A",
+    "address": 3053,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power B",
+    "address": 3055,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power C",
+    "address": 3057,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power Total",
+    "address": 3059,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power A",
+    "address": 3061,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power B",
+    "address": 3063,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power C",
+    "address": 3065,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power Total",
+    "address": 3067,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power A",
+    "address": 3069,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power B",
+    "address": 3071,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power C",
+    "address": 3073,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power Total",
+    "address": 3075,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Residual current I0 sum",
+    "address": 3093,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Frequency",
+    "address": 3109,
+    "dataType": "FLOAT32",
+    "unit": "Hz",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor A",
+    "address": 3143,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor B",
+    "address": 3145,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor C",
+    "address": 3147,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor Total",
+    "address": 3149,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor A",
+    "address": 3151,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor B",
+    "address": 3153,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor C",
+    "address": 3155,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor Total",
+    "address": 3157,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor A Lagging",
+    "address": 3159,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor A Leading",
+    "address": 3161,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor B Lagging",
+    "address": 3163,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor B Leading",
+    "address": 3165,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor C Lagging",
+    "address": 3167,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor C Leading",
+    "address": 3169,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor Lagging",
+    "address": 3171,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor Leading",
+    "address": 3173,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Current Disturbance",
+    "address": 13597,
+    "dataType": "INT32U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Disturbance",
+    "address": 13599,
+    "dataType": "INT32U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current A",
+    "address": 21299,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current B",
+    "address": 21301,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current C",
+    "address": 21303,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current N",
+    "address": 21305,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage A-N",
+    "address": 21329,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage B-N",
+    "address": 21331,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage C-N",
+    "address": 21333,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "K-Factor A",
+    "address": 21357,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "K-Factor B",
+    "address": 21359,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "K-Factor C",
+    "address": 21361,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "Crest Factor A",
+    "address": 21363,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Crest Factor B",
+    "address": 21365,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Crest Factor C",
+    "address": 21367,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Crest Factor N",
+    "address": 21369,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Total Cap HD Current A",
+    "address": 21431,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Ind HD Current A",
+    "address": 21433,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Cap HD Current B",
+    "address": 21435,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Ind HD Current B",
+    "address": 21437,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Cap HD Current C",
+    "address": 21439,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Ind HD Current C",
+    "address": 21441,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Cap HD Current N",
+    "address": 21443,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Ind HD Current N",
+    "address": 21445,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Cap HD Voltage A",
+    "address": 21451,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Ind HD Voltage A",
+    "address": 21453,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Cap HD Voltage B",
+    "address": 21455,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Ind HD Voltage B",
+    "address": 21457,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Cap HD Voltage C",
+    "address": 21459,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Ind HD Voltage C",
+    "address": 21461,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Even HD Current A",
+    "address": 21463,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Odd HD Current A",
+    "address": 21465,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Even HD Current B",
+    "address": 21467,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Odd HD Current B",
+    "address": 21469,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Even HD Current C",
+    "address": 21471,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Odd HD Current C",
+    "address": 21473,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Even HD Current N",
+    "address": 21475,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Odd HD Current N",
+    "address": 21477,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Even HD Voltage A",
+    "address": 21483,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Odd HD Voltage A",
+    "address": 21485,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Even HD Voltage B",
+    "address": 21487,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Odd HD Voltage B",
+    "address": 21489,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Even HD Voltage C",
+    "address": 21491,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Total Odd HD Voltage C",
+    "address": 21493,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Active Power A",
+    "address": 21495,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Active Power B",
+    "address": 21497,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Active Power C",
+    "address": 21499,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Active Power Total",
+    "address": 21501,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Reactive Power A",
+    "address": 21503,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Reactive Power B",
+    "address": 21505,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Reactive Power C",
+    "address": 21507,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Reactive Power Total",
+    "address": 21509,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Apparent Power A",
+    "address": 21511,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Apparent Power B",
+    "address": 21513,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Apparent Power C",
+    "address": 21515,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Fundamental Apparent Power Total",
+    "address": 21517,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Current, Positive Sequence, Magnitude",
+    "address": 21597,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current, Positive Sequence, Angle",
+    "address": 21599,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current, Negative Sequence, Magnitude",
+    "address": 21601,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current, Negative Sequence, Angle",
+    "address": 21603,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current, Zero Sequence, Magnitude",
+    "address": 21605,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current, Zero Sequence, Angle",
+    "address": 21607,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage, Positive Sequence, Magnitude",
+    "address": 21609,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage, Positive Sequence, Angle",
+    "address": 21611,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage, Negative Sequence, Magnitude",
+    "address": 21613,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage, Negative Sequence, Angle",
+    "address": 21615,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage, Zero Sequence, Magnitude",
+    "address": 21617,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage, Zero Sequence, Angle",
+    "address": 21619,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "K-Factor N",
+    "address": 21677,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H1 Magnitude, V",
+    "address": 22877,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H1 Angle",
+    "address": 22879,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H2 Magnitude, V",
+    "address": 22883,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H2 Angle",
+    "address": 22885,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H3 Magnitude, V",
+    "address": 22889,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H3 Angle",
+    "address": 22891,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H4 Magnitude, V",
+    "address": 22895,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H4 Angle",
+    "address": 22897,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H5 Magnitude, V",
+    "address": 22901,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H5 Angle",
+    "address": 22903,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H1 Magnitude, V",
+    "address": 23265,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H1 Angle",
+    "address": 23267,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H2 Magnitude, V",
+    "address": 23271,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H2 Angle",
+    "address": 23273,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H3 Magnitude, V",
+    "address": 23277,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H3 Angle",
+    "address": 23279,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H4 Magnitude, V",
+    "address": 23283,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H4 Angle",
+    "address": 23285,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H5 Magnitude, V",
+    "address": 23289,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H5 Angle",
+    "address": 23291,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H1 Magnitude, V",
+    "address": 23653,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H1 Angle",
+    "address": 23655,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H2 Magnitude, V",
+    "address": 23659,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H2 Angle",
+    "address": 23661,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H3 Magnitude, V",
+    "address": 23665,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H3 Angle",
+    "address": 23667,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H4 Magnitude, V",
+    "address": 23671,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H4 Angle",
+    "address": 23673,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H5 Magnitude, V",
+    "address": 23677,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H5 Angle",
+    "address": 23679,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H1 Magnitude, A",
+    "address": 24429,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H1 Angle",
+    "address": 24431,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H2 Magnitude, A",
+    "address": 24435,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H2 Angle",
+    "address": 24437,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H3 Magnitude, A",
+    "address": 24441,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H3 Angle",
+    "address": 24443,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H4 Magnitude, A",
+    "address": 24447,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H4 Angle",
+    "address": 24449,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H5 Magnitude, A",
+    "address": 24453,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H5 Angle",
+    "address": 24455,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H6 Magnitude, A",
+    "address": 24459,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H6 Angle",
+    "address": 24461,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H7 Magnitude, A",
+    "address": 24465,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H7 Angle",
+    "address": 24467,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H1 Magnitude, A",
+    "address": 24817,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H1 Angle",
+    "address": 24819,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H2 Magnitude, A",
+    "address": 24823,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H2 Angle",
+    "address": 24825,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H3 Magnitude, A",
+    "address": 24829,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H3 Angle",
+    "address": 24831,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H4 Magnitude, A",
+    "address": 24835,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H4 Angle",
+    "address": 24837,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H5 Magnitude, A",
+    "address": 24841,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H5 Angle",
+    "address": 24843,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H6 Magnitude, A",
+    "address": 24847,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H6 Angle",
+    "address": 24849,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H7 Magnitude, A",
+    "address": 24853,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H7 Angle",
+    "address": 24855,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H1 Magnitude, A",
+    "address": 25205,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H1 Angle",
+    "address": 25207,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H2 Magnitude, A",
+    "address": 25211,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H2 Angle",
+    "address": 25213,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H3 Magnitude, A",
+    "address": 25217,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H3 Angle",
+    "address": 25219,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H4 Magnitude, A",
+    "address": 25223,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H4 Angle",
+    "address": 25225,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H5 Magnitude, A",
+    "address": 25229,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H5 Angle",
+    "address": 25231,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H6 Magnitude, A",
+    "address": 25235,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H6 Angle",
+    "address": 25237,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H7 Magnitude, A",
+    "address": 25241,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H7 Angle",
+    "address": 25243,
+    "dataType": "FLOAT32",
+    "unit": "degrees",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current A",
+    "address": 27217,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current B",
+    "address": 27219,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current C",
+    "address": 27221,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current N",
+    "address": 27223,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current G",
+    "address": 27225,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current Avg",
+    "address": 27227,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage A-B",
+    "address": 27237,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage B-C",
+    "address": 27239,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage C-A",
+    "address": 27241,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage L-L Avg",
+    "address": 27243,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage A-N",
+    "address": 27245,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage B-N",
+    "address": 27247,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage C-N",
+    "address": 27249,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage L-N Avg",
+    "address": 27253,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance L-N Worst",
+    "address": 27269,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min Active Power Total",
+    "address": 27277,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Min Reactive Power Total",
+    "address": 27285,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Min Apparent Power Total",
+    "address": 27293,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Min Power Factor Lagging",
+    "address": 27321,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min Power Factor Leading",
+    "address": 27323,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Current A",
+    "address": 27337,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Current B",
+    "address": 27339,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Current C",
+    "address": 27341,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Current N",
+    "address": 27343,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage A-N",
+    "address": 27367,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage B-N",
+    "address": 27369,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage C-N",
+    "address": 27371,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Min Frequency",
+    "address": 27615,
+    "dataType": "FLOAT32",
+    "unit": "Hz",
+    "description": ""
+  },
+  {
+    "parameter": "Current A Low",
+    "address": 27643,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B Low",
+    "address": 27645,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C Low",
+    "address": 27647,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current N Low",
+    "address": 27649,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current Avg Low",
+    "address": 27651,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-B Low",
+    "address": 27653,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-C Low",
+    "address": 27655,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-A Low",
+    "address": 27657,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage L-L Avg Low",
+    "address": 27659,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance Low",
+    "address": 27669,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "Frequency High",
+    "address": 28171,
+    "dataType": "FLOAT32",
+    "unit": "Hz",
+    "description": ""
+  },
+  {
+    "parameter": "Current A K Factor High",
+    "address": 28173,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Current B K Factor High",
+    "address": 28175,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Current C K Factor High",
+    "address": 28177,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Current A Mean",
+    "address": 28179,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current B Mean",
+    "address": 28181,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current C Mean",
+    "address": 28183,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current N Mean",
+    "address": 28185,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Current Avg Mean",
+    "address": 28187,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-B Mean",
+    "address": 28189,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-C Mean",
+    "address": 28191,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-A Mean",
+    "address": 28193,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage L-L Avg Mean",
+    "address": 28195,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance Mean",
+    "address": 28205,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power Mean",
+    "address": 28207,
+    "dataType": "FLOAT32",
+    "unit": "W",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power Mean",
+    "address": 28209,
+    "dataType": "FLOAT32",
+    "unit": "VAR",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power Mean",
+    "address": 28211,
+    "dataType": "FLOAT32",
+    "unit": "VA",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor Lagging Mean",
+    "address": 28213,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor Leading Mean",
+    "address": 28215,
+    "dataType": "FLOAT32",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "Frequency Mean",
+    "address": 28217,
+    "dataType": "FLOAT32",
+    "unit": "Hz",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip A1",
+    "address": 40245,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip B1",
+    "address": 40246,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip C1",
+    "address": 40247,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip D1",
+    "address": 40248,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip A2",
+    "address": 40249,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip B2",
+    "address": 40250,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip C2",
+    "address": 40251,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip D2",
+    "address": 40252,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip A3",
+    "address": 40253,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip B3",
+    "address": 40254,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip C3",
+    "address": 40255,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip D3",
+    "address": 40256,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip A4",
+    "address": 40257,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip B4",
+    "address": 40258,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip C4",
+    "address": 40259,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip D4",
+    "address": 40260,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip A5",
+    "address": 40261,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip B5",
+    "address": 40262,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip C5",
+    "address": 40263,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip D5",
+    "address": 40264,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip X1",
+    "address": 40265,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip X2",
+    "address": 40266,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip X3",
+    "address": 40267,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip X4",
+    "address": 40268,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Dip X5",
+    "address": 40269,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip A1",
+    "address": 40270,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip B1",
+    "address": 40271,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip C1",
+    "address": 40272,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip D1",
+    "address": 40273,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip A2",
+    "address": 40274,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip B2",
+    "address": 40275,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip C2",
+    "address": 40276,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip D2",
+    "address": 40277,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip A3",
+    "address": 40278,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip B3",
+    "address": 40279,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip C3",
+    "address": 40280,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip D3",
+    "address": 40281,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip A4",
+    "address": 40282,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip B4",
+    "address": 40283,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip C4",
+    "address": 40284,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip D4",
+    "address": 40285,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip A5",
+    "address": 40286,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip B5",
+    "address": 40287,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip C5",
+    "address": 40288,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip D5",
+    "address": 40289,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip X1",
+    "address": 40290,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip X2",
+    "address": 40291,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip X3",
+    "address": 40292,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip X4",
+    "address": 40293,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Dip X5",
+    "address": 40294,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip A1",
+    "address": 40295,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip B1",
+    "address": 40296,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip C1",
+    "address": 40297,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip D1",
+    "address": 40298,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip A2",
+    "address": 40299,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip B2",
+    "address": 40300,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip C2",
+    "address": 40301,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip D2",
+    "address": 40302,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip A3",
+    "address": 40303,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip B3",
+    "address": 40304,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip C3",
+    "address": 40305,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip D3",
+    "address": 40306,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip A4",
+    "address": 40307,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip B4",
+    "address": 40308,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip C4",
+    "address": 40309,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip D4",
+    "address": 40310,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip A5",
+    "address": 40311,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip B5",
+    "address": 40312,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip C5",
+    "address": 40313,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip D5",
+    "address": 40314,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip X1",
+    "address": 40315,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip X2",
+    "address": 40316,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip X3",
+    "address": 40317,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip X4",
+    "address": 40318,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Dip X5",
+    "address": 40319,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt S1",
+    "address": 40320,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt T1",
+    "address": 40321,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt S2",
+    "address": 40322,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt T2",
+    "address": 40323,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt S3",
+    "address": 40324,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt T3",
+    "address": 40325,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt S4",
+    "address": 40326,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Ovrvlt T4",
+    "address": 40327,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt S1",
+    "address": 40328,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt T1",
+    "address": 40329,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt S2",
+    "address": 40330,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt T2",
+    "address": 40331,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt S3",
+    "address": 40332,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt T3",
+    "address": 40333,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt S4",
+    "address": 40334,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Ovrvlt T4",
+    "address": 40335,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt S1",
+    "address": 40336,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt T1",
+    "address": 40337,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt S2",
+    "address": 40338,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt T2",
+    "address": 40339,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt S3",
+    "address": 40340,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt T3",
+    "address": 40341,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt S4",
+    "address": 40342,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Ovrvlt T4",
+    "address": 40343,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Intrpt N1",
+    "address": 40344,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Intrpt N2",
+    "address": 40345,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Intrpt N3",
+    "address": 40346,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Intrpt N1",
+    "address": 40347,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Intrpt N2",
+    "address": 40348,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Intrpt N3",
+    "address": 40349,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Intrpt N1",
+    "address": 40350,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Intrpt N2",
+    "address": 40351,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Intrpt N3",
+    "address": 40352,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell S1",
+    "address": 40436,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell T1",
+    "address": 40437,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell S2",
+    "address": 40438,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell T2",
+    "address": 40439,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell S3",
+    "address": 40440,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell T3",
+    "address": 40441,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell S4",
+    "address": 40442,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Swell T4",
+    "address": 40443,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Intrpt N1",
+    "address": 40444,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Intrpt N2",
+    "address": 40445,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Intrpt N3",
+    "address": 40446,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Intrpt tot",
+    "address": 40447,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip A1",
+    "address": 40461,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip B1",
+    "address": 40462,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip C1",
+    "address": 40463,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip D1",
+    "address": 40464,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip A2",
+    "address": 40465,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip B2",
+    "address": 40466,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip C2",
+    "address": 40467,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip D2",
+    "address": 40468,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip A3",
+    "address": 40469,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip B3",
+    "address": 40470,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip C3",
+    "address": 40471,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip D3",
+    "address": 40472,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip A4",
+    "address": 40473,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip B4",
+    "address": 40474,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip C4",
+    "address": 40475,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip D4",
+    "address": 40476,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip A5",
+    "address": 40477,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip B5",
+    "address": 40478,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip C5",
+    "address": 40479,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip D5",
+    "address": 40480,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip X1",
+    "address": 40481,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip X2",
+    "address": 40482,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip X3",
+    "address": 40483,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip X4",
+    "address": 40484,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V-Dip X5",
+    "address": 40485,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Hrm Z",
+    "address": 43727,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Hrm Z1",
+    "address": 43728,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V1-Hrm Z2",
+    "address": 43729,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Hrm Z",
+    "address": 43730,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Hrm Z1",
+    "address": 43731,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V2-Hrm Z2",
+    "address": 43732,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Hrm Z",
+    "address": 43733,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Hrm Z1",
+    "address": 43734,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V3-Hrm Z2",
+    "address": 43735,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V-Hrm Z1",
+    "address": 43736,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V-Hrm Z2",
+    "address": 43737,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "V-Hrm Z Comp",
+    "address": 43738,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "V-THD Z Comp",
+    "address": 43740,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": ""
+  },
+  {
+    "parameter": "I1-Hrm Z",
+    "address": 43742,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I1-Hrm Z1",
+    "address": 43743,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I1-Hrm Z2",
+    "address": 43744,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I2-Hrm Z",
+    "address": 43745,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I2-Hrm Z1",
+    "address": 43746,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I2-Hrm Z2",
+    "address": 43747,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I3-Hrm Z",
+    "address": 43748,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I3-Hrm Z1",
+    "address": 43749,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I3-Hrm Z2",
+    "address": 43750,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  },
+  {
+    "parameter": "I-Hrm Z1",
+    "address": 43751,
+    "dataType": "INT16U",
+    "unit": "---",
+    "description": ""
+  }
+]

@@ -22,10 +22,20 @@ export interface Device {
   ipAddress: string;
   subnetMask: string;
   slaveAddress: number;
+  breakerRating?: number;
+  unitCost?: number;
   status: 'online' | 'offline' | 'connecting';
   lastSeen: string;
   includeInTotalSummary: boolean;
   parameterMappings?: Record<string, string>;
+  // Micrologic 6E protection settings
+  protectionIr?: number;
+  protectionTr?: number;
+  protectionIsd?: number;
+  protectionTsd?: number;
+  protectionIi?: number;
+  protectionIg?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+  protectionTg?: number;
 }
 
 export interface DataPoint {
@@ -82,6 +92,17 @@ export interface DataPoint {
   humidity?: number;
 }
 
+export interface DeviceEvent {
+  id: number;
+  deviceId: string;
+  parameter: string;
+  eventType: string;
+  prevValue: number | null;
+  newValue: number | null;
+  eventTimestamp: string;
+  description: string | null;
+}
+
 class ApiService {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const token = getAuthToken();
@@ -110,7 +131,13 @@ class ApiService {
         }
       }
       const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || `HTTP error! status: ${response.status}`);
+      console.error('[API] Error response:', error);
+      const errorMsg = error.error || `HTTP error! status: ${response.status}`;
+      const errorDetails = error.details ? ` Details: ${JSON.stringify(error.details)}` : '';
+      const errorObj = new Error(errorMsg + errorDetails);
+      // Preserve error details for better error handling
+      (errorObj as any).response = { data: error, status: response.status };
+      throw errorObj;
     }
 
     return response.json();
@@ -228,9 +255,18 @@ class ApiService {
   }
 
   async updateDevice(id: string, updates: Partial<Device>): Promise<Device> {
+    // Filter out undefined values - JSON.stringify omits them, but let's be explicit
+    const cleanUpdates: any = {};
+    Object.entries(updates).forEach(([key, value]) => {
+      // Only include defined values (allow null for clearing fields, but not undefined)
+      if (value !== undefined) {
+        cleanUpdates[key] = value;
+      }
+    });
+    console.log('[API] updateDevice - sending:', { id, updates: cleanUpdates });
     return this.request<Device>(`/devices/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(updates),
+      body: JSON.stringify(cleanUpdates),
     });
   }
 
@@ -269,8 +305,122 @@ class ApiService {
     );
   }
 
-  async getLatestData(deviceId: string): Promise<DataPoint> {
-    return this.request<DataPoint>(`/data/${deviceId}/latest`);
+  async getDeviceParameters(deviceId: string): Promise<Array<{ key: string; columnName: string; dataType: string }>> {
+    const token = getAuthToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/data/${deviceId}/parameters`, {
+        headers,
+      });
+
+      if (response.status === 404) {
+        return [];
+      }
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          removeAuthToken();
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
+        }
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.parameters || [];
+    } catch (error: any) {
+      if (error.message?.includes('404')) {
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  async getParameterTimeSeries(
+    deviceId: string,
+    parameterName: string,
+    options?: {
+      startTime?: string;
+      endTime?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<{ deviceId: string; parameterName: string; columnName: string; count: number; data: Array<{ timestamp: string; value: number }> }> {
+    const params = new URLSearchParams();
+    if (options?.startTime) params.append('startTime', options.startTime);
+    if (options?.endTime) params.append('endTime', options.endTime);
+    if (options?.limit) params.append('limit', options.limit.toString());
+    if (options?.offset) params.append('offset', options.offset.toString());
+
+    const query = params.toString();
+    try {
+      return await this.request<{ deviceId: string; parameterName: string; columnName: string; count: number; data: Array<{ timestamp: string; value: number }> }>(
+        `/data/${deviceId}/parameter/${encodeURIComponent(parameterName)}${query ? `?${query}` : ''}`
+      );
+    } catch (error: any) {
+      // If parameter not found, return empty data
+      if (error.message?.includes('404') || error.message?.includes('not found')) {
+        return {
+          deviceId,
+          parameterName,
+          columnName: '',
+          count: 0,
+          data: []
+        };
+      }
+      throw error;
+    }
+  }
+
+  async getLatestData(deviceId: string): Promise<DataPoint | null> {
+    const token = getAuthToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/data/${deviceId}/latest`, {
+        headers,
+      });
+
+      // 404 is expected when no data exists yet - return null instead of throwing
+      if (response.status === 404) {
+        return null;
+      }
+
+      if (!response.ok) {
+        // Handle 401 (unauthorized) - token expired or invalid
+        if (response.status === 401) {
+          removeAuthToken();
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
+        }
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error || `HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error: any) {
+      // If it's already a handled 404, return null
+      if (error.message?.includes('404') || error.message?.includes('No data points found')) {
+        return null;
+      }
+      throw error;
+    }
   }
 
   async insertDataPoint(deviceId: string, dataPoint: Partial<DataPoint>): Promise<{ id: number; timestamp: string }> {
@@ -317,6 +467,189 @@ class ApiService {
     return this.request('/devices/test-connection', {
       method: 'POST',
       body: JSON.stringify({ ipAddress, slaveAddress }),
+    });
+  }
+
+  // Summary endpoint (derived from device data columns, not the device_events table)
+  async getDeviceEventSummary(
+    deviceId: string,
+    options?: {
+      startTime?: string;
+      endTime?: string;
+      limit?: number;
+    }
+  ): Promise<{
+    deviceId: string;
+    startTime: string;
+    endTime: string;
+    events: Array<{ label: string; column: string; count: number; timestamps: string[] }>;
+    interruptions: { count: number; timestamps: string[] };
+  }> {
+    const params = new URLSearchParams();
+    if (options?.startTime) params.append('startTime', options.startTime);
+    if (options?.endTime) params.append('endTime', options.endTime);
+    if (options?.limit) params.append('limit', options.limit.toString());
+    const query = params.toString();
+    return this.request(`/data/${deviceId}/events${query ? `?${query}` : ''}`);
+  }
+
+  // Get events from device_events table for Micrologic 6E alarms
+  async getDeviceEvents(
+    deviceId: string,
+    options?: {
+      startTime?: string;
+      endTime?: string;
+      type?: string;
+      parameter?: string;
+    }
+  ): Promise<{
+    deviceId: string;
+    count: number;
+    data: Array<{
+      id: number;
+      deviceId: string;
+      parameter: string;
+      eventType: string;
+      prevValue: number | null;
+      newValue: number | null;
+      eventTimestamp: string;
+      description: string | null;
+    }>;
+  }> {
+    const params = new URLSearchParams();
+    if (options?.startTime) params.append('startTime', options.startTime);
+    if (options?.endTime) params.append('endTime', options.endTime);
+    if (options?.type) params.append('type', options.type);
+    if (options?.parameter) params.append('parameter', options.parameter);
+    const query = params.toString();
+    return this.request(`/events/${deviceId}${query ? `?${query}` : ''}`);
+  }
+
+  // Get Power Quality and Analysis Report data
+  async getPowerQualityReport(
+    deviceId: string,
+    startTime: string,
+    endTime: string
+  ): Promise<{
+    deviceName: string;
+    startTime: string;
+    endTime: string;
+    energyData: {
+      Wh: { start: number | null; end: number | null };
+      Varh: { start: number | null; end: number | null };
+      kVAh: { start: number | null; end: number | null };
+      differences: {
+        Wh: number | null;
+        Varh: number | null;
+        kVAh: number | null;
+      };
+      energyCharges: number | null;
+      unitCost: number;
+    };
+    maxMinData: Record<string, {
+      max: number | null;
+      min: number | null;
+      maxTime: string | null;
+      minTime: string | null;
+    }>;
+    events: Array<{
+      parameter: string;
+      event_type: string;
+      event_timestamp: string;
+      description: string | null;
+      new_value: number | null;
+    }>;
+  }> {
+    const params = new URLSearchParams();
+    params.append('startTime', startTime);
+    params.append('endTime', endTime);
+    return this.request(`/data/${deviceId}/power-quality-report?${params.toString()}`);
+  }
+
+  // Patch management endpoints
+  async applyPatch(patchFile: File): Promise<{ success: boolean; message: string; requiresRestart?: boolean }> {
+    const token = getAuthToken();
+    const formData = new FormData();
+    formData.append('patch', patchFile);
+
+    const response = await fetch(`${API_BASE_URL}/patches/apply/backend`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        removeAuthToken();
+        if (!window.location.pathname.includes('/login')) {
+          window.location.href = '/login';
+        }
+      }
+      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(error.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  async getPatchHistory(): Promise<Array<{
+    id: number;
+    patch_id: string;
+    version: string;
+    description: string;
+    target: string;
+    created_at: string;
+    success_count: number;
+    failed_count: number;
+    last_applied: string | null;
+  }>> {
+    const result = await this.request<{ success: boolean; history: any[] }>('/patches/history');
+    return result.history;
+  }
+
+  async downloadPatch(patchId: string): Promise<any> {
+    const result = await this.request<{ success: boolean; patch: any }>(`/patches/download/${patchId}`);
+    return result.patch;
+  }
+
+  async getPatchApplications(): Promise<Array<{
+    id: number;
+    patch_id: string;
+    target: string;
+    applied_at: string;
+    applied_by: string;
+    status: string;
+    error_message: string | null;
+    description: string;
+    version: string;
+  }>> {
+    const result = await this.request<{ success: boolean; applications: any[] }>('/patches/applications');
+    return result.applications;
+  }
+
+  async generatePatch(
+    description: string,
+    target: 'backend' | 'frontend' | 'both',
+    files: Array<{
+      path: string;
+      operation: 'add' | 'modify' | 'delete';
+      changes?: Array<{
+        type: 'replace' | 'insert' | 'delete';
+        search?: string;
+        replace?: string;
+        content?: string;
+        lineStart?: number;
+        lineEnd?: number;
+      }>;
+      content?: string;
+    }>,
+    author?: string
+  ): Promise<{ success: boolean; patch: any; message: string }> {
+    return this.request('/patches/generate', {
+      method: 'POST',
+      body: JSON.stringify({ description, target, files, author }),
     });
   }
 }

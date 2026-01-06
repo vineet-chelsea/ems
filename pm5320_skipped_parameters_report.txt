@@ -1,0 +1,97 @@
+================================================================================
+PM5320 SKIPPED PARAMETERS ANALYSIS REPORT
+================================================================================
+
+Total parameters in mappings: 298
+Expected collected: 286
+Skipped parameters: 12
+
+================================================================================
+MOST LIKELY SKIPPED PARAMETERS (Top 12 Candidates):
+================================================================================
+
+1. P Peak Demand DateTime
+   Address: 3771, Data Type: FLOAT32
+   Reason: DateTime parameter incorrectly typed as FLOAT32 (should be DATETIME)
+
+2. kvar Peak Demand DateTime
+   Address: 3787, Data Type: FLOAT32
+   Reason: DateTime parameter incorrectly typed as FLOAT32 (should be DATETIME)
+
+3. kva Peak Demand DateTime
+   Address: 3803, Data Type: FLOAT32
+   Reason: DateTime parameter incorrectly typed as FLOAT32 (should be DATETIME)
+
+4. Current Peak Demand DateTime
+   Address: 3883, Data Type: FLOAT32
+   Reason: DateTime parameter incorrectly typed as FLOAT32 (should be DATETIME)
+
+5. Accumulated Energy Reset Date/Time
+   Address: 3199, Data Type: INT32U
+   Reason: DateTime parameter incorrectly typed as INT32U (should be DATETIME)
+
+6-8. UTF8 String Parameters (3 total):
+   - Meter Name (addr: 29)
+   - Meter Model (addr: 49)
+   - Manufacturer (addr: 69)
+   Reason: UTF8 parameters might fail if device returns empty/null strings or 
+           if encoding issues occur during reading
+
+9-12. High-Address Parameters (4 most likely):
+   Based on analysis, these are the highest address parameters that might be 
+   out of device register range or return invalid values:
+   
+   - Max THD Voltage L-N (addr: 27851, type: FLOAT32)
+   - Max Frequency (addr: 28091, type: FLOAT32)
+   - Current C, H7 Magnitude, % (addr: 25239, type: FLOAT32)
+   - Current C, H3 Magnitude, % (addr: 25215, type: FLOAT32)
+   
+   Reason: Very high addresses (>25000) might be out of device register range
+           or might return NaN/Infinity values
+
+================================================================================
+VERIFICATION STEPS:
+================================================================================
+
+To confirm the exact 12 skipped parameters, check:
+
+1. Backend Console Logs:
+   Look for messages like:
+   "INFO: Skipped X parameter(s) that were not available from device"
+   "DEBUG: Skipping {param} (addr: {address}, type: {data_type}) - not available"
+   "DEBUG: Skipping {param} (addr: {address}, type: {data_type}) - NaN/Infinity value"
+
+2. Database Columns:
+   Check the device_* table for PM5320 device and count actual columns vs expected
+
+3. API Response:
+   Call GET /data/:deviceId/latest and count the parameters returned
+
+================================================================================
+RECOMMENDED FIXES:
+================================================================================
+
+1. Fix DateTime Parameters:
+   Change dataType from FLOAT32 to DATETIME for:
+   - P Peak Demand DateTime (addr: 3771)
+   - kvar Peak Demand DateTime (addr: 3787)
+   - kva Peak Demand DateTime (addr: 3803)
+   - Current Peak Demand DateTime (addr: 3883)
+   
+   Change dataType from INT32U to DATETIME for:
+   - Accumulated Energy Reset Date/Time (addr: 3199)
+
+2. Verify UTF8 Parameters:
+   Ensure Meter Name, Meter Model, and Manufacturer are returning valid strings
+   from the device. If empty, they will be skipped.
+
+3. Verify High-Address Parameters:
+   Confirm that addresses >25000 are within the PM5320 device register range.
+   If not, remove them from mappings or adjust addresses.
+
+4. Check for NaN/Infinity:
+   Some parameters might be returning NaN or Infinity values, which are automatically
+   filtered out. Check backend logs for specific parameters.
+
+================================================================================
+

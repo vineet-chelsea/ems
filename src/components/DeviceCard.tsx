@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Wifi, WifiOff, Loader } from "lucide-react";
 import { Device } from "./EnergyDashboard";
+import { getDeviceTypeDisplayName } from "@/utils/deviceUtils";
 
 interface DeviceCardProps {
   device: Device;
@@ -45,7 +46,7 @@ export function DeviceCard({ device, onClick }: DeviceCardProps) {
               {device.name}
             </CardTitle>
             <CardDescription className="flex items-center gap-2">
-              <span>{device.type}</span>
+              <span>{getDeviceTypeDisplayName(device.type)}</span>
               <span>•</span>
               <span>{device.ipAddress}</span>
             </CardDescription>
@@ -61,13 +62,7 @@ export function DeviceCard({ device, onClick }: DeviceCardProps) {
       
       <CardContent className="space-y-4">
         {device.status === 'online' && Object.keys(device.parameters).length > 0 && (
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="space-y-1">
-              <span className="text-muted-foreground">Total Power</span>
-              <div className="font-medium text-lg text-accent">
-                {device.parameters.Ptotal?.toFixed(1) || '0.0'} kW
-              </div>
-            </div>
+          <div className="text-sm">
             <div className="space-y-1">
               <span className="text-muted-foreground">Avg Power Factor</span>
               <div className="font-medium text-lg text-secondary">
@@ -78,7 +73,7 @@ export function DeviceCard({ device, onClick }: DeviceCardProps) {
         )}
         
         <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-3">
-          <span>Last seen: {device.lastSeen.toLocaleTimeString()}</span>
+          <span>Last seen: {new Date(device.lastSeen).toLocaleString()}</span>
           <Activity className="w-3 h-3" />
         </div>
       </CardContent>

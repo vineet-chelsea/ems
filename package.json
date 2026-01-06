@@ -12,7 +12,7 @@
     "build:win": "vite build && electron-builder --win",
     "build:mac": "vite build && electron-builder --mac",
     "build:linux": "vite build && electron-builder --linux",
-    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:8080 && electron .\"",
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "tsc -p tsconfig.electron.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -56,6 +56,8 @@
     "electron-updater": "^6.1.7",
     "embla-carousel-react": "^8.3.0",
     "input-otp": "^1.2.4",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",

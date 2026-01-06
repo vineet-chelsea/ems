@@ -8,9 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { UserPlus, Trash2, Settings, KeyRound } from 'lucide-react';
+import { UserPlus, Trash2, Settings, KeyRound, Code } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminRecoveryDialog } from './AdminRecoveryDialog';
+import { PatchManager } from './PatchManager';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 interface AdminPanelProps {
   devices: Array<{ id: string; name: string }>;

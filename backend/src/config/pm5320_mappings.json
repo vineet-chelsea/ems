@@ -1,0 +1,4273 @@
+[
+  {
+    "parameter": "Meter Name",
+    "address": 29,
+    "dataType": "UTF8",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 30,
+      "registers": [
+        20557,
+        13619,
+        12848,
+        8269,
+        25972,
+        25970
+      ],
+      "format": "hr_block.setValues(30, [20557, 13619, 12848, 8269, 25972, 25970])"
+    }
+  },
+  {
+    "parameter": "Meter Model",
+    "address": 49,
+    "dataType": "UTF8",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 50,
+      "registers": [
+        20557,
+        13619,
+        12848
+      ],
+      "format": "hr_block.setValues(50, [20557, 13619, 12848])"
+    }
+  },
+  {
+    "parameter": "Manufacturer",
+    "address": 69,
+    "dataType": "UTF8",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 70,
+      "registers": [
+        21347,
+        26734,
+        25961,
+        25701,
+        29216,
+        17772,
+        25955,
+        29810,
+        26979
+      ],
+      "format": "hr_block.setValues(70, [21347, 26734, 25961, 25701, 29216, 17772, 25955, 29810, 26979])"
+    }
+  },
+  {
+    "parameter": "Number of Phases",
+    "address": 2013,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 2014,
+      "registers": [
+        3
+      ],
+      "format": "hr_block.setValues(2014, [3])"
+    }
+  },
+  {
+    "parameter": "Number of Wires",
+    "address": 2014,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 2015,
+      "registers": [
+        4
+      ],
+      "format": "hr_block.setValues(2015, [4])"
+    }
+  },
+  {
+    "parameter": "Power System Configuration",
+    "address": 2015,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 2016,
+      "registers": [
+        1
+      ],
+      "format": "hr_block.setValues(2016, [1])"
+    }
+  },
+  {
+    "parameter": "Nominal Frequency",
+    "address": 2016,
+    "dataType": "INT16U",
+    "unit": "Hz",
+    "description": "",
+    "sampleValues": {
+      "address": 2017,
+      "registers": [
+        50
+      ],
+      "format": "hr_block.setValues(2017, [50])"
+    }
+  },
+  {
+    "parameter": "Nominal Voltage",
+    "address": 2017,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 2018,
+      "registers": [
+        17254,
+        0
+      ],
+      "format": "hr_block.setValues(2018, [17254, 0])"
+    }
+  },
+  {
+    "parameter": "Nominal Current",
+    "address": 2019,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 2020,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(2020, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Nominal Power Factor",
+    "address": 2021,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 2022,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(2022, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Normal Phase Rotation",
+    "address": 2023,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 2024,
+      "registers": [
+        1
+      ],
+      "format": "hr_block.setValues(2024, [1])"
+    }
+  },
+  {
+    "parameter": "Active Energy Delivered (Into Load)",
+    "address": 2699,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": "",
+    "sampleValues": {
+      "address": 2700,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2700, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Active Energy Received (Out of Load)",
+    "address": 2701,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": "",
+    "sampleValues": {
+      "address": 2702,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2702, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Active Energy Delivered + Received",
+    "address": 2703,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": "",
+    "sampleValues": {
+      "address": 2704,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2704, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Active Energy Delivered- Received",
+    "address": 2705,
+    "dataType": "FLOAT32",
+    "unit": "kWh",
+    "description": "",
+    "sampleValues": {
+      "address": 2706,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2706, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Energy Delivered",
+    "address": 2707,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": "",
+    "sampleValues": {
+      "address": 2708,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2708, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Energy Received",
+    "address": 2709,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": "",
+    "sampleValues": {
+      "address": 2710,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2710, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Energy Delivered + Received",
+    "address": 2711,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": "",
+    "sampleValues": {
+      "address": 2712,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2712, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Energy Delivered - Received",
+    "address": 2713,
+    "dataType": "FLOAT32",
+    "unit": "kVARh",
+    "description": "",
+    "sampleValues": {
+      "address": 2714,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2714, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Apparent Energy Delivered",
+    "address": 2715,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": "",
+    "sampleValues": {
+      "address": 2716,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2716, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Apparent Energy Received",
+    "address": 2717,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": "",
+    "sampleValues": {
+      "address": 2718,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2718, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Apparent Energy Delivered + Received",
+    "address": 2719,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": "",
+    "sampleValues": {
+      "address": 2720,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2720, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Apparent Energy Delivered - Received",
+    "address": 2721,
+    "dataType": "FLOAT32",
+    "unit": "kVAh",
+    "description": "",
+    "sampleValues": {
+      "address": 2722,
+      "registers": [
+        17948,
+        16384
+      ],
+      "format": "hr_block.setValues(2722, [17948, 16384])"
+    }
+  },
+  {
+    "parameter": "Current A",
+    "address": 2999,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3000,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3000, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current B",
+    "address": 3001,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3002,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3002, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current C",
+    "address": 3003,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3004,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3004, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current N",
+    "address": 3005,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3006,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3006, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current G",
+    "address": 3007,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3008,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3008, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Avg",
+    "address": 3009,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3010,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3010, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Unbalance A",
+    "address": 3011,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3012,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3012, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Unbalance B",
+    "address": 3013,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3014,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3014, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Unbalance C",
+    "address": 3015,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3016,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3016, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Unbalance Worst",
+    "address": 3017,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3018,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3018, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Voltage A-B",
+    "address": 3019,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3020,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3020, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage B-C",
+    "address": 3021,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3022,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3022, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage C-A",
+    "address": 3023,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3024,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3024, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage L-L Avg",
+    "address": 3025,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3026,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3026, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage A-N",
+    "address": 3027,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3028,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3028, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage B-N",
+    "address": 3029,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3030,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3030, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage C-N",
+    "address": 3031,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3032,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3032, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage N-G",
+    "address": 3033,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3034,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3034, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage L-N Avg",
+    "address": 3035,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 3036,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3036, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance A-B",
+    "address": 3037,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3038,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3038, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance B-C",
+    "address": 3039,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3040,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3040, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance C-A",
+    "address": 3041,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3042,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3042, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance L-L Worst",
+    "address": 3043,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3044,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3044, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance A-N",
+    "address": 3045,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3046,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3046, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance B-N",
+    "address": 3047,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3048,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3048, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance C-N",
+    "address": 3049,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3050,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3050, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage Unbalance L-N Worst",
+    "address": 3051,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 3052,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(3052, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Active Power A",
+    "address": 3053,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3054,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3054, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Active Power B",
+    "address": 3055,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3056,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3056, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Active Power C",
+    "address": 3057,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3058,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3058, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Active Power Total",
+    "address": 3059,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3060,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3060, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Power A",
+    "address": 3061,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3062,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3062, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Power B",
+    "address": 3063,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3064,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3064, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Power C",
+    "address": 3065,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3066,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3066, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Reactive Power Total",
+    "address": 3067,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3068,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(3068, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Apparent Power A",
+    "address": 3069,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3070,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(3070, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Apparent Power B",
+    "address": 3071,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3072,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(3072, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Apparent Power C",
+    "address": 3073,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3074,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(3074, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Apparent Power Total",
+    "address": 3075,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3076,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(3076, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Power Factor A",
+    "address": 3077,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3078,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3078, [0])"
+    }
+  },
+  {
+    "parameter": "Power Factor B",
+    "address": 3079,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3080,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3080, [0])"
+    }
+  },
+  {
+    "parameter": "Power Factor C",
+    "address": 3081,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3082,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3082, [0])"
+    }
+  },
+  {
+    "parameter": "Power Factor Total",
+    "address": 3083,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3084,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3084, [0])"
+    }
+  },
+  {
+    "parameter": "Displacement Power Factor A",
+    "address": 3085,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3086,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3086, [0])"
+    }
+  },
+  {
+    "parameter": "Displacement Power Factor B",
+    "address": 3087,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3088,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3088, [0])"
+    }
+  },
+  {
+    "parameter": "Displacement Power Factor C",
+    "address": 3089,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3090,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3090, [0])"
+    }
+  },
+  {
+    "parameter": "Displacement Power Factor Total",
+    "address": 3091,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 3092,
+      "registers": [
+        0
+      ],
+      "format": "hr_block.setValues(3092, [0])"
+    }
+  },
+  {
+    "parameter": "Frequency",
+    "address": 3109,
+    "dataType": "FLOAT32",
+    "unit": "Hz",
+    "description": "",
+    "sampleValues": {
+      "address": 3110,
+      "registers": [
+        16968,
+        0
+      ],
+      "format": "hr_block.setValues(3110, [16968, 0])"
+    }
+  },
+  {
+    "parameter": "Accumulated Energy Reset Date/Time",
+    "address": 3199,
+    "dataType": "DATETIME",
+    "unit": "",
+    "length": 4,
+    "description": "",
+    "sampleValues": {
+      "address": 3199,
+      "registers": [
+        24,
+        303,
+        2590,
+        0
+      ],
+      "format": "hr_block.setValues(3199, [24, 303, 2590, 0])"
+    }
+  },
+  {
+    "parameter": "P Last Demand",
+    "address": 3763,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3764,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3764, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "P Present Demand",
+    "address": 3765,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3766,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3766, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "P Predicted Demand",
+    "address": 3767,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3768,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3768, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "P Peak Demand",
+    "address": 3769,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 3770,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3770, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "P Peak Demand DateTime",
+    "address": 3771,
+    "dataType": "DATETIME",
+    "unit": "",
+    "length": 4,
+    "description": "",
+    "sampleValues": {
+      "address": 3771,
+      "registers": [
+        24,
+        303,
+        2590,
+        0
+      ],
+      "format": "hr_block.setValues(3771, [24, 303, 2590, 0])"
+    }
+  },
+  {
+    "parameter": "kvar Last Demand",
+    "address": 3779,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3780,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3780, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kvar Present Demand",
+    "address": 3781,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3782,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3782, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kvar Predicted Demand",
+    "address": 3783,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3784,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3784, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kvar Peak Demand",
+    "address": 3785,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 3786,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3786, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kvar Peak Demand DateTime",
+    "address": 3787,
+    "dataType": "DATETIME",
+    "unit": "",
+    "length": 4,
+    "description": "",
+    "sampleValues": {
+      "address": 3787,
+      "registers": [
+        24,
+        303,
+        2590,
+        0
+      ],
+      "format": "hr_block.setValues(3787, [24, 303, 2590, 0])"
+    }
+  },
+  {
+    "parameter": "kva Last Demand",
+    "address": 3795,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3796,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3796, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kva Present Demand",
+    "address": 3797,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3798,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3798, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kva Predicted Demand",
+    "address": 3799,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3800,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3800, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kva Peak Demand",
+    "address": 3801,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 3802,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(3802, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "kva Peak Demand DateTime",
+    "address": 3803,
+    "dataType": "DATETIME",
+    "unit": "",
+    "length": 4,
+    "description": "",
+    "sampleValues": {
+      "address": 3803,
+      "registers": [
+        24,
+        303,
+        2590,
+        0
+      ],
+      "format": "hr_block.setValues(3803, [24, 303, 2590, 0])"
+    }
+  },
+  {
+    "parameter": "Current Last Demand",
+    "address": 3875,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3876,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3876, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Present Demand",
+    "address": 3877,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3878,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3878, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Predicted Demand",
+    "address": 3879,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3880,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3880, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Peak Demand",
+    "address": 3881,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 3882,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(3882, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current Peak Demand DateTime",
+    "address": 3883,
+    "dataType": "DATETIME",
+    "unit": "",
+    "length": 4,
+    "description": "",
+    "sampleValues": {
+      "address": 3883,
+      "registers": [
+        24,
+        303,
+        2590,
+        0
+      ],
+      "format": "hr_block.setValues(3883, [24, 303, 2590, 0])"
+    }
+  },
+  {
+    "parameter": "Over Current, Phase",
+    "address": 13522,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13523,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13523, [100])"
+    }
+  },
+  {
+    "parameter": "Under Current, Phase",
+    "address": 13523,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13524,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13524, [100])"
+    }
+  },
+  {
+    "parameter": "Over Current, Neutral",
+    "address": 13524,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13525,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13525, [100])"
+    }
+  },
+  {
+    "parameter": "Over Current, Ground",
+    "address": 13525,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13526,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13526, [100])"
+    }
+  },
+  {
+    "parameter": "Over Voltage, L-L",
+    "address": 13526,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13527,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13527, [100])"
+    }
+  },
+  {
+    "parameter": "Under Voltage, L-L",
+    "address": 13527,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13528,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13528, [100])"
+    }
+  },
+  {
+    "parameter": "Over Voltage, L-N",
+    "address": 13528,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13529,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13529, [100])"
+    }
+  },
+  {
+    "parameter": "Under Voltage, L-N",
+    "address": 13529,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13530,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13530, [100])"
+    }
+  },
+  {
+    "parameter": "Over Power, Active",
+    "address": 13530,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13531,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13531, [100])"
+    }
+  },
+  {
+    "parameter": "Over Power, Reactive",
+    "address": 13531,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13532,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13532, [100])"
+    }
+  },
+  {
+    "parameter": "Over Power, Apparent",
+    "address": 13532,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13533,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13533, [100])"
+    }
+  },
+  {
+    "parameter": "Lead Power Factor, True",
+    "address": 13533,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13534,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13534, [100])"
+    }
+  },
+  {
+    "parameter": "Lag Power Factor, True",
+    "address": 13534,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13535,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13535, [100])"
+    }
+  },
+  {
+    "parameter": "Lead Power Factor, Displacement",
+    "address": 13535,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13536,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13536, [100])"
+    }
+  },
+  {
+    "parameter": "Lag Power Factor, Displacement",
+    "address": 13536,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13537,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13537, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Active Power, Present",
+    "address": 13537,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13538,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13538, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Active Power, Last",
+    "address": 13538,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13539,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13539, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Active Power, Predicted",
+    "address": 13539,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13540,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13540, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Reactive Power, Present",
+    "address": 13540,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13541,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13541, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Reactive Power, Last",
+    "address": 13541,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13542,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13542, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Reactive Power, Predicted",
+    "address": 13542,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13543,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13543, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Apparent Power, Present",
+    "address": 13543,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13544,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13544, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Apparent Power, Last",
+    "address": 13544,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13545,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13545, [100])"
+    }
+  },
+  {
+    "parameter": "Over Demand, Apparent Power, Predicted",
+    "address": 13545,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13546,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13546, [100])"
+    }
+  },
+  {
+    "parameter": "Over Frequency",
+    "address": 13546,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13547,
+      "registers": [
+        50
+      ],
+      "format": "hr_block.setValues(13547, [50])"
+    }
+  },
+  {
+    "parameter": "Under Frequency",
+    "address": 13547,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13548,
+      "registers": [
+        50
+      ],
+      "format": "hr_block.setValues(13548, [50])"
+    }
+  },
+  {
+    "parameter": "Over Voltage Unbalance",
+    "address": 13548,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13549,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13549, [100])"
+    }
+  },
+  {
+    "parameter": "Over Voltage Total Harmonic Distortion",
+    "address": 13549,
+    "dataType": "INT16U",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 13550,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13550, [100])"
+    }
+  },
+  {
+    "parameter": "Phase Loss",
+    "address": 13550,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13551,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13551, [100])"
+    }
+  },
+  {
+    "parameter": "Meter Powerup (Control Power Loss)",
+    "address": 13622,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13623,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13623, [100])"
+    }
+  },
+  {
+    "parameter": "Meter Reset",
+    "address": 13623,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13624,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13624, [100])"
+    }
+  },
+  {
+    "parameter": "Meter Diagnostic",
+    "address": 13624,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13625,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13625, [100])"
+    }
+  },
+  {
+    "parameter": "Phase Reversal",
+    "address": 13625,
+    "dataType": "INT16U",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 13626,
+      "registers": [
+        100
+      ],
+      "format": "hr_block.setValues(13626, [100])"
+    }
+  },
+  {
+    "parameter": "THD Current A",
+    "address": 21299,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21300,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(21300, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "THD Current B",
+    "address": 21301,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21302,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(21302, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "THD Current C",
+    "address": 21303,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21304,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(21304, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "THD Current N",
+    "address": 21305,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21306,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(21306, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "THD Current G",
+    "address": 21307,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21308,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(21308, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Total Demand Distortion",
+    "address": 21319,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21320,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(21320, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "THD Voltage A-B",
+    "address": 21321,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21322,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21322, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage B-C",
+    "address": 21323,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21324,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21324, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage C-A",
+    "address": 21325,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21326,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21326, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage L-L",
+    "address": 21327,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21328,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21328, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage A-N",
+    "address": 21329,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21330,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21330, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage B-N",
+    "address": 21331,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21332,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21332, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage C-N",
+    "address": 21333,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21334,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21334, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage N-G",
+    "address": 21335,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21336,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21336, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "THD Voltage L-N",
+    "address": 21337,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21338,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21338, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage A-B, H5 Magnitude, %",
+    "address": 21735,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21736,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21736, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage A-B, H7 Magnitude, %",
+    "address": 21747,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 21748,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(21748, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage B-C, H5 Magnitude, %",
+    "address": 22123,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 22124,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(22124, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage B-C, H7 Magnitude, %",
+    "address": 22135,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 22136,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(22136, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage C-A, H5 Magnitude, %",
+    "address": 22511,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 22512,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(22512, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage C-A, H7 Magnitude, %",
+    "address": 22523,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 22524,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(22524, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage A-N, H5 Magnitude, %",
+    "address": 22899,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 22900,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(22900, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage A-N, H7 Magnitude, %",
+    "address": 22911,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 22912,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(22912, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage B-N, H5 Magnitude, %",
+    "address": 23287,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 23288,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(23288, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage B-N, H7 Magnitude, %",
+    "address": 23299,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 23300,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(23300, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage C-N, H5 Magnitude, %",
+    "address": 23675,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 23676,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(23676, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Voltage C-N, H7 Magnitude, %",
+    "address": 23687,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 23688,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(23688, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Current A, H3 Magnitude, %",
+    "address": 24439,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 24440,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(24440, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current A, H5 Magnitude, %",
+    "address": 24451,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 24452,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(24452, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current A, H7 Magnitude, %",
+    "address": 24463,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 24464,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(24464, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current B, H3 Magnitude, %",
+    "address": 24827,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 24828,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(24828, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current B, H5 Magnitude, %",
+    "address": 24839,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 24840,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(24840, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current B, H7 Magnitude, %",
+    "address": 24851,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 24852,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(24852, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current C, H3 Magnitude, %",
+    "address": 25215,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 25216,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(25216, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current C, H5 Magnitude, %",
+    "address": 25227,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 25228,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(25228, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Current C, H7 Magnitude, %",
+    "address": 25239,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 25240,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(25240, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current A",
+    "address": 27217,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27218,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27218, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current B",
+    "address": 27219,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27220,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27220, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current C",
+    "address": 27221,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27222,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27222, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current N",
+    "address": 27223,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27224,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27224, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current G",
+    "address": 27225,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27226,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27226, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current Avg",
+    "address": 27227,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27228,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27228, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current Unbalance A",
+    "address": 27229,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27230,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27230, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current Unbalance B",
+    "address": 27231,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27232,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27232, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current Unbalance C",
+    "address": 27233,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27234,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27234, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Current Unbalance Worst",
+    "address": 27235,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27236,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27236, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Voltage A-B",
+    "address": 27237,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27238,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27238, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage B-C",
+    "address": 27239,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27240,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27240, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage C-A",
+    "address": 27241,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27242,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27242, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage L-L Avg",
+    "address": 27243,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27244,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27244, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage A-N",
+    "address": 27245,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27246,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27246, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage B-N",
+    "address": 27247,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27248,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27248, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage C-N",
+    "address": 27249,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27250,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27250, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage N-G",
+    "address": 27251,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27252,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27252, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage L-N Avg",
+    "address": 27253,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27254,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27254, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance A-B",
+    "address": 27255,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27256,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27256, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance B-C",
+    "address": 27257,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27258,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27258, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance C-A",
+    "address": 27259,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27260,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27260, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance L-L Worst",
+    "address": 27261,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27262,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27262, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance A-N",
+    "address": 27263,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27264,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27264, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance B-N",
+    "address": 27265,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27266,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27266, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance C-N",
+    "address": 27267,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27268,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27268, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Voltage Unbalance L-N Worst",
+    "address": 27269,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27270,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27270, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Active Power A",
+    "address": 27271,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27272,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27272, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Active Power B",
+    "address": 27273,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27274,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27274, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Active Power C",
+    "address": 27275,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27276,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27276, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Active Power Total",
+    "address": 27277,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27278,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27278, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Reactive Power A",
+    "address": 27279,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27280,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27280, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Reactive Power B",
+    "address": 27281,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27282,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27282, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Reactive Power C",
+    "address": 27283,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27284,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27284, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Reactive Power Total",
+    "address": 27285,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27286,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27286, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Min Apparent Power A",
+    "address": 27287,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27288,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27288, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Apparent Power B",
+    "address": 27289,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27290,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27290, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Apparent Power C",
+    "address": 27291,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27292,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27292, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Apparent Power Total",
+    "address": 27293,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27294,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27294, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Power Factor A",
+    "address": 27305,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27306,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27306, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min Power Factor B",
+    "address": 27307,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27308,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27308, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min Power Factor C",
+    "address": 27309,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27310,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27310, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min Power Factor Total",
+    "address": 27311,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27312,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27312, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min Displacement Power Factor A",
+    "address": 27313,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27314,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27314, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min Displacement Power Factor B",
+    "address": 27315,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27316,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27316, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min Displacement Power Factor C",
+    "address": 27317,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27318,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27318, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min Displacement PF Total",
+    "address": 27319,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27320,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27320, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Min THD Current A",
+    "address": 27337,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27338,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27338, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min THD Current B",
+    "address": 27339,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27340,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27340, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min THD Current C",
+    "address": 27341,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27342,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27342, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min THD Current N",
+    "address": 27343,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27344,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27344, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min THD Current G",
+    "address": 27345,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27346,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27346, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Min Total Demand Distortion",
+    "address": 27357,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27358,
+      "registers": [
+        17402,
+        0
+      ],
+      "format": "hr_block.setValues(27358, [17402, 0])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage A-B",
+    "address": 27359,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27360,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27360, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage B-C",
+    "address": 27361,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27362,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27362, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage C-A",
+    "address": 27363,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27364,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27364, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage L-L Avg",
+    "address": 27365,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27366,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27366, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage A-N",
+    "address": 27367,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27368,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27368, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage B-N",
+    "address": 27369,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27370,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27370, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage C-N",
+    "address": 27371,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27372,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27372, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage N-G",
+    "address": 27373,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27374,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27374, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min THD Voltage L-N Avg",
+    "address": 27375,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27376,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27376, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Min Frequency",
+    "address": 27615,
+    "dataType": "FLOAT32",
+    "unit": "Hz",
+    "description": "",
+    "sampleValues": {
+      "address": 27616,
+      "registers": [
+        16968,
+        0
+      ],
+      "format": "hr_block.setValues(27616, [16968, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current A",
+    "address": 27693,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27694,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27694, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current B",
+    "address": 27695,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27696,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27696, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current C",
+    "address": 27697,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27698,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27698, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current N",
+    "address": 27699,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27700,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27700, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current G",
+    "address": 27701,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27702,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27702, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current Avg",
+    "address": 27703,
+    "dataType": "FLOAT32",
+    "unit": "A",
+    "description": "",
+    "sampleValues": {
+      "address": 27704,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27704, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current Unbalance A",
+    "address": 27705,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27706,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27706, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current Unbalance B",
+    "address": 27707,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27708,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27708, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current Unbalance C",
+    "address": 27709,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27710,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27710, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Current Unbalance Worst",
+    "address": 27711,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27712,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27712, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max Voltage A-B",
+    "address": 27713,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27714,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27714, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage B-C",
+    "address": 27715,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27716,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27716, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage C-A",
+    "address": 27717,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27718,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27718, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage L-L Avg",
+    "address": 27719,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27720,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27720, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage A-N",
+    "address": 27721,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27722,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27722, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage B-N",
+    "address": 27723,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27724,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27724, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage C-N",
+    "address": 27725,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27726,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27726, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage, N-G",
+    "address": 27727,
+    "dataType": "FLOAT32",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27728,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27728, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage L-N Avg",
+    "address": 27729,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27730,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27730, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance A-B",
+    "address": 27731,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27732,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27732, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance B-C",
+    "address": 27733,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27734,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27734, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance C-A",
+    "address": 27735,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27736,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27736, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance L-L Worst",
+    "address": 27737,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27738,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27738, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance A-N",
+    "address": 27739,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27740,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27740, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance B-N",
+    "address": 27741,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27742,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27742, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance C-N",
+    "address": 27743,
+    "dataType": "FLOAT32",
+    "unit": "V",
+    "description": "",
+    "sampleValues": {
+      "address": 27744,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27744, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Voltage Unbalance L-N Worst",
+    "address": 27745,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27746,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27746, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Active Power A",
+    "address": 27747,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27748,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27748, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Active Power B",
+    "address": 27749,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27750,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27750, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Active Power C",
+    "address": 27751,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27752,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27752, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Active Power Total",
+    "address": 27753,
+    "dataType": "FLOAT32",
+    "unit": "kW",
+    "description": "",
+    "sampleValues": {
+      "address": 27754,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27754, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Reactive Power A",
+    "address": 27755,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27756,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27756, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Reactive Power B",
+    "address": 27757,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27758,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27758, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Reactive Power C",
+    "address": 27759,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27760,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27760, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Reactive Power Total",
+    "address": 27761,
+    "dataType": "FLOAT32",
+    "unit": "kVAR",
+    "description": "",
+    "sampleValues": {
+      "address": 27762,
+      "registers": [
+        17692,
+        16384
+      ],
+      "format": "hr_block.setValues(27762, [17692, 16384])"
+    }
+  },
+  {
+    "parameter": "Max Apparent Power A",
+    "address": 27763,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27764,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27764, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Apparent Power B",
+    "address": 27765,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27766,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27766, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Apparent Power C",
+    "address": 27767,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27768,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27768, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Apparent Power Total",
+    "address": 27769,
+    "dataType": "FLOAT32",
+    "unit": "kVA",
+    "description": "",
+    "sampleValues": {
+      "address": 27770,
+      "registers": [
+        17723,
+        32768
+      ],
+      "format": "hr_block.setValues(27770, [17723, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Power Factor A",
+    "address": 27781,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27782,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27782, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max Power Factor B",
+    "address": 27783,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27784,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27784, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max Power Factor C",
+    "address": 27785,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27786,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27786, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max Power Factor Total",
+    "address": 27787,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27788,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27788, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max Displacement Power Factor A",
+    "address": 27789,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27790,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27790, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max Displacement Power Factor B",
+    "address": 27791,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27792,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27792, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max Displacement Power Factor C",
+    "address": 27793,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27794,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27794, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max Displacement PF Total",
+    "address": 27795,
+    "dataType": "4Q_FP_PF",
+    "unit": "",
+    "description": "",
+    "sampleValues": {
+      "address": 27796,
+      "registers": [
+        16243,
+        13107
+      ],
+      "format": "hr_block.setValues(27796, [16243, 13107])"
+    }
+  },
+  {
+    "parameter": "Max THD Current A",
+    "address": 27813,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27814,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27814, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max THD Current B",
+    "address": 27815,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27816,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27816, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max THD Current C",
+    "address": 27817,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27818,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27818, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max THD Current N",
+    "address": 27819,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27820,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27820, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max THD Current G",
+    "address": 27821,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27822,
+      "registers": [
+        16680,
+        0
+      ],
+      "format": "hr_block.setValues(27822, [16680, 0])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage A-B",
+    "address": 27835,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27836,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27836, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage B-C",
+    "address": 27837,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27838,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27838, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage C-A",
+    "address": 27839,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27840,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27840, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage L-L",
+    "address": 27841,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27842,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27842, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage A-N",
+    "address": 27843,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27844,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27844, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage B-N",
+    "address": 27845,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27846,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27846, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage C-N",
+    "address": 27847,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27848,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27848, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage N-G",
+    "address": 27849,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27850,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27850, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max THD Voltage L-N",
+    "address": 27851,
+    "dataType": "FLOAT32",
+    "unit": "%",
+    "description": "",
+    "sampleValues": {
+      "address": 27852,
+      "registers": [
+        17244,
+        32768
+      ],
+      "format": "hr_block.setValues(27852, [17244, 32768])"
+    }
+  },
+  {
+    "parameter": "Max Frequency",
+    "address": 28091,
+    "dataType": "FLOAT32",
+    "unit": "Hz",
+    "description": "",
+    "sampleValues": {
+      "address": 28092,
+      "registers": [
+        16968,
+        0
+      ],
+      "format": "hr_block.setValues(28092, [16968, 0])"
+    }
+  }
+]

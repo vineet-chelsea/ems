@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,19 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Wifi, WifiOff, Loader, CheckCircle, XCircle, Upload, Download, FileSpreadsheet, X } from "lucide-react";
+import { Wifi, WifiOff, Loader, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/services/api";
-import { 
-  generateParameterMappingTemplate, 
-  parseParameterMappingFile, 
-  validateParameterMapping,
-  ParameterMappingRow,
-  mappingsToObject
-} from "@/utils/excelUtils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface AddDeviceDialogProps {
   open: boolean;
@@ -34,6 +24,8 @@ interface AddDeviceDialogProps {
     ipAddress: string; 
     subnetMask: string; 
     slaveAddress: number;
+    breakerRating?: number;
+    unitCost?: number;
     type: string;
     parameterMappings?: Record<string, string>;
   }) => void;
@@ -45,14 +37,20 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
     type: "PM5320",
     ipAddress: "192.168.0.5",
     subnetMask: "255.255.255.0",
-    slaveAddress: 1
+    slaveAddress: 1,
+    breakerRating: 0,
+    unitCost: 0,
+    // Micrologic 6E protection settings
+    protectionIr: undefined as number | undefined,
+    protectionTr: undefined as number | undefined,
+    protectionIsd: undefined as number | undefined,
+    protectionTsd: undefined as number | undefined,
+    protectionIi: undefined as number | undefined,
+    protectionIg: undefined as string | undefined,
+    protectionTg: undefined as number | undefined,
   });
   const [pingStatus, setPingStatus] = useState<'idle' | 'testing' | 'success' | 'failed'>('idle');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [excelFile, setExcelFile] = useState<File | null>(null);
-  const [parameterMappings, setParameterMappings] = useState<ParameterMappingRow[]>([]);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePingTest = async () => {
     if (!formData.ipAddress) {
@@ -83,62 +81,6 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
     }
   };
 
-  const handleDownloadTemplate = () => {
-    try {
-      generateParameterMappingTemplate(formData.type);
-      toast.success('Template downloaded successfully');
-    } catch (error) {
-      console.error('Error generating template:', error);
-      toast.error('Failed to generate template');
-    }
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-      setUploadError('Please upload an Excel file (.xlsx or .xls)');
-      return;
-    }
-
-    setExcelFile(file);
-    setUploadError(null);
-
-    try {
-      const mappings = await parseParameterMappingFile(file);
-      
-      // Validate all mappings
-      const validationResults = mappings.map(validateParameterMapping);
-      const invalidMappings = validationResults.filter(r => !r.valid);
-      
-      if (invalidMappings.length > 0) {
-        const errors = invalidMappings.flatMap((r, i) => 
-          r.errors.map(e => `Row ${i + 2}: ${e}`)
-        );
-        setUploadError(`Validation errors:\n${errors.join('\n')}`);
-        setParameterMappings([]);
-        return;
-      }
-
-      setParameterMappings(mappings);
-      toast.success(`Successfully parsed ${mappings.length} parameter mapping(s)`);
-    } catch (error: any) {
-      console.error('Error parsing file:', error);
-      setUploadError(error.message || 'Failed to parse Excel file');
-      setParameterMappings([]);
-    }
-  };
-
-  const handleRemoveFile = () => {
-    setExcelFile(null);
-    setParameterMappings([]);
-    setUploadError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.ipAddress) {
@@ -149,17 +91,24 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
     setIsSubmitting(true);
     
     try {
-      const parameterMappingsObj = parameterMappings.length > 0 
-        ? mappingsToObject(parameterMappings)
-        : undefined;
-
       onAddDevice({
         name: formData.name,
         ipAddress: formData.ipAddress,
         subnetMask: "255.255.255.0",
         slaveAddress: formData.slaveAddress ?? 1,
+        breakerRating: formData.breakerRating || undefined,
+        unitCost: formData.unitCost || undefined,
         type: formData.type,
-        parameterMappings: parameterMappingsObj,
+        // Micrologic 6E protection settings (only include if type is MICROLOGIC_6E)
+        ...(formData.type === 'MICROLOGIC_6E' ? {
+          protectionIr: formData.protectionIr,
+          protectionTr: formData.protectionTr,
+          protectionIsd: formData.protectionIsd,
+          protectionTsd: formData.protectionTsd,
+          protectionIi: formData.protectionIi,
+          protectionIg: formData.protectionIg,
+          protectionTg: formData.protectionTg,
+        } : {}),
       });
 
       // Reset form
@@ -168,15 +117,18 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
         type: "PM5320", 
         ipAddress: "192.168.0.5",
         subnetMask: "255.255.255.0",
-        slaveAddress: 1
+        slaveAddress: 1,
+        breakerRating: 0,
+        unitCost: 0,
+        protectionIr: undefined,
+        protectionTr: undefined,
+        protectionIsd: undefined,
+        protectionTsd: undefined,
+        protectionIi: undefined,
+        protectionIg: undefined,
+        protectionTg: undefined,
       });
       setPingStatus('idle');
-      setParameterMappings([]);
-      setExcelFile(null);
-      setUploadError(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
       setIsSubmitting(false);
       onOpenChange(false);
     } catch (error: any) {
@@ -220,7 +172,7 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
             Add New Device
           </DialogTitle>
           <DialogDescription>
-            Configure a new energy monitoring device. Optionally upload parameter/register mappings.
+            Configure a new energy monitoring device.
           </DialogDescription>
         </DialogHeader>
 
@@ -233,10 +185,10 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
                 <SelectValue placeholder="Select device type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="PM5320">PM5320 Power Meter</SelectItem>
-                <SelectItem value="PM5330">PM5330 Power Meter</SelectItem>
-                <SelectItem value="PM5350">PM5350 Power Meter</SelectItem>
-                <SelectItem value="Custom">Custom Device</SelectItem>
+                <SelectItem value="PM5320">PM513x,PM532x,PM53xx Power Meter</SelectItem>
+                <SelectItem value="PM8000">PM8000 Power Meter</SelectItem>
+                <SelectItem value="MICROLOGIC_6E">Micrologic 6E</SelectItem>
+                <SelectItem value="EM6400">EM6400</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -295,6 +247,209 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
             </p>
           </div>
 
+          {/* Breaker Rating + Unit Cost */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="breaker-rating">Breaker Rating (A)</Label>
+              <Input
+                id="breaker-rating"
+                type="number"
+                min="0"
+                placeholder="e.g., 100"
+                value={formData.breakerRating}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value) || 0;
+                  setFormData(prev => ({ ...prev, breakerRating: Math.max(0, value) }));
+                }}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="unit-cost">Unit Cost (Rs/kWh)</Label>
+              <Input
+                id="unit-cost"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="e.g., 9.50"
+                value={formData.unitCost}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  setFormData(prev => ({ ...prev, unitCost: isNaN(value) ? 0 : Math.max(0, value) }));
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Micrologic 6E Protection Settings */}
+          {formData.type === 'MICROLOGIC_6E' && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+              <Label className="text-base font-semibold">Protection Settings</Label>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Ir (Long Time Overload) */}
+                <div className="space-y-2">
+                  <Label htmlFor="protection-ir">Ir (Long Time Overload)</Label>
+                  <Input
+                    id="protection-ir"
+                    type="number"
+                    min="0.1"
+                    max="1.0"
+                    step="0.1"
+                    placeholder="0.1 - 1.0"
+                    value={formData.protectionIr ?? ''}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value) && value >= 0.1 && value <= 1.0) {
+                        setFormData(prev => ({ ...prev, protectionIr: value }));
+                      } else if (e.target.value === '') {
+                        setFormData(prev => ({ ...prev, protectionIr: undefined }));
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* tr (Long time overload duration) */}
+                <div className="space-y-2">
+                  <Label htmlFor="protection-tr">tr (Long Time Overload Duration) (s)</Label>
+                  <Input
+                    id="protection-tr"
+                    type="number"
+                    min="0.5"
+                    max="25.0"
+                    step="0.1"
+                    placeholder="0.5 - 25.0"
+                    value={formData.protectionTr ?? ''}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value) && value >= 0.5 && value <= 25.0) {
+                        setFormData(prev => ({ ...prev, protectionTr: value }));
+                      } else if (e.target.value === '') {
+                        setFormData(prev => ({ ...prev, protectionTr: undefined }));
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Isd (Short Time) */}
+                <div className="space-y-2">
+                  <Label htmlFor="protection-isd">Isd (Short Time)</Label>
+                  <Input
+                    id="protection-isd"
+                    type="number"
+                    min="1.0"
+                    max="10.0"
+                    step="0.5"
+                    placeholder="1.0 - 10.0"
+                    value={formData.protectionIsd ?? ''}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value) && value >= 1.0 && value <= 10.0) {
+                        setFormData(prev => ({ ...prev, protectionIsd: value }));
+                      } else if (e.target.value === '') {
+                        setFormData(prev => ({ ...prev, protectionIsd: undefined }));
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* tsd */}
+                <div className="space-y-2">
+                  <Label htmlFor="protection-tsd">tsd (s)</Label>
+                  <Input
+                    id="protection-tsd"
+                    type="number"
+                    min="0.1"
+                    max="0.4"
+                    step="0.1"
+                    placeholder="0.1 - 0.4"
+                    value={formData.protectionTsd ?? ''}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value) && value >= 0.1 && value <= 0.4) {
+                        setFormData(prev => ({ ...prev, protectionTsd: value }));
+                      } else if (e.target.value === '') {
+                        setFormData(prev => ({ ...prev, protectionTsd: undefined }));
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Ii (Instantaneous) */}
+                <div className="space-y-2">
+                  <Label htmlFor="protection-ii">Ii (Instantaneous)</Label>
+                  <Input
+                    id="protection-ii"
+                    type="number"
+                    min="2.0"
+                    max="10.0"
+                    step="0.1"
+                    placeholder="2.0 - 10.0"
+                    value={formData.protectionIi ?? ''}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value) && value >= 2.0 && value <= 10.0) {
+                        setFormData(prev => ({ ...prev, protectionIi: value }));
+                      } else if (e.target.value === '') {
+                        setFormData(prev => ({ ...prev, protectionIi: undefined }));
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Ig */}
+                <div className="space-y-2">
+                  <Label htmlFor="protection-ig">Ig</Label>
+                  <Select
+                    value={formData.protectionIg ?? undefined}
+                    onValueChange={(value) => {
+                      // Use "none" as a special value to represent undefined
+                      if (value === 'none') {
+                        setFormData(prev => ({ ...prev, protectionIg: undefined }));
+                      } else {
+                        setFormData(prev => ({ ...prev, protectionIg: value as 'A' | 'B' | 'C' | 'D' | 'E' | 'F' }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="protection-ig">
+                      <SelectValue placeholder="Select Ig" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="A">A</SelectItem>
+                      <SelectItem value="B">B</SelectItem>
+                      <SelectItem value="C">C</SelectItem>
+                      <SelectItem value="D">D</SelectItem>
+                      <SelectItem value="E">E</SelectItem>
+                      <SelectItem value="F">F</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* tg(s) */}
+                <div className="space-y-2">
+                  <Label htmlFor="protection-tg">tg(s)</Label>
+                  <Input
+                    id="protection-tg"
+                    type="number"
+                    min="0.1"
+                    max="0.4"
+                    step="0.1"
+                    placeholder="0.1 - 0.4"
+                    value={formData.protectionTg ?? ''}
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (!isNaN(value) && value >= 0.1 && value <= 0.4) {
+                        setFormData(prev => ({ ...prev, protectionTg: value }));
+                      } else if (e.target.value === '') {
+                        setFormData(prev => ({ ...prev, protectionTg: undefined }));
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Connection Test */}
           <div className="space-y-3 p-4 border rounded-lg bg-muted/50">
             <div className="flex items-center justify-between">
@@ -329,107 +484,11 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
             </Button>
           </div>
 
-          {/* Parameter Mapping Upload Section */}
-          <div className="space-y-4 p-4 border rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="text-base font-semibold">Parameter/Register Mapping (Optional)</Label>
-                <p className="text-sm text-muted-foreground">
-                  Upload an Excel file to map parameters to register addresses
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownloadTemplate}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Template
-              </Button>
-            </div>
-
-            {/* File Upload */}
-            {!excelFile ? (
-              <div className="space-y-2">
-                <Input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleFileUpload}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Upload Excel file with Parameter and Address columns
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-2 border rounded bg-muted/50">
-                  <div className="flex items-center gap-2">
-                    <FileSpreadsheet className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium">{excelFile.name}</span>
-                    <Badge variant="secondary">{parameterMappings.length} mappings</Badge>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemoveFile}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Error Display */}
-            {uploadError && (
-              <Alert variant="destructive">
-                <AlertDescription className="whitespace-pre-wrap text-sm">{uploadError}</AlertDescription>
-              </Alert>
-            )}
-
-            {/* Parameter Mappings Preview */}
-            {parameterMappings.length > 0 && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm">Parameter Mappings Preview</CardTitle>
-                  <CardDescription>
-                    {parameterMappings.length} parameter(s) mapped
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="max-h-48 overflow-y-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Parameter</TableHead>
-                          <TableHead>Register Address</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {parameterMappings.map((mapping, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="font-medium">{mapping.parameter}</TableCell>
-                            <TableCell className="text-muted-foreground">{mapping.address}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => {
             onOpenChange(false);
-            setParameterMappings([]);
-            setExcelFile(null);
-            setUploadError(null);
-            if (fileInputRef.current) {
-              fileInputRef.current.value = '';
-            }
           }}>
             Cancel
           </Button>

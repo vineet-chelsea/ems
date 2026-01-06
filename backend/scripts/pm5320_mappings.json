@@ -1,0 +1,1790 @@
+[
+  {
+    "parameter": "Meter Name",
+    "address": 29,
+    "dataType": "UTF8",
+    "description": ""
+  },
+  {
+    "parameter": "Meter Model",
+    "address": 49,
+    "dataType": "UTF8",
+    "description": ""
+  },
+  {
+    "parameter": "Manufacturer",
+    "address": 69,
+    "dataType": "UTF8",
+    "description": ""
+  },
+  {
+    "parameter": "Number of Phases",
+    "address": 2013,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Number of Wires",
+    "address": 2014,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Power System Configuration",
+    "address": 2015,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Nominal Frequency",
+    "address": 2016,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Nominal Voltage",
+    "address": 2017,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Nominal Current",
+    "address": 2019,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Nominal Power Factor",
+    "address": 2021,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Normal Phase Rotation",
+    "address": 2023,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered (Into Load)",
+    "address": 2699,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Received (Out of Load)",
+    "address": 2701,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered + Received",
+    "address": 2703,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered- Received",
+    "address": 2705,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered",
+    "address": 2707,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Received",
+    "address": 2709,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered + Received",
+    "address": 2711,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered - Received",
+    "address": 2713,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered",
+    "address": 2715,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Received",
+    "address": 2717,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered + Received",
+    "address": 2719,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered - Received",
+    "address": 2721,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current A",
+    "address": 2999,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current B",
+    "address": 3001,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current C",
+    "address": 3003,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current N",
+    "address": 3005,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current G",
+    "address": 3007,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Avg",
+    "address": 3009,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Unbalance A",
+    "address": 3011,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Unbalance B",
+    "address": 3013,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Unbalance C",
+    "address": 3015,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Unbalance Worst",
+    "address": 3017,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-B",
+    "address": 3019,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-C",
+    "address": 3021,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-A",
+    "address": 3023,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage L-L Avg",
+    "address": 3025,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N",
+    "address": 3027,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N",
+    "address": 3029,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N",
+    "address": 3031,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage N-G",
+    "address": 3033,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage L-N Avg",
+    "address": 3035,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance A-B",
+    "address": 3037,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance B-C",
+    "address": 3039,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance C-A",
+    "address": 3041,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance L-L Worst",
+    "address": 3043,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance A-N",
+    "address": 3045,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance B-N",
+    "address": 3047,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance C-N",
+    "address": 3049,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage Unbalance L-N Worst",
+    "address": 3051,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power A",
+    "address": 3053,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power B",
+    "address": 3055,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power C",
+    "address": 3057,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Active Power Total",
+    "address": 3059,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power A",
+    "address": 3061,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power B",
+    "address": 3063,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power C",
+    "address": 3065,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Power Total",
+    "address": 3067,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power A",
+    "address": 3069,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power B",
+    "address": 3071,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power C",
+    "address": 3073,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Power Total",
+    "address": 3075,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor A",
+    "address": 3077,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor B",
+    "address": 3079,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor C",
+    "address": 3081,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Power Factor Total",
+    "address": 3083,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor A",
+    "address": 3085,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor B",
+    "address": 3087,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor C",
+    "address": 3089,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Displacement Power Factor Total",
+    "address": 3091,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Frequency",
+    "address": 3109,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Accumulated Energy Reset Date/Time",
+    "address": 3199,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered (Into Load)",
+    "address": 3203,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Received (Out of Load)",
+    "address": 3207,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered + Received",
+    "address": 3211,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Active Energy Delivered- Received",
+    "address": 3215,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered",
+    "address": 3219,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Received",
+    "address": 3223,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered + Received",
+    "address": 3227,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Reactive Energy Delivered - Received",
+    "address": 3231,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered",
+    "address": 3235,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Received",
+    "address": 3239,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered + Received",
+    "address": 3243,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "Apparent Energy Delivered - Received",
+    "address": 3247,
+    "dataType": "INT32U",
+    "description": ""
+  },
+  {
+    "parameter": "P Last Demand",
+    "address": 3763,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "P Present Demand",
+    "address": 3765,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "P Predicted Demand",
+    "address": 3767,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "P Peak Demand",
+    "address": 3769,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "P Peak Demand DateTime",
+    "address": 3771,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kvar Last Demand",
+    "address": 3779,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kvar Present Demand",
+    "address": 3781,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kvar Predicted Demand",
+    "address": 3783,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kvar Peak Demand",
+    "address": 3785,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kvar Peak Demand DateTime",
+    "address": 3787,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kva Last Demand",
+    "address": 3795,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kva Present Demand",
+    "address": 3797,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kva Predicted Demand",
+    "address": 3799,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kva Peak Demand",
+    "address": 3801,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "kva Peak Demand DateTime",
+    "address": 3803,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Last Demand",
+    "address": 3875,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Present Demand",
+    "address": 3877,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Predicted Demand",
+    "address": 3879,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Peak Demand",
+    "address": 3881,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current Peak Demand DateTime",
+    "address": 3883,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Over Current, Phase",
+    "address": 13522,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Under Current, Phase",
+    "address": 13523,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Current, Neutral",
+    "address": 13524,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Current, Ground",
+    "address": 13525,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Voltage, L-L",
+    "address": 13526,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Under Voltage, L-L",
+    "address": 13527,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Voltage, L-N",
+    "address": 13528,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Under Voltage, L-N",
+    "address": 13529,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Power, Active",
+    "address": 13530,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Power, Reactive",
+    "address": 13531,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Power, Apparent",
+    "address": 13532,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Lead Power Factor, True",
+    "address": 13533,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Lag Power Factor, True",
+    "address": 13534,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Lead Power Factor, Displacement",
+    "address": 13535,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Lag Power Factor, Displacement",
+    "address": 13536,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Active Power, Present",
+    "address": 13537,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Active Power, Last",
+    "address": 13538,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Active Power, Predicted",
+    "address": 13539,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Reactive Power, Present",
+    "address": 13540,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Reactive Power, Last",
+    "address": 13541,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Reactive Power, Predicted",
+    "address": 13542,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Apparent Power, Present",
+    "address": 13543,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Apparent Power, Last",
+    "address": 13544,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Demand, Apparent Power, Predicted",
+    "address": 13545,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Frequency",
+    "address": 13546,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Under Frequency",
+    "address": 13547,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Voltage Unbalance",
+    "address": 13548,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Over Voltage Total Harmonic Distortion",
+    "address": 13549,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Phase Loss",
+    "address": 13550,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Meter Powerup (Control Power Loss)",
+    "address": 13622,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Meter Reset",
+    "address": 13623,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Meter Diagnostic",
+    "address": 13624,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "Phase Reversal",
+    "address": 13625,
+    "dataType": "INT16U",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current A",
+    "address": 21299,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current B",
+    "address": 21301,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current C",
+    "address": 21303,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current N",
+    "address": 21305,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Current G",
+    "address": 21307,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Total Demand Distortion",
+    "address": 21319,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage A-B",
+    "address": 21321,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage B-C",
+    "address": 21323,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage C-A",
+    "address": 21325,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage L-L",
+    "address": 21327,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage A-N",
+    "address": 21329,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage B-N",
+    "address": 21331,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage C-N",
+    "address": 21333,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage N-G",
+    "address": 21335,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "THD Voltage L-N",
+    "address": 21337,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-B, H5 Magnitude, %",
+    "address": 21735,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-B, H7 Magnitude, %",
+    "address": 21747,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-C, H5 Magnitude, %",
+    "address": 22123,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-C, H7 Magnitude, %",
+    "address": 22135,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-A, H5 Magnitude, %",
+    "address": 22511,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-A, H7 Magnitude, %",
+    "address": 22523,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H5 Magnitude, %",
+    "address": 22899,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage A-N, H7 Magnitude, %",
+    "address": 22911,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H5 Magnitude, %",
+    "address": 23287,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage B-N, H7 Magnitude, %",
+    "address": 23299,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H5 Magnitude, %",
+    "address": 23675,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Voltage C-N, H7 Magnitude, %",
+    "address": 23687,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H3 Magnitude, %",
+    "address": 24439,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H5 Magnitude, %",
+    "address": 24451,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current A, H7 Magnitude, %",
+    "address": 24463,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H3 Magnitude, %",
+    "address": 24827,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H5 Magnitude, %",
+    "address": 24839,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current B, H7 Magnitude, %",
+    "address": 24851,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H3 Magnitude, %",
+    "address": 25215,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H5 Magnitude, %",
+    "address": 25227,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Current C, H7 Magnitude, %",
+    "address": 25239,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current A",
+    "address": 27217,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current B",
+    "address": 27219,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current C",
+    "address": 27221,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current N",
+    "address": 27223,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current G",
+    "address": 27225,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current Avg",
+    "address": 27227,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current Unbalance A",
+    "address": 27229,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current Unbalance B",
+    "address": 27231,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current Unbalance C",
+    "address": 27233,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Current Unbalance Worst",
+    "address": 27235,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage A-B",
+    "address": 27237,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage B-C",
+    "address": 27239,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage C-A",
+    "address": 27241,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage L-L Avg",
+    "address": 27243,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage A-N",
+    "address": 27245,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage B-N",
+    "address": 27247,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage C-N",
+    "address": 27249,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage N-G",
+    "address": 27251,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage L-N Avg",
+    "address": 27253,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance A-B",
+    "address": 27255,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance B-C",
+    "address": 27257,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance C-A",
+    "address": 27259,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance L-L Worst",
+    "address": 27261,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance A-N",
+    "address": 27263,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance B-N",
+    "address": 27265,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance C-N",
+    "address": 27267,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Voltage Unbalance L-N Worst",
+    "address": 27269,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Active Power A",
+    "address": 27271,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Active Power B",
+    "address": 27273,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Active Power C",
+    "address": 27275,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Active Power Total",
+    "address": 27277,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Reactive Power A",
+    "address": 27279,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Reactive Power B",
+    "address": 27281,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Reactive Power C",
+    "address": 27283,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Reactive Power Total",
+    "address": 27285,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Apparent Power A",
+    "address": 27287,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Apparent Power B",
+    "address": 27289,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Apparent Power C",
+    "address": 27291,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Apparent Power Total",
+    "address": 27293,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Power Factor A",
+    "address": 27305,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min Power Factor B",
+    "address": 27307,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min Power Factor C",
+    "address": 27309,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min Power Factor Total",
+    "address": 27311,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min Displacement Power Factor A",
+    "address": 27313,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min Displacement Power Factor B",
+    "address": 27315,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min Displacement Power Factor C",
+    "address": 27317,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min Displacement PF Total",
+    "address": 27319,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD\u00a0Current A",
+    "address": 27337,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD\u00a0Current B",
+    "address": 27339,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Current C",
+    "address": 27341,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Current N",
+    "address": 27343,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Current G",
+    "address": 27345,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Total Demand Distortion",
+    "address": 27357,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage A-B",
+    "address": 27359,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage B-C",
+    "address": 27361,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage C-A",
+    "address": 27363,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage L-L Avg",
+    "address": 27365,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage A-N",
+    "address": 27367,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD\u00a0Voltage B-N",
+    "address": 27369,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD\u00a0Voltage C-N",
+    "address": 27371,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage N-G",
+    "address": 27373,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min THD Voltage L-N Avg",
+    "address": 27375,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Min Frequency",
+    "address": 27615,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current A",
+    "address": 27693,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current B",
+    "address": 27695,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current C",
+    "address": 27697,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current N",
+    "address": 27699,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current G",
+    "address": 27701,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current Avg",
+    "address": 27703,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current Unbalance A",
+    "address": 27705,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current Unbalance B",
+    "address": 27707,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current Unbalance C",
+    "address": 27709,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Current Unbalance Worst",
+    "address": 27711,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage A-B",
+    "address": 27713,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage B-C",
+    "address": 27715,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage C-A",
+    "address": 27717,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage L-L Avg",
+    "address": 27719,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage A-N",
+    "address": 27721,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage B-N",
+    "address": 27723,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage C-N",
+    "address": 27725,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage, N-G",
+    "address": 27727,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage L-N Avg",
+    "address": 27729,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance A-B",
+    "address": 27731,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance B-C",
+    "address": 27733,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance C-A",
+    "address": 27735,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance L-L Worst",
+    "address": 27737,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance A-N",
+    "address": 27739,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance B-N",
+    "address": 27741,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance C-N",
+    "address": 27743,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Voltage Unbalance L-N Worst",
+    "address": 27745,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Active Power A",
+    "address": 27747,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Active Power B",
+    "address": 27749,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Active Power C",
+    "address": 27751,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Active Power Total",
+    "address": 27753,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Reactive Power A",
+    "address": 27755,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Reactive Power B",
+    "address": 27757,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Reactive Power C",
+    "address": 27759,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Reactive Power Total",
+    "address": 27761,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Apparent Power A",
+    "address": 27763,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Apparent Power B",
+    "address": 27765,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Apparent Power C",
+    "address": 27767,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Apparent Power Total",
+    "address": 27769,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Power Factor A",
+    "address": 27781,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max Power Factor B",
+    "address": 27783,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max Power Factor C",
+    "address": 27785,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max Power Factor Total",
+    "address": 27787,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max Displacement Power Factor A",
+    "address": 27789,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max Displacement Power Factor B",
+    "address": 27791,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max Displacement Power Factor C",
+    "address": 27793,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max Displacement PF Total",
+    "address": 27795,
+    "dataType": "4Q_FP_PF",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Current A",
+    "address": 27813,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Current B",
+    "address": 27815,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Current C",
+    "address": 27817,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Current N",
+    "address": 27819,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Current G",
+    "address": 27821,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage A-B",
+    "address": 27835,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage B-C",
+    "address": 27837,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage C-A",
+    "address": 27839,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage L-L",
+    "address": 27841,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage A-N",
+    "address": 27843,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage B-N",
+    "address": 27845,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage C-N",
+    "address": 27847,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage N-G",
+    "address": 27849,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max THD Voltage L-N",
+    "address": 27851,
+    "dataType": "FLOAT32",
+    "description": ""
+  },
+  {
+    "parameter": "Max Frequency",
+    "address": 28091,
+    "dataType": "FLOAT32",
+    "description": ""
+  }
+]

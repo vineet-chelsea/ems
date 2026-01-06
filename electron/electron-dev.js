@@ -24,7 +24,7 @@ function createWindow() {
   });
 
   // Load from Vite dev server
-  mainWindow.loadURL('http://localhost:8080');
+  mainWindow.loadURL('http://localhost:5173');
   mainWindow.webContents.openDevTools();
 
   mainWindow.once('ready-to-show', () => {

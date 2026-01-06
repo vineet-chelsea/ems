@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   AlertTriangle, 
   Zap, 
@@ -16,9 +16,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Device } from "./EnergyDashboard";
+import { api } from "@/services/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+type EventItem = {
+  label: string;
+  count: number;
+  timestamps: string[];
+};
+
+type PeriodOption = '24-hours' | '7-days' | '30-days' | '12-months';
 
 interface PowerQualityDashboardProps {
   device: Device;
+  selectedPeriod?: PeriodOption;
+  onPeriodChange?: (period: PeriodOption) => void;
 }
 
 interface PowerQualityEvent {
@@ -151,17 +168,22 @@ const POWER_QUALITY_CARDS = [
   }
 ];
 
-export function PowerQualityDashboard({ device }: PowerQualityDashboardProps) {
-  const [selectedPeriod, setSelectedPeriod] = useState('30-days');
+export function PowerQualityDashboard({ device, selectedPeriod: controlledPeriod, onPeriodChange }: PowerQualityDashboardProps) {
+  const [internalPeriod, setInternalPeriod] = useState<PeriodOption>(controlledPeriod || '30-days');
+  const selectedPeriod = controlledPeriod || internalPeriod;
   const [powerQualityData, setPowerQualityData] = useState<Record<string, PowerQualityEvent>>({});
+  const [eventData, setEventData] = useState<Record<string, EventItem>>({});
+  const [interruptions, setInterruptions] = useState<{ count: number; timestamps: string[] }>({ count: 0, timestamps: [] });
+  const [activeEvent, setActiveEvent] = useState<EventItem | null>(null);
+  const [loadingEvents, setLoadingEvents] = useState(false);
 
   // Backend API integration functions
-  const handleCardClick = async (cardId: string, apiEndpoint: string) => {
+  const fetchCardData = async (cardId: string, apiEndpoint: string, period: string) => {
     try {
-      console.log(`Fetching data for ${cardId} from ${apiEndpoint}`);
+      console.log(`Fetching data for ${cardId} from ${apiEndpoint} with period=${period}`);
       
       // Backend API call
-      const response = await fetch(`${apiEndpoint}/${device.id}?period=${selectedPeriod}`, {
+      const response = await fetch(`${apiEndpoint}/${device.id}?period=${period}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -190,6 +212,120 @@ export function PowerQualityDashboard({ device }: PowerQualityDashboardProps) {
     }
   };
 
+  const handleCardClick = async (cardId: string, apiEndpoint: string) => {
+    fetchCardData(cardId, apiEndpoint, selectedPeriod);
+  };
+
+  const handlePeriodChange = (period: PeriodOption | string) => {
+    const p = period as PeriodOption;
+    setInternalPeriod(p);
+    if (onPeriodChange) onPeriodChange(p);
+  };
+
+  // Keep internal state in sync if parent controls it
+  useEffect(() => {
+    if (controlledPeriod && controlledPeriod !== internalPeriod) {
+      setInternalPeriod(controlledPeriod);
+    }
+  }, [controlledPeriod]);
+
+  const periodToRange = (period: PeriodOption) => {
+    const end = new Date();
+    let start = new Date();
+    switch (period) {
+      case '24-hours':
+        start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case '7-days':
+        start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case '30-days':
+        start = new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case '12-months':
+        start = new Date(end.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
+    }
+    return { start, end };
+  };
+
+  // Auto-refresh events when period changes or on interval
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoadingEvents(true);
+        const { start, end } = periodToRange(selectedPeriod);
+        
+        console.log(`[PowerQualityDashboard] Fetching events for device ${device.id}`, {
+          start: start.toISOString(),
+          end: end.toISOString(),
+          period: selectedPeriod
+        });
+        
+        const resp = await api.getDeviceEvents(device.id, {
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+        });
+        
+        console.log('[PowerQualityDashboard] Events API response:', {
+          deviceId: resp.deviceId,
+          count: resp.count,
+          hasData: !!resp.data,
+          hasEvents: !!resp.events,
+          dataLength: resp.data?.length,
+          eventsLength: resp.events?.length
+        });
+        
+        // Handle both response structures (data or events)
+        const events = resp.data || resp.events || [];
+        
+        if (events.length === 0) {
+          console.log('[PowerQualityDashboard] No events found in response');
+        }
+        
+        // Group events by event_type and parameter
+        const grouped: Record<string, EventItem> = {};
+        events.forEach((evt: any) => {
+          console.log('[PowerQualityDashboard] Processing event:', evt);
+          // Create a unique key for each event type + parameter combination
+          const key = `${evt.eventType}_${evt.parameter}`;
+          const label = `${evt.parameter} - ${evt.eventType.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}`;
+          
+          if (!grouped[key]) {
+            grouped[key] = { label, count: 0, timestamps: [] };
+          }
+          grouped[key].count++;
+          if (evt.eventTimestamp) {
+            grouped[key].timestamps.push(evt.eventTimestamp);
+          }
+        });
+        
+        console.log('[PowerQualityDashboard] Grouped events:', grouped);
+        
+        // Sort timestamps in descending order
+        Object.values(grouped).forEach(evt => {
+          evt.timestamps.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+        });
+        
+        setEventData(grouped);
+      } catch (err) {
+        console.error('[PowerQualityDashboard] Failed to fetch device events:', err);
+        setEventData({});
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+    
+    fetchEvents();
+    
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      fetchEvents();
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [selectedPeriod, device.id]);
+
   const getSeverityColor = (severity: 'low' | 'medium' | 'high') => {
     switch (severity) {
       case 'low':
@@ -216,13 +352,7 @@ export function PowerQualityDashboard({ device }: PowerQualityDashboardProps) {
     }
   };
 
-  const powerQualityEvents = POWER_QUALITY_CARDS.filter(card => 
-    card.type === 'power-quality' || card.type === 'steady-state'
-  );
-  
-  const equipmentStatus = POWER_QUALITY_CARDS.filter(card => 
-    card.type === 'equipment'
-  );
+  const backendEventList = Object.values(eventData);
 
   return (
     <Card>
@@ -235,7 +365,7 @@ export function PowerQualityDashboard({ device }: PowerQualityDashboardProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <Tabs value={selectedPeriod} onValueChange={setSelectedPeriod} className="space-y-6">
+        <Tabs value={selectedPeriod} onValueChange={handlePeriodChange} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="24-hours">LAST 24 HOURS</TabsTrigger>
             <TabsTrigger value="7-days">LAST 7 DAYS</TabsTrigger>
@@ -244,90 +374,69 @@ export function PowerQualityDashboard({ device }: PowerQualityDashboardProps) {
           </TabsList>
 
           <TabsContent value={selectedPeriod} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Power Quality Events & Steady State Disturbances */}
-              <div className="lg:col-span-2 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {powerQualityEvents.map((card) => {
-                    const Icon = card.icon;
-                    const eventData = powerQualityData[card.id];
-                    
-                    return (
-                      <Card 
-                        key={card.id}
-                        className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-success"
-                        onClick={() => handleCardClick(card.id, card.apiEndpoint)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded ${getSeverityColor(card.severity)} ${getSeverityTextColor(card.severity)}`}>
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-medium text-sm">{card.title}</h3>
-                              <p className="text-xs text-muted-foreground">{card.subtitle}</p>
-                              {eventData && (
-                                <div className="mt-2">
-                                  <Badge variant="secondary" className="text-xs">
-                                    {eventData.count} events
-                                  </Badge>
-                                </div>
-                              )}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                Event Flags
+              </h3>
+              {loadingEvents && (
+                <div className="text-xs text-muted-foreground">Loading events…</div>
+              )}
+              {backendEventList.length === 0 && !loadingEvents && (
+                <div className="text-sm text-muted-foreground">No events for the selected period.</div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {backendEventList.map((evt) => {
+                  const isAlert = evt.count > 0;
+                  return (
+                    <Card
+                      key={evt.label}
+                      className={`cursor-pointer hover:shadow-md transition-shadow border-l-4 ${isAlert ? 'border-l-destructive' : 'border-l-success'}`}
+                      onClick={() => {
+                        if (evt.timestamps?.length) setActiveEvent(evt);
+                      }}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2 rounded ${isAlert ? 'bg-destructive text-destructive-foreground' : 'bg-success text-success-foreground'}`}>
+                            <div className="h-3 w-3 rounded-full bg-white/80" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm">{evt.label}</h3>
+                            <div className="mt-2">
+                              <Badge variant={isAlert ? 'destructive' : 'secondary'} className="text-xs">
+                                {isAlert ? `${evt.count} events` : 'No events'}
+                              </Badge>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Corrective Equipment Status */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                  CORRECTIVE EQUIPMENT STATUS
-                </h3>
-                <div className="space-y-3">
-                  {equipmentStatus.map((card) => {
-                    const Icon = card.icon;
-                    const equipmentData = powerQualityData[card.id];
-                    
-                    return (
-                      <Card 
-                        key={card.id}
-                        className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-success"
-                        onClick={() => handleCardClick(card.id, card.apiEndpoint)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded ${getSeverityColor(card.severity)} ${getSeverityTextColor(card.severity)}`}>
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-medium text-sm">{card.title}</h3>
-                              <p className="text-xs text-muted-foreground">{card.subtitle}</p>
-                              {equipmentData && (
-                                <div className="mt-2">
-                                  <Badge 
-                                    variant={equipmentData.severity === 'low' ? 'secondary' : 'destructive'} 
-                                    className="text-xs"
-                                  >
-                                    {equipmentData.severity === 'low' ? 'Operational' : 'Issue Detected'}
-                                  </Badge>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           </TabsContent>
         </Tabs>
       </CardContent>
+
+      <Dialog open={!!activeEvent} onOpenChange={() => setActiveEvent(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{activeEvent?.label || 'Event'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[60vh] overflow-auto text-sm">
+            {activeEvent?.timestamps && activeEvent.timestamps.length > 0 ? (
+              activeEvent.timestamps.map((ts, idx) => (
+                <div key={idx} className="border-b pb-1">
+                  {new Date(ts).toLocaleString()}
+                </div>
+              ))
+            ) : (
+              <div className="text-muted-foreground">No timestamps available</div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

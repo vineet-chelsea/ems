@@ -1,6 +1,10 @@
 import express from 'express';
 import { db } from '../db/connection.js';
 import { z } from 'zod';
+import pm8000Mappings from '../config/pm8000_mappings.json';
+import micrologic6eMappings from '../config/micrologic6e_mappings.json';
+import em6400Mappings from '../config/em6400_mappings.json';
+import pm5320Mappings from '../config/pm5320_mappings.json';
 
 const router = express.Router();
 
@@ -22,36 +26,13 @@ router.get('/:deviceType', async (req, res) => {
         deviceType: 'PM5320',
         defaultSubnetMask: '255.255.255.0',
         defaultSlaveAddress: 1,
-        registerMappings: [
-          { parameter: 'V1', address: 40001, dataType: 'FLOAT32', description: 'Voltage L1-N (V)' },
-          { parameter: 'V2', address: 40003, dataType: 'FLOAT32', description: 'Voltage L2-N (V)' },
-          { parameter: 'V3', address: 40005, dataType: 'FLOAT32', description: 'Voltage L3-N (V)' },
-          { parameter: 'VR', address: 40007, dataType: 'FLOAT32', description: 'Voltage R-N (V)' },
-          { parameter: 'VY', address: 40009, dataType: 'FLOAT32', description: 'Voltage Y-N (V)' },
-          { parameter: 'VB', address: 40011, dataType: 'FLOAT32', description: 'Voltage B-N (V)' },
-          { parameter: 'Vavg', address: 40013, dataType: 'FLOAT32', description: 'Average Voltage (V)' },
-          { parameter: 'I1', address: 40015, dataType: 'FLOAT32', description: 'Current L1 (A)' },
-          { parameter: 'I2', address: 40017, dataType: 'FLOAT32', description: 'Current L2 (A)' },
-          { parameter: 'I3', address: 40019, dataType: 'FLOAT32', description: 'Current L3 (A)' },
-          { parameter: 'IR', address: 40021, dataType: 'FLOAT32', description: 'Current R (A)' },
-          { parameter: 'IY', address: 40023, dataType: 'FLOAT32', description: 'Current Y (A)' },
-          { parameter: 'IB', address: 40025, dataType: 'FLOAT32', description: 'Current B (A)' },
-          { parameter: 'Iavg', address: 40027, dataType: 'FLOAT32', description: 'Average Current (A)' },
-          { parameter: 'Ipeak', address: 40029, dataType: 'FLOAT32', description: 'Peak Current (A)' },
-          { parameter: 'P1', address: 40031, dataType: 'FLOAT32', description: 'Active Power L1 (kW)' },
-          { parameter: 'P2', address: 40033, dataType: 'FLOAT32', description: 'Active Power L2 (kW)' },
-          { parameter: 'P3', address: 40035, dataType: 'FLOAT32', description: 'Active Power L3 (kW)' },
-          { parameter: 'Ptotal', address: 40037, dataType: 'FLOAT32', description: 'Total Active Power (kW)' },
-          { parameter: 'PF1', address: 40039, dataType: '4Q_FP_PF', description: 'Power Factor L1' },
-          { parameter: 'PF2', address: 40040, dataType: '4Q_FP_PF', description: 'Power Factor L2' },
-          { parameter: 'PF3', address: 40041, dataType: '4Q_FP_PF', description: 'Power Factor L3' },
-          { parameter: 'PFavg', address: 40042, dataType: '4Q_FP_PF', description: 'Average Power Factor' },
-          { parameter: 'frequency', address: 40043, dataType: 'FLOAT32', description: 'Frequency (Hz)' },
-          { parameter: 'energy_active', address: 40045, dataType: 'INT32U', description: 'Active Energy (Wh)' },
-          { parameter: 'energy_reactive', address: 40047, dataType: 'INT32U', description: 'Reactive Energy (VARh)' },
-          { parameter: 'V', address: 40049, dataType: 'FLOAT32', description: 'Voltage (V)' },
-          { parameter: 'I', address: 40051, dataType: 'FLOAT32', description: 'Current (A)' },
-        ],
+        registerMappings: (pm5320Mappings as any[]).map((m: any) => ({
+          parameter: m.parameter,
+          address: m.address,
+          dataType: m.dataType,
+          description: m.description || '',
+          unit: m.unit || '', // Include unit field from JSON (empty if not present)
+        })),
         // Legacy parameterMappings for backward compatibility
         parameterMappings: {
           V1: '40001',
@@ -96,6 +77,56 @@ router.get('/:deviceType', async (req, res) => {
           PFavg: '40042',
         },
       },
+      PM8000: {
+        deviceType: 'PM8000',
+        defaultSubnetMask: '255.255.255.0',
+        defaultSlaveAddress: 1,
+        registerMappings: (pm8000Mappings as any[]).map((m: any) => ({
+          parameter: m.parameter,
+          address: m.address,
+          dataType: m.dataType,
+          description: m.description || '',
+          unit: m.unit || '',
+          length: m.length || undefined,
+        })),
+        parameterMappings: {},
+      },
+      MICROLOGIC_6E: {
+        deviceType: 'MICROLOGIC_6E',
+        defaultSubnetMask: '255.255.255.0',
+        defaultSlaveAddress: 1,
+        registerMappings: (micrologic6eMappings as any[]).map((m: any) => ({
+          parameter: m.parameter,
+          address: m.address,
+          dataType: m.dataType,
+          description: m.description || '',
+          unit: m.unit || '',
+          length: m.length || undefined,
+          bit: m.bit ?? undefined,
+          validIfBit: m.validIfBit ?? undefined,
+          validIfValue: m.validIfValue ?? undefined,
+          wordOrder: m.wordOrder ?? undefined,
+        })),
+        parameterMappings: {},
+      },
+      EM6400: {
+        deviceType: 'EM6400',
+        defaultSubnetMask: '255.255.255.0',
+        defaultSlaveAddress: 1,
+        registerMappings: (em6400Mappings as any[]).map((m: any) => ({
+          parameter: m.parameter,
+          address: m.address,
+          dataType: m.dataType,
+          description: m.description || '',
+          unit: m.unit || '',
+          length: m.length || undefined,
+          bit: m.bit ?? undefined,
+          validIfBit: m.validIfBit ?? undefined,
+          validIfValue: m.validIfValue ?? undefined,
+          wordOrder: m.wordOrder ?? undefined,
+        })),
+        parameterMappings: {},
+      },
     };
 
     const config = defaultConfigs[deviceType] || {
@@ -116,7 +147,7 @@ router.get('/:deviceType', async (req, res) => {
 // Get all device types
 router.get('/', async (req, res) => {
   try {
-    const deviceTypes = ['PM5320', 'PM5330', 'PM5350', 'Custom'];
+    const deviceTypes = ['PM5320', 'PM5330', 'PM5350', 'PM8000', 'MICROLOGIC_6E', 'EM6400', 'Custom'];
     res.json({ deviceTypes });
   } catch (error) {
     console.error('Error fetching device types:', error);

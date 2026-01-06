@@ -85,7 +85,7 @@ export async function createDeviceTable(deviceId: string): Promise<void> {
     )
   `;
 
-  // Convert to hypertable if not already a hypertable
+  // Convert to hypertable if TimescaleDB is available
   const createHypertableQuery = `
     SELECT create_hypertable('${tableName}', 'timestamp', 
       chunk_time_interval => INTERVAL '1 day',
@@ -113,13 +113,20 @@ export async function createDeviceTable(deviceId: string): Promise<void> {
     // Create table
     await db.query(createTableQuery);
     
-    // Convert to hypertable
+    // Convert to hypertable (optional)
+    let hypertableEnabled = false;
     try {
       await db.query(createHypertableQuery);
+      hypertableEnabled = true;
       console.log(`Hypertable ${tableName} created successfully`);
     } catch (error: any) {
-      // Table might already be a hypertable
-      if (!error.message?.includes('already a hypertable')) {
+      const msg = error.message || '';
+      // If TimescaleDB is not installed, continue without hypertable
+      if (msg.includes('create_hypertable') || msg.includes('timescaledb')) {
+        console.warn(`TimescaleDB not available; continuing with regular table for ${tableName}`);
+      } else if (msg.includes('already a hypertable')) {
+        hypertableEnabled = true;
+      } else {
         throw error;
       }
     }
@@ -127,21 +134,23 @@ export async function createDeviceTable(deviceId: string): Promise<void> {
     // Create indexes
     await db.query(createIndexesQuery);
     
-    // Enable compression for data older than 7 days
-    try {
-      await db.query(enableCompressionQuery);
-      await db.query(`
-        SELECT add_compression_policy('${tableName}', INTERVAL '7 days', if_not_exists => TRUE)
-      `);
-      console.log(`Compression enabled for ${tableName}`);
-    } catch (error: any) {
-      // Compression might already be enabled
-      if (!error.message?.includes('already compressed')) {
-        console.warn(`Could not enable compression for ${tableName}:`, error.message);
+    // Enable compression for data older than 7 days (only if hypertable is enabled)
+    if (hypertableEnabled) {
+      try {
+        await db.query(enableCompressionQuery);
+        await db.query(`
+          SELECT add_compression_policy('${tableName}', INTERVAL '7 days', if_not_exists => TRUE)
+        `);
+        console.log(`Compression enabled for ${tableName}`);
+      } catch (error: any) {
+        if (!error.message?.includes('already compressed')) {
+          console.warn(`Could not enable compression for ${tableName}:`, error.message);
+        }
       }
+      console.log(`TimescaleDB hypertable ${tableName} configured successfully`);
+    } else {
+      console.log(`Created regular table ${tableName} (TimescaleDB not available)`);
     }
-    
-    console.log(`TimescaleDB hypertable ${tableName} configured successfully`);
   } catch (error) {
     console.error(`Error creating hypertable ${tableName}:`, error);
     throw error;
@@ -177,18 +186,19 @@ export function getDeviceTableName(deviceId: string): string {
 export async function cleanupOrphanedTables(): Promise<void> {
   try {
     // Core schema tables that should never be dropped
-    const protectedTables = ['devices', 'users', 'user_device_permissions'];
+    const protectedTables = ['devices', 'users', 'user_device_permissions', 'device_events'];
     
     // Get all device IDs from devices table
     const deviceIds = await getAllDeviceIds();
     
-    // Get all tables that match device_* pattern (but not the devices table itself)
+    // Get all tables that match device_* pattern (but not the devices table itself or device_events)
     const tablesResult = await db.query(`
       SELECT tablename 
       FROM pg_tables 
       WHERE schemaname = 'public' 
       AND tablename LIKE 'device_%'
       AND tablename != 'devices'
+      AND tablename != 'device_events'
     `);
     
     const existingTables = tablesResult.rows.map(row => row.tablename);
