@@ -62,6 +62,15 @@ MONITORING_ENABLED=true        # Enable metrics logging
 MONITORING_LOG_INTERVAL=60     # Log metrics every N seconds
 ```
 
+## GPU Acceleration
+
+```bash
+GPU_ENABLED=true               # Enable GPU acceleration
+GPU_USE_FOR_REPORTS=true       # Use GPU for report generation
+GPU_USE_FOR_STATISTICS=true    # Use GPU for statistics
+GPU_MIN_ROWS=100000            # Minimum rows to use GPU (avoid overhead)
+```
+
 ## Server
 
 ```bash

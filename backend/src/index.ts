@@ -147,6 +147,19 @@ async function initialize() {
     // Start data retention scheduler
     startDataRetentionScheduler();
     
+    // Check GPU availability
+    try {
+      const { gpuProcessor } = await import('./services/gpuProcessor.js');
+      const gpuStatus = await gpuProcessor.checkGPUAvailability();
+      if (gpuStatus.gpu_available) {
+        console.log('✓ GPU acceleration available:', gpuStatus);
+      } else {
+        console.log('ℹ GPU acceleration not available (CPU fallback will be used)');
+      }
+    } catch (error) {
+      console.warn('Could not check GPU availability:', error);
+    }
+    
     // Start data collection service (uses configurable interval from performance.config.ts)
     startDataCollection();
     console.log('Data collection service started');

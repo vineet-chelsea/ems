@@ -50,6 +50,14 @@ export interface PerformanceConfig {
     enabled: boolean;
     logInterval: number;            // Log metrics every N seconds
   };
+  
+  // GPU Acceleration
+  gpu: {
+    enabled: boolean;               // Enable GPU acceleration
+    useForReports: boolean;         // Use GPU for report generation
+    useForStatistics: boolean;      // Use GPU for statistics
+    minRowsForGPU: number;          // Minimum rows to use GPU (avoid overhead)
+  };
 }
 
 export const defaultConfig: PerformanceConfig = {
@@ -83,6 +91,12 @@ export const defaultConfig: PerformanceConfig = {
   monitoring: {
     enabled: true,
     logInterval: 60,                  // Every minute
+  },
+  gpu: {
+    enabled: true,                    // Enable GPU acceleration
+    useForReports: true,              // Use GPU for report generation
+    useForStatistics: true,           // Use GPU for statistics
+    minRowsForGPU: 100000,            // Use GPU for queries with >100k rows
   },
 };
 
@@ -135,6 +149,18 @@ export function loadConfig(): PerformanceConfig {
   }
   if (process.env.MONITORING_LOG_INTERVAL) {
     config.monitoring.logInterval = parseInt(process.env.MONITORING_LOG_INTERVAL);
+  }
+  if (process.env.GPU_ENABLED) {
+    config.gpu.enabled = process.env.GPU_ENABLED.toLowerCase() === 'true';
+  }
+  if (process.env.GPU_USE_FOR_REPORTS) {
+    config.gpu.useForReports = process.env.GPU_USE_FOR_REPORTS.toLowerCase() === 'true';
+  }
+  if (process.env.GPU_USE_FOR_STATISTICS) {
+    config.gpu.useForStatistics = process.env.GPU_USE_FOR_STATISTICS.toLowerCase() === 'true';
+  }
+  if (process.env.GPU_MIN_ROWS) {
+    config.gpu.minRowsForGPU = parseInt(process.env.GPU_MIN_ROWS);
   }
   
   return config;

@@ -1,0 +1,12 @@
+# GPU Acceleration Requirements
+# Install with: pip install -r requirements_gpu.txt
+
+# For CUDA 12.x (RTX 5060 Ti recommended)
+cupy-cuda12x>=12.0.0
+
+# For CUDA 11.x (alternative)
+# cupy-cuda11x>=11.0.0
+
+# Core dependencies (if not already installed)
+numpy>=1.20.0
+

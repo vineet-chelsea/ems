@@ -4,6 +4,7 @@ import { getDeviceTableName } from '../db/tableManager.js';
 import { authenticateToken, checkDevicePermission, requireAdmin, AuthRequest } from '../middleware/auth.js';
 import { sendDataPoint } from '../services/kafka.js';
 import { collectAllDevicesData } from '../services/dataCollector.js';
+import { gpuProcessor } from '../services/gpuProcessor.js';
 import { z } from 'zod';
 
 const router = express.Router();
@@ -1674,67 +1675,163 @@ router.get('/:deviceId/power-quality-report', async (req: AuthRequest, res) => {
     const maxMinParams = getMaxMinParams(deviceType, existingColumns);
     const maxMinData: Record<string, { max: number | null; min: number | null; maxTime: string | null; minTime: string | null; unit: string }> = {};
 
-    for (const { param, unit, conversion } of maxMinParams) {
-      const colName = toColumnName(param);
+    // Use GPU acceleration for large datasets if enabled
+    const useGPU = config.gpu.enabled && config.gpu.useForReports && rowCount >= config.gpu.minRowsForGPU;
+    
+    if (useGPU && maxMinParams.length > 0) {
+      console.log(`[PowerQualityReport] Using GPU acceleration for ${maxMinParams.length} parameters (${rowCount} rows)`);
       
-      if (!existingColumns.has(colName)) {
-        console.warn(`[PowerQualityReport] Column "${colName}" does not exist for parameter "${param}"`);
-        maxMinData[param] = { max: null, min: null, maxTime: null, minTime: null, unit };
-        continue;
-      }
-
       try {
-        const query = `
-          SELECT 
-            MAX("${colName}") as max_val,
-            MIN("${colName}") as min_val,
-            (SELECT timestamp FROM ${tableName} 
-             WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL 
-             ORDER BY "${colName}" DESC LIMIT 1) as max_time,
-            (SELECT timestamp FROM ${tableName} 
-             WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL 
-             ORDER BY "${colName}" ASC LIMIT 1) as min_time
-          FROM ${tableName}
-          WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL
-        `;
+        // Fetch all data for parameters in parallel using GPU
+        const dataDict: Record<string, number[]> = {};
+        const paramMap: Record<string, { unit: string; conversion?: (val: number) => number }> = {};
         
-        const result = await db.query(query, [start, end]);
-        if (result.rows[0]) {
-          const maxVal = result.rows[0].max_val;
-          const minVal = result.rows[0].min_val;
+        for (const { param, unit, conversion } of maxMinParams) {
+          const colName = toColumnName(param);
+          if (!existingColumns.has(colName)) continue;
           
-          // Convert to number if needed
-          let maxNum = maxVal !== null && maxVal !== undefined
-            ? (typeof maxVal === 'string' ? parseFloat(maxVal) : Number(maxVal))
-            : null;
-          let minNum = minVal !== null && minVal !== undefined
-            ? (typeof minVal === 'string' ? parseFloat(minVal) : Number(minVal))
-            : null;
+          paramMap[colName] = { unit, conversion };
           
-          // Apply conversion if provided (e.g., kW to W, kVA to VA)
-          if (conversion) {
-            if (maxNum !== null && !isNaN(maxNum) && isFinite(maxNum)) {
-              maxNum = conversion(maxNum);
-            }
-            if (minNum !== null && !isNaN(minNum) && isFinite(minNum)) {
-              minNum = conversion(minNum);
-            }
+          // Fetch all values for this parameter
+          const query = `
+            SELECT "${colName}", timestamp
+            FROM ${tableName}
+            WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL
+            ORDER BY timestamp
+          `;
+          
+          const result = await db.query(query, [start, end]);
+          const values = result.rows
+            .map((r: any) => {
+              const val = r[colName];
+              return val !== null && val !== undefined 
+                ? (typeof val === 'string' ? parseFloat(val) : Number(val))
+                : null;
+            })
+            .filter((v: any) => v !== null && isFinite(v)) as number[];
+          
+          if (values.length > 0) {
+            dataDict[colName] = values;
           }
+        }
+        
+        // Calculate statistics using GPU
+        if (Object.keys(dataDict).length > 0) {
+          const gpuStats = await gpuProcessor.calculateMultipleStatistics(dataDict);
           
-          maxMinData[param] = {
-            max: (maxNum !== null && !isNaN(maxNum) && isFinite(maxNum)) ? maxNum : null,
-            min: (minNum !== null && !isNaN(minNum) && isFinite(minNum)) ? minNum : null,
-            maxTime: result.rows[0].max_time,
-            minTime: result.rows[0].min_time,
-            unit,
-          };
-          console.log(`[PowerQualityReport] ${param} (${colName}): max=${maxVal} -> ${maxMinData[param].max} ${unit}, min=${minVal} -> ${maxMinData[param].min} ${unit}`);
-        } else {
+          // Also get timestamps for max/min
+          for (const { param, unit, conversion } of maxMinParams) {
+            const colName = toColumnName(param);
+            if (!gpuStats[colName]) continue;
+            
+            const stats = gpuStats[colName];
+            let maxNum = stats.max;
+            let minNum = stats.min;
+            
+            // Apply conversion if provided
+            if (conversion && paramMap[colName].conversion) {
+              if (maxNum !== null) maxNum = conversion(maxNum);
+              if (minNum !== null) minNum = conversion(minNum);
+            }
+            
+            // Get timestamps for max/min (still need to query for these)
+            const maxTimeQuery = `
+              SELECT timestamp FROM ${tableName}
+              WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL
+              ORDER BY "${colName}" DESC LIMIT 1
+            `;
+            const minTimeQuery = `
+              SELECT timestamp FROM ${tableName}
+              WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL
+              ORDER BY "${colName}" ASC LIMIT 1
+            `;
+            
+            const [maxTimeResult, minTimeResult] = await Promise.all([
+              db.query(maxTimeQuery, [start, end]),
+              db.query(minTimeQuery, [start, end])
+            ]);
+            
+            maxMinData[param] = {
+              max: maxNum,
+              min: minNum,
+              maxTime: maxTimeResult.rows[0]?.timestamp || null,
+              minTime: minTimeResult.rows[0]?.timestamp || null,
+              unit,
+            };
+          }
+        }
+      } catch (gpuError: any) {
+        console.warn(`[PowerQualityReport] GPU acceleration failed, falling back to CPU:`, gpuError.message);
+        // Fall through to CPU calculation below
+      }
+    }
+    
+    // CPU fallback or if GPU not used
+    if (Object.keys(maxMinData).length < maxMinParams.length) {
+      for (const { param, unit, conversion } of maxMinParams) {
+        if (maxMinData[param]) continue; // Already calculated with GPU
+        
+        const colName = toColumnName(param);
+        
+        if (!existingColumns.has(colName)) {
+          console.warn(`[PowerQualityReport] Column "${colName}" does not exist for parameter "${param}"`);
+          maxMinData[param] = { max: null, min: null, maxTime: null, minTime: null, unit };
+          continue;
+        }
+
+        try {
+          const query = `
+            SELECT 
+              MAX("${colName}") as max_val,
+              MIN("${colName}") as min_val,
+              (SELECT timestamp FROM ${tableName} 
+               WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL 
+               ORDER BY "${colName}" DESC LIMIT 1) as max_time,
+              (SELECT timestamp FROM ${tableName} 
+               WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL 
+               ORDER BY "${colName}" ASC LIMIT 1) as min_time
+            FROM ${tableName}
+            WHERE timestamp >= $1 AND timestamp <= $2 AND "${colName}" IS NOT NULL
+          `;
+          
+          const result = await db.query(query, [start, end]);
+          if (result.rows[0]) {
+            const maxVal = result.rows[0].max_val;
+            const minVal = result.rows[0].min_val;
+            
+            // Convert to number if needed
+            let maxNum = maxVal !== null && maxVal !== undefined
+              ? (typeof maxVal === 'string' ? parseFloat(maxVal) : Number(maxVal))
+              : null;
+            let minNum = minVal !== null && minVal !== undefined
+              ? (typeof minVal === 'string' ? parseFloat(minVal) : Number(minVal))
+              : null;
+            
+            // Apply conversion if provided (e.g., kW to W, kVA to VA)
+            if (conversion) {
+              if (maxNum !== null && !isNaN(maxNum) && isFinite(maxNum)) {
+                maxNum = conversion(maxNum);
+              }
+              if (minNum !== null && !isNaN(minNum) && isFinite(minNum)) {
+                minNum = conversion(minNum);
+              }
+            }
+            
+            maxMinData[param] = {
+              max: (maxNum !== null && !isNaN(maxNum) && isFinite(maxNum)) ? maxNum : null,
+              min: (minNum !== null && !isNaN(minNum) && isFinite(minNum)) ? minNum : null,
+              maxTime: result.rows[0].max_time,
+              minTime: result.rows[0].min_time,
+              unit,
+            };
+            console.log(`[PowerQualityReport] ${param} (${colName}): max=${maxVal} -> ${maxMinData[param].max} ${unit}, min=${minVal} -> ${maxMinData[param].min} ${unit}`);
+          } else {
+            maxMinData[param] = { max: null, min: null, maxTime: null, minTime: null, unit };
+          }
+        } catch (err: any) {
+          console.error(`[PowerQualityReport] Error querying max/min for ${param} (${colName}):`, err.message);
           maxMinData[param] = { max: null, min: null, maxTime: null, minTime: null, unit };
         }
-      } catch (err: any) {
-        console.error(`[PowerQualityReport] Error querying max/min for ${param} (${colName}):`, err.message);
-        maxMinData[param] = { max: null, min: null, maxTime: null, minTime: null, unit };
       }
     }
 
