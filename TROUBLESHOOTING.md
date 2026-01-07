@@ -223,3 +223,4 @@ Write-Host "Backend: $backendPath" -ForegroundColor Green
 
 Save this as `verify-paths.ps1` and run it to check your setup.
 
+
