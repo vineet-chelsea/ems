@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "node scripts/copy-assets.js",
     "start": "node dist/index.js",
     "migrate": "tsx src/db/migrate.ts",
     "setup-db": "powershell -ExecutionPolicy Bypass -File scripts/setup-database-with-password.ps1"
@@ -30,6 +31,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.5.5",
+    "@types/node-cron": "^3.0.11",
     "@types/pg": "^8.10.9",
     "tsx": "^4.7.0",
     "typescript": "^5.5.3"

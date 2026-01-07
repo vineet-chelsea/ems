@@ -6,10 +6,7 @@ import { promisify } from 'util';
 import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
-import pm8000Mappings from '../config/pm8000_mappings.json';
-import micrologic6eMappings from '../config/micrologic6e_mappings.json';
-import em6400Mappings from '../config/em6400_mappings.json';
-import pm5320Mappings from '../config/pm5320_mappings.json';
+import { pm8000Mappings, micrologic6eMappings, em6400Mappings, pm5320Mappings } from '../utils/loadMappings.js';
 import { loadConfig } from '../config/performance.config.js';
 import { workerPool } from './workerPool.js';
 import { convertToHypertable } from '../db/connection.js';
@@ -2850,19 +2847,19 @@ async function collectDeviceData(device: Device): Promise<boolean> {
     const registerMappings = await getDeviceRegisterMappings(device);
 
     // Cleanup columns when mappings change (per process) to remove stray/old columns
-    const tableName = getDeviceTableName(device.id);
+    const deviceTableName = getDeviceTableName(device.id);
     const allowedColumns = getAllowedColumns(registerMappings);
     const signature = allowedColumns.join('|');
     const prevSig = cleanedColumnsSignatureForDevice.get(device.id);
     if (prevSig !== signature) {
-      await cleanupUnusedColumns(tableName, allowedColumns);
+      await cleanupUnusedColumns(deviceTableName, allowedColumns);
       cleanedColumnsSignatureForDevice.set(device.id, signature);
     }
     // Ensure all mapped columns exist up front (before any successful read),
     // so parameter endpoints never 404 due to missing columns.
     for (const col of allowedColumns) {
       await ensureColumnExists(
-        tableName,
+        deviceTableName,
         col,
         false, // most are numeric; string types handled below
         false
@@ -2873,7 +2870,7 @@ async function collectDeviceData(device: Device): Promise<boolean> {
       if (mapping.dataType === 'COMPUTED') continue;
       const colName = sanitizeColumnName(mapping.parameter);
       await ensureColumnExists(
-        tableName,
+        deviceTableName,
         colName,
         isStringType(mapping.dataType),
         isDateTimeType(mapping.dataType)

@@ -164,10 +164,14 @@ async function initialize() {
     startDataCollection();
     console.log('Data collection service started');
     
+    // Load config for logging
+    const { loadConfig } = await import('./config/performance.config.js');
+    const perfConfig = loadConfig();
+    
     app.listen(PORT, () => {
       console.log(`Backend API server running on port ${PORT}`);
       console.log(`Kafka: ${isKafkaEnabled() ? 'Enabled' : 'Disabled'}`);
-      console.log(`Data Collection: Enabled (interval: ${collectionInterval}s)`);
+      console.log(`Data Collection: Enabled (interval: ${perfConfig.sampling.defaultInterval}s)`);
     });
   } catch (error) {
     console.error('Failed to initialize:', error);

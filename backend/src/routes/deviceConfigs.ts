@@ -1,10 +1,7 @@
 import express from 'express';
 import { db } from '../db/connection.js';
 import { z } from 'zod';
-import pm8000Mappings from '../config/pm8000_mappings.json';
-import micrologic6eMappings from '../config/micrologic6e_mappings.json';
-import em6400Mappings from '../config/em6400_mappings.json';
-import pm5320Mappings from '../config/pm5320_mappings.json';
+import { pm8000Mappings, micrologic6eMappings, em6400Mappings, pm5320Mappings } from '../utils/loadMappings.js';
 
 const router = express.Router();
 
