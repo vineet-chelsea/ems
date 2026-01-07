@@ -7,15 +7,16 @@ const __dirname = path.dirname(__filename);
 
 /**
  * Load device mapping JSON file at runtime
+ * Always prioritizes src/config (source of truth) over dist/config
  * Works in both development (src/) and production (dist/)
  */
 function loadMappingFile(filename: string): any[] {
-  // Try dist/config first (production - after build)
-  let configPath = path.join(__dirname, '../../dist/config', filename);
+  // Try src/config first (source of truth - always use these if available)
+  let configPath = path.join(__dirname, '../../src/config', filename);
   
   if (!fs.existsSync(configPath)) {
-    // Try src/config (development - when running with tsx)
-    configPath = path.join(__dirname, '../../src/config', filename);
+    // Try dist/config (fallback for production builds)
+    configPath = path.join(__dirname, '../../dist/config', filename);
   }
   
   if (!fs.existsSync(configPath)) {
@@ -27,11 +28,11 @@ function loadMappingFile(filename: string): any[] {
     const error = new Error(
       `Mapping file not found: ${filename}\n` +
       `Tried paths:\n` +
-      `  1. ${path.join(__dirname, '../../dist/config', filename)}\n` +
-      `  2. ${path.join(__dirname, '../../src/config', filename)}\n` +
-      `  3. ${path.join(__dirname, '../config', filename)}\n\n` +
+      `  1. ${path.join(__dirname, '../../src/config', filename)} (source - preferred)\n` +
+      `  2. ${path.join(__dirname, '../../dist/config', filename)} (build output)\n` +
+      `  3. ${path.join(__dirname, '../config', filename)} (fallback)\n\n` +
       `Current __dirname: ${__dirname}\n` +
-      `Make sure to run 'npm run build' to copy JSON files to dist/config/`
+      `Make sure the file exists in backend/src/config/`
     );
     console.error(error.message);
     throw error;
