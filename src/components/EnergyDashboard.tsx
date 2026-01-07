@@ -9,8 +9,9 @@ import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
 import { AdminPanel } from "./AdminPanel";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
-import { AutoUpdate } from "./AutoUpdate";
-import { AutoStartSettings } from "./AutoStartSettings";
+// AutoUpdate and AutoStartSettings are Electron-only features, removed for web deployment
+// import { AutoUpdate } from "./AutoUpdate";
+// import { AutoStartSettings } from "./AutoStartSettings";
 import { PatchManager } from "./PatchManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -370,8 +371,11 @@ export function EnergyDashboard() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6">
-              <AutoStartSettings />
-              <AutoUpdate />
+              {/* Electron-specific features (AutoStart, AutoUpdate) are not available in web deployment */}
+              <div className="text-sm text-muted-foreground p-4 border rounded-lg">
+                <p className="font-medium mb-2">Additional Settings</p>
+                <p>Auto-start and auto-update features are available in the desktop application version.</p>
+              </div>
             </TabsContent>
           </Tabs>
         ) : (

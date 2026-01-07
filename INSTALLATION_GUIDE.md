@@ -243,15 +243,31 @@ For high-performance deployment, configure PostgreSQL settings:
 
 ### Step 2: Build the Application
 
+**Important:** Make sure you're in the correct directory for each build command.
+
 1. Build the backend:
    ```powershell
+   # Navigate to backend directory
    cd backend
+   
+   # Verify you're in the right place
+   Get-Location
+   # Should show: ...\ems\backend
+   
+   # Build backend (compiles TypeScript to JavaScript)
    npm run build
+   
+   # Return to root
    cd ..
    ```
 
 2. Build the frontend (if needed):
    ```powershell
+   # Make sure you're in the root ems directory (not backend)
+   Get-Location
+   # Should show: ...\ems (NOT ...\ems\backend)
+   
+   # Build frontend
    npm run build
    ```
 
@@ -294,12 +310,28 @@ For high-performance deployment with 64GB RAM and SSD:
 
 **Terminal 1 - Backend:**
 ```powershell
+# Navigate to backend
 cd backend
+
+# Verify location
+Get-Location
+# Should show: ...\ems\backend
+
+# Start backend in development mode (no build needed)
 npm run dev
 ```
 
 **Terminal 2 - Frontend:**
 ```powershell
+# Make sure you're in root ems directory (NOT backend)
+cd C:\Users\vemco\EMS\ems
+# Or: cd .. (if you're in backend)
+
+# Verify location
+Get-Location
+# Should show: ...\ems (NOT ...\ems\backend)
+
+# Start frontend
 npm run dev
 ```
 
@@ -309,15 +341,37 @@ The application will be available at:
 
 ### Production Mode
 
+**Important:** Build backend first before starting in production mode.
+
 **Terminal 1 - Backend:**
 ```powershell
+# Navigate to backend
 cd backend
+
+# Verify location
+Get-Location
+# Should show: ...\ems\backend
+
+# Build backend (compiles TypeScript)
+npm run build
+
+# Start backend
 npm start
 ```
 
 **Terminal 2 - Frontend:**
 ```powershell
+# Make sure you're in root ems directory
+cd C:\Users\vemco\EMS\ems
+
+# Verify location
+Get-Location
+# Should show: ...\ems (NOT ...\ems\backend)
+
+# Build frontend
 npm run build
+
+# Preview (optional)
 npm run preview
 ```
 
