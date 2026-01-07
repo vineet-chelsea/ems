@@ -17,6 +17,13 @@ A desktop application for monitoring and managing energy devices (PM5320 power m
 
 **🚀 New Installation?** See [QUICK_INSTALL.md](./QUICK_INSTALL.md) for the simplest setup guide!
 
+**⚠️ Important:** When cloning, make sure to checkout the correct branch:
+```bash
+git clone <repository-url>
+cd ems
+git checkout db-creds-history-26fbd  # Branch with all latest features
+```
+
 ### Local Development (Recommended for Testing)
 
 **⚠️ Important**: The production config requires 64GB RAM. For local testing, use the local configuration:
