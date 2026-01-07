@@ -69,19 +69,19 @@ try {
         Write-Host "  3. PostgreSQL not installed" -ForegroundColor Gray
         exit 1
     }
-    Write-Host "  ✓ Connected successfully" -ForegroundColor Green
+    Write-Host "  [OK] Connected successfully" -ForegroundColor Green
     Write-Host ""
 
     # Create database
     Write-Host "Creating database 'ems_db'..." -ForegroundColor Cyan
     $createDbResult = psql -U postgres -c "CREATE DATABASE ems_db;" 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "  ✓ Database created" -ForegroundColor Green
+        Write-Host "  [OK] Database created" -ForegroundColor Green
     } else {
         if ($createDbResult -match "already exists") {
-            Write-Host "  ⚠ Database already exists (this is OK)" -ForegroundColor Yellow
+            Write-Host "  [INFO] Database already exists (this is OK)" -ForegroundColor Yellow
         } else {
-            Write-Host "  ⚠ $createDbResult" -ForegroundColor Yellow
+            Write-Host "  [WARN] $createDbResult" -ForegroundColor Yellow
         }
     }
 
@@ -102,16 +102,16 @@ END
 "@
     $createUserResult = $createUserSQL | psql -U postgres 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "  ✓ User created/updated" -ForegroundColor Green
+        Write-Host "  [OK] User created/updated" -ForegroundColor Green
     } else {
-        Write-Host "  ⚠ User creation result: $createUserResult" -ForegroundColor Yellow
+        Write-Host "  [WARN] User creation result: $createUserResult" -ForegroundColor Yellow
     }
 
     # Grant database privileges
     Write-Host "Granting database privileges..." -ForegroundColor Cyan
     $grantDbResult = psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE ems_db TO ems_user;" 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "  ✓ Database privileges granted" -ForegroundColor Green
+        Write-Host "  [OK] Database privileges granted" -ForegroundColor Green
     }
 
     # Grant schema privileges
@@ -125,7 +125,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO ems_user;
 "@
     $grantSchemaResult = $grantSchemaSQL | psql -U postgres -d ems_db 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "  ✓ Schema privileges granted" -ForegroundColor Green
+        Write-Host "  [OK] Schema privileges granted" -ForegroundColor Green
     }
 
     Write-Host ""

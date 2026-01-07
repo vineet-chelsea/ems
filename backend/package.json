@@ -10,7 +10,7 @@
     "copy-assets": "node scripts/copy-assets.js",
     "start": "node dist/index.js",
     "migrate": "tsx src/db/migrate.ts",
-    "setup-db": "powershell -ExecutionPolicy Bypass -File scripts/setup-database-with-password.ps1"
+    "setup-db": "node scripts/setup-db.js"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
