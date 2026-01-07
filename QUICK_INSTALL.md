@@ -35,9 +35,24 @@ pip install pymodbus
 ## Installation Steps
 
 ### Step 1: Clone Repository
+
+**Important:** Clone the correct branch that has all the latest features:
 ```powershell
+# Clone the repository
 git clone <your-repository-url>
 cd ems
+
+# Switch to the branch with all features (if not already on it)
+git checkout db-creds-history-26fbd
+
+# Or clone directly with the branch:
+# git clone -b db-creds-history-26fbd <your-repository-url>
+```
+
+**Verify the setup script exists:**
+```powershell
+Test-Path backend/scripts/setup-db.js
+# Should return: True
 ```
 
 ### Step 2: Install Frontend Dependencies
@@ -69,6 +84,22 @@ cd ..
 ### Step 4: Setup Database
 
 **Option A: Using Setup Script (Recommended)**
+
+**Important:** Make sure you're on the correct branch and have the latest code:
+```powershell
+# Check current branch
+git branch
+
+# If needed, switch to the branch with setup-db script
+# (usually 'db-creds-history-26fbd' or 'main')
+git pull origin db-creds-history-26fbd
+
+# Verify the script exists
+Test-Path backend/scripts/setup-db.js
+# Should return: True
+```
+
+Then run:
 ```powershell
 cd backend
 npm run setup-db
