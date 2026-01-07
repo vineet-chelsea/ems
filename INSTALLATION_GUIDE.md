@@ -118,12 +118,23 @@ npm install
 **Important:** Now navigate to the backend directory.
 
 ```powershell
+# First, make sure you're in the root directory
+cd C:\Users\vemco\EMS\ems
+
+# Verify backend folder exists
+Test-Path backend
+# Should return: True
+
 # Navigate to backend
 cd backend
 
 # Verify you're in backend directory
 Get-Location
 # Should show: ...\ems\backend
+
+# Verify package.json exists
+Test-Path package.json
+# Should return: True
 
 # Verify which package.json
 Get-Content package.json | Select-String "name"
@@ -135,6 +146,8 @@ npm install
 # Return to root
 cd ..
 ```
+
+**Troubleshooting:** If you get "Cannot find path backend/package.json", see `TROUBLESHOOTING.md` for detailed solutions.
 
 **What this installs:**
 - Express (web server)
