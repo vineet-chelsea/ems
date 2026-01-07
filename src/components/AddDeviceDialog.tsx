@@ -94,7 +94,7 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
       onAddDevice({
         name: formData.name,
         ipAddress: formData.ipAddress,
-        subnetMask: "255.255.255.0",
+        subnetMask: formData.subnetMask || "255.255.255.0",
         slaveAddress: formData.slaveAddress ?? 1,
         breakerRating: formData.breakerRating || undefined,
         unitCost: formData.unitCost || undefined,
@@ -219,9 +219,9 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
               <Label htmlFor="subnet-mask">Subnet Mask</Label>
               <Input
                 id="subnet-mask"
-                value="255.255.255.0"
-                disabled
-                className="bg-muted cursor-not-allowed"
+                placeholder="255.255.255.0"
+                value={formData.subnetMask}
+                onChange={(e) => setFormData(prev => ({ ...prev, subnetMask: e.target.value }))}
               />
             </div>
           </div>

@@ -4,6 +4,19 @@ import * as log from 'electron-log';
 import { app } from 'electron';
 import * as fs from 'fs';
 
+// Safe logging wrapper
+function safeLog(level: 'info' | 'warn' | 'error', message: string, ...args: any[]) {
+  try {
+    if (log && typeof log[level] === 'function') {
+      log[level](message, ...args);
+    } else {
+      console[level === 'info' ? 'log' : level](message, ...args);
+    }
+  } catch (err) {
+    console[level === 'info' ? 'log' : level](message, ...args);
+  }
+}
+
 /**
  * Get the path to docker-compose.yml
  * Must be called after app is ready (or use process.cwd() in dev mode)
@@ -27,12 +40,12 @@ export async function checkDocker(): Promise<boolean> {
   return new Promise((resolve) => {
     exec('docker --version', (error) => {
       if (error) {
-        log.error('Docker is not installed or not in PATH');
+        safeLog('error', 'Docker is not installed or not in PATH');
         resolve(false);
       } else {
         exec('docker info', (error) => {
           if (error) {
-            log.error('Docker daemon is not running');
+            safeLog('error', 'Docker daemon is not running');
             resolve(false);
           } else {
             resolve(true);
@@ -51,14 +64,14 @@ export async function startDockerContainers(): Promise<boolean> {
     const dockerComposePath = getDockerComposePath();
     
     if (!fs.existsSync(dockerComposePath)) {
-      log.error(`Docker compose file not found at: ${dockerComposePath}`);
+      safeLog('error', `Docker compose file not found at: ${dockerComposePath}`);
       return false;
     }
 
     const dockerComposeDir = path.dirname(dockerComposePath);
     
     return new Promise((resolve) => {
-      log.info('Starting Docker containers...');
+      safeLog('info', 'Starting Docker containers...');
       
       const dockerCompose = spawn('docker-compose', ['up', '-d'], {
         cwd: dockerComposeDir,
@@ -70,32 +83,35 @@ export async function startDockerContainers(): Promise<boolean> {
 
       dockerCompose.stdout?.on('data', (data) => {
         output += data.toString();
-        log.info(data.toString());
+        safeLog('info', data.toString());
       });
 
       dockerCompose.stderr?.on('data', (data) => {
         errorOutput += data.toString();
-        log.error(data.toString());
+        safeLog('error', data.toString());
       });
 
-      dockerCompose.on('close', (code) => {
+      dockerCompose.on('close', async (code) => {
         if (code === 0) {
-          log.info('Docker containers started successfully');
+          safeLog('info', 'Docker containers started successfully');
+          // Wait a bit for containers to initialize
+          safeLog('info', 'Waiting for containers to be ready...');
+          await new Promise(resolve => setTimeout(resolve, 5000));
           resolve(true);
         } else {
-          log.error(`Docker compose failed with code ${code}`);
-          log.error(`Error output: ${errorOutput}`);
+          safeLog('error', `Docker compose failed with code ${code}`);
+          safeLog('error', `Error output: ${errorOutput}`);
           resolve(false);
         }
       });
 
       dockerCompose.on('error', (error) => {
-        log.error(`Failed to start docker-compose: ${error.message}`);
+        safeLog('error', `Failed to start docker-compose: ${error.message}`);
         resolve(false);
       });
     });
-  } catch (error) {
-    log.error('Error starting Docker containers:', error);
+  } catch (error: any) {
+    safeLog('error', 'Error starting Docker containers:', error);
     return false;
   }
 }
@@ -109,7 +125,7 @@ export async function stopDockerContainers(): Promise<boolean> {
     const dockerComposeDir = path.dirname(dockerComposePath);
     
     return new Promise((resolve) => {
-      log.info('Stopping Docker containers...');
+      safeLog('info', 'Stopping Docker containers...');
       
       const dockerCompose = spawn('docker-compose', ['down'], {
         cwd: dockerComposeDir,
@@ -118,21 +134,21 @@ export async function stopDockerContainers(): Promise<boolean> {
 
       dockerCompose.on('close', (code) => {
         if (code === 0) {
-          log.info('Docker containers stopped successfully');
+          safeLog('info', 'Docker containers stopped successfully');
           resolve(true);
         } else {
-          log.error(`Failed to stop Docker containers with code ${code}`);
+          safeLog('error', `Failed to stop Docker containers with code ${code}`);
           resolve(false);
         }
       });
 
       dockerCompose.on('error', (error) => {
-        log.error(`Failed to stop docker-compose: ${error.message}`);
+        safeLog('error', `Failed to stop docker-compose: ${error.message}`);
         resolve(false);
       });
     });
-  } catch (error) {
-    log.error('Error stopping Docker containers:', error);
+  } catch (error: any) {
+    safeLog('error', 'Error stopping Docker containers:', error);
     return false;
   }
 }
@@ -169,13 +185,13 @@ export async function waitForBackend(maxAttempts = 30, delay = 1000): Promise<bo
   for (let i = 0; i < maxAttempts; i++) {
     const isHealthy = await checkBackendHealth();
     if (isHealthy) {
-      log.info('Backend API is ready');
+      safeLog('info', 'Backend API is ready');
       return true;
     }
-    log.info(`Waiting for backend... (${i + 1}/${maxAttempts})`);
+    safeLog('info', `Waiting for backend... (${i + 1}/${maxAttempts})`);
     await new Promise(resolve => setTimeout(resolve, delay));
   }
-  log.error('Backend API did not become ready in time');
+  safeLog('error', 'Backend API did not become ready in time');
   return false;
 }
 

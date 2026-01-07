@@ -184,17 +184,29 @@ initialize();
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
-  stopDataCollection();
+  await stopDataCollection();
   await disconnectKafkaProducer();
-  await db.end();
+  // Wait a bit for any pending queries to complete
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  try {
+    await db.end();
+  } catch (error: any) {
+    console.error('Error closing database pool:', error.message);
+  }
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
   console.log('SIGINT received, shutting down gracefully');
-  stopDataCollection();
+  await stopDataCollection();
   await disconnectKafkaProducer();
-  await db.end();
+  // Wait a bit for any pending queries to complete
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  try {
+    await db.end();
+  } catch (error: any) {
+    console.error('Error closing database pool:', error.message);
+  }
   process.exit(0);
 });
 

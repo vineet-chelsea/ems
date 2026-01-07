@@ -442,9 +442,25 @@ class ApiService {
     return this.request(`/data/${deviceId}/stats${query ? `?${query}` : ''}`);
   }
 
-  // Health check
+  // Health check (note: /health is not under /api prefix)
   async healthCheck(): Promise<{ status: string; database: string }> {
-    return this.request<{ status: string; database: string }>('/health');
+    const token = getAuthToken();
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    // Health endpoint is at /health, not /api/health
+    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001';
+    const response = await fetch(`${baseUrl}/health`, { headers });
+    
+    if (!response.ok) {
+      throw new Error(`Health check failed: ${response.status}`);
+    }
+    
+    return response.json();
   }
 
   // Device configuration endpoints

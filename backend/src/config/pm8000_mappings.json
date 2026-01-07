@@ -213,7 +213,7 @@
     "parameter": "Current Unbalance Worst",
     "address": 3017,
     "dataType": "FLOAT32",
-    "unit": "---",
+    "unit": "%",
     "description": ""
   },
   {
@@ -276,7 +276,7 @@
     "parameter": "Voltage Unbalance L-N Worst",
     "address": 3051,
     "dataType": "FLOAT32",
-    "unit": "---",
+    "unit": "%",
     "description": ""
   },
   {
@@ -1837,7 +1837,7 @@
     "parameter": "Voltage Unbalance Mean",
     "address": 28205,
     "dataType": "FLOAT32",
-    "unit": "---",
+    "unit": "%",
     "description": ""
   },
   {

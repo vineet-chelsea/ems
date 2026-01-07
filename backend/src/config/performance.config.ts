@@ -73,16 +73,16 @@ export const defaultConfig: PerformanceConfig = {
     connectionTimeout: 5000,
   },
   batch: {
-    deviceBatchSize: 10,
-    insertBatchSize: 100,
+    deviceBatchSize: 15,              // Process 15 devices in parallel
+    insertBatchSize: 200,             // Insert 200 rows per batch
   },
   retention: {
     dataRetentionDays: 180,          // 6 months
     cleanupSchedule: '0 2 * * *',    // Daily at 2 AM
   },
   workers: {
-    maxWorkers: 10,
-    workerTimeout: 5000,
+    maxWorkers: 18,                   // 18 workers to handle 15 devices + headroom
+    workerTimeout: 8000,              // 8 second timeout
   },
   memory: {
     maxReportMemoryMB: 2048,         // 2GB max for reports

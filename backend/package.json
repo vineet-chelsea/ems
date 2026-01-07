@@ -9,6 +9,12 @@
     "build": "tsc && npm run copy-assets",
     "copy-assets": "node scripts/copy-assets.js",
     "start": "node dist/index.js",
+    "start:pm2": "pm2 start ecosystem.config.json",
+    "start:pm2:dev": "pm2 start ecosystem.config.json --env development",
+    "stop:pm2": "pm2 stop ems-backend",
+    "restart:pm2": "pm2 restart ems-backend",
+    "delete:pm2": "pm2 delete ems-backend",
+    "logs:pm2": "pm2 logs ems-backend",
     "migrate": "tsx src/db/migrate.ts",
     "setup-db": "node scripts/setup-db.js"
   },

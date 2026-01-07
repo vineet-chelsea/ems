@@ -33,6 +33,13 @@ class GPUProcessor {
   private gpuAvailable: boolean | null = null;
   private lastCheck: number = 0;
   private checkInterval = 60000; // Check every minute
+  
+  /**
+   * Get the Python command to use (Python 3.11 for CuPy compatibility)
+   */
+  private getPythonCommand(): string {
+    return process.platform === 'win32' ? 'py -3.11' : 'python3.11';
+  }
 
   /**
    * Check if GPU is available
@@ -49,8 +56,9 @@ class GPUProcessor {
 
     try {
       const scriptPath = require('path').join(__dirname, '../../scripts/gpu_stats.py');
+      const pythonCmd = this.getPythonCommand();
       const { stdout } = await execAsync(
-        `python "${scriptPath}" check`,
+        `${pythonCmd} "${scriptPath}" check`,
         { timeout: 5000 }
       );
 
@@ -86,10 +94,11 @@ class GPUProcessor {
 
     try {
       const scriptPath = require('path').join(__dirname, '../../scripts/gpu_stats.py');
+      const pythonCmd = this.getPythonCommand();
       const dataJson = JSON.stringify(data);
       
       const { stdout, stderr } = await execAsync(
-        `python "${scriptPath}" stats ${JSON.stringify(dataJson)}`,
+        `${pythonCmd} "${scriptPath}" stats ${JSON.stringify(dataJson)}`,
         { 
           maxBuffer: 10 * 1024 * 1024,
           timeout: 30000 
@@ -126,10 +135,11 @@ class GPUProcessor {
 
     try {
       const scriptPath = require('path').join(__dirname, '../../scripts/gpu_stats.py');
+      const pythonCmd = this.getPythonCommand();
       const dataJson = JSON.stringify(dataDict);
       
       const { stdout, stderr } = await execAsync(
-        `python "${scriptPath}" multi_stats ${JSON.stringify(dataJson)}`,
+        `${pythonCmd} "${scriptPath}" multi_stats ${JSON.stringify(dataJson)}`,
         { 
           maxBuffer: 10 * 1024 * 1024,
           timeout: 60000 
@@ -168,11 +178,12 @@ class GPUProcessor {
 
     try {
       const scriptPath = require('path').join(__dirname, '../../scripts/gpu_stats.py');
+      const pythonCmd = this.getPythonCommand();
       const tsJson = JSON.stringify(timestamps);
       const valJson = JSON.stringify(values);
       
       const { stdout, stderr } = await execAsync(
-        `python "${scriptPath}" aggregate ${tsJson} ${valJson} ${intervalSeconds}`,
+        `${pythonCmd} "${scriptPath}" aggregate ${tsJson} ${valJson} ${intervalSeconds}`,
         { 
           maxBuffer: 10 * 1024 * 1024,
           timeout: 60000 

@@ -325,6 +325,7 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
   
   // Local state for editable device settings (only for Micrologic 6E)
   const [editableSettings, setEditableSettings] = useState({
+    subnetMask: device.subnetMask || '255.255.255.0',
     breakerRating: device.breakerRating ?? undefined,
     unitCost: device.unitCost ?? undefined,
     protectionIr: device.protectionIr ?? undefined,
@@ -340,6 +341,7 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
   // Update local state when device changes
   useEffect(() => {
     setEditableSettings({
+      subnetMask: device.subnetMask || '255.255.255.0',
       breakerRating: device.breakerRating ?? undefined,
       unitCost: device.unitCost ?? undefined,
       protectionIr: device.protectionIr ?? undefined,
@@ -358,6 +360,24 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
     
     // Client-side validation
     const validationErrors: string[] = [];
+    
+    // Validate subnet mask (IP address format)
+    if (editableSettings.subnetMask) {
+      const subnetMaskRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+      if (!subnetMaskRegex.test(editableSettings.subnetMask)) {
+        validationErrors.push('Subnet mask must be a valid IP address format (e.g., 255.255.255.0)');
+      } else {
+        // Validate each octet is between 0-255
+        const octets = editableSettings.subnetMask.split('.');
+        for (const octet of octets) {
+          const num = parseInt(octet, 10);
+          if (isNaN(num) || num < 0 || num > 255) {
+            validationErrors.push('Subnet mask octets must be between 0 and 255');
+            break;
+          }
+        }
+      }
+    }
     
     if (device.type === 'MICROLOGIC_6E') {
       // Validate protection settings
@@ -409,6 +429,10 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
       // Prepare update payload - only include fields that are defined
       const updatePayload: any = {};
       
+      if (editableSettings.subnetMask !== undefined) {
+        updatePayload.subnetMask = editableSettings.subnetMask || '255.255.255.0';
+      }
+      
       if (editableSettings.breakerRating !== undefined) {
         updatePayload.breakerRating = editableSettings.breakerRating === null || editableSettings.breakerRating === '' ? undefined : Number(editableSettings.breakerRating);
       }
@@ -459,6 +483,7 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
       onUpdateDevice(updatedDevice);
       // Also update editableSettings to reflect the saved values
       setEditableSettings({
+        subnetMask: updatedDevice.subnetMask || '255.255.255.0',
         breakerRating: updatedDevice.breakerRating ?? undefined,
         unitCost: updatedDevice.unitCost ?? undefined,
         protectionIr: updatedDevice.protectionIr ?? undefined,
@@ -1391,8 +1416,17 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
                     <div className="p-2 bg-muted rounded text-sm">{device.ipAddress}</div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Subnet Mask</Label>
-                    <div className="p-2 bg-muted rounded text-sm">{device.subnetMask}</div>
+                    <Label htmlFor="edit-subnet-mask">Subnet Mask</Label>
+                    {isAdmin ? (
+                      <Input
+                        id="edit-subnet-mask"
+                        placeholder="255.255.255.0"
+                        value={editableSettings.subnetMask || ''}
+                        onChange={(e) => setEditableSettings(prev => ({ ...prev, subnetMask: e.target.value }))}
+                      />
+                    ) : (
+                      <div className="p-2 bg-muted rounded text-sm">{device.subnetMask}</div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label>Slave Address</Label>

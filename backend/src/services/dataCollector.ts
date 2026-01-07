@@ -1677,13 +1677,13 @@ function augmentEm6400ComputedFields(device: Device, data: Record<string, number
     data['UnderVoltage Alarm'] = updateCounterValue('UnderVoltage Alarm', vLnAvg < nominalV * 0.92);
   }
 
-  // 7/8/9) Phase loss when phase-to-neutral voltage is 0 - counter increments when phase is lost
+  // 7/8/9) Phase loss when phase-to-neutral voltage is less than 0.7 * Nominal Voltage - counter increments when phase is lost
   const vAN = num(data, 'Voltage A-N');
   const vBN = num(data, 'Voltage B-N');
   const vCN = num(data, 'Voltage C-N');
-  if (vAN !== undefined) data['Phase A loss'] = updateCounterValue('Phase A loss', vAN === 0);
-  if (vBN !== undefined) data['Phase B loss'] = updateCounterValue('Phase B loss', vBN === 0);
-  if (vCN !== undefined) data['Phase C loss'] = updateCounterValue('Phase C loss', vCN === 0);
+  if (vAN !== undefined && nominalV !== undefined) data['Phase A loss'] = updateCounterValue('Phase A loss', vAN < nominalV * 0.7);
+  if (vBN !== undefined && nominalV !== undefined) data['Phase B loss'] = updateCounterValue('Phase B loss', vBN < nominalV * 0.7);
+  if (vCN !== undefined && nominalV !== undefined) data['Phase C loss'] = updateCounterValue('Phase C loss', vCN < nominalV * 0.7);
 
   // 10) Current imbalance alarm (> 20% deviation) - counter increments when condition is met
   const iA = num(data, 'Current A');
@@ -2010,6 +2010,7 @@ async function readModbusData(
   const scriptContent = `
 import sys
 import json
+import socket
 from pymodbus.client import ModbusTcpClient
 import struct
 
@@ -2254,6 +2255,37 @@ def read_register(client, address, data_type, device_id, word_order='AB'):
     else:
         return None
 
+def quick_connect_test(host, port, timeout=0.5):
+    """Quick TCP connection test - fails fast if connection refused (500ms)
+    Returns: (success: bool, error_type: str, error_code: int)
+    """
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        result = sock.connect_ex((host, port))
+        sock.close()
+        # Check if connection was refused (error code 111 on Linux, 10061 on Windows)
+        # 0 means success, non-zero means error
+        if result == 0:
+            return (True, "success", 0)
+        # Connection refused errors - device is definitely offline
+        if result == 111 or result == 10061:
+            return (False, "connection_refused", result)
+        # Other errors (timeout, network unreachable, etc.)
+        # Error 10060 is WSAETIMEDOUT on Windows, timeout on Linux is usually 110 or 116
+        if result == 10060 or result == 110 or result == 116:
+            return (False, "timeout", result)
+        # Unknown error - log the error code for debugging
+        print(f"DEBUG: quick_connect_test returned unknown error code: {result}", file=sys.stderr)
+        return (False, "unknown", result)
+    except socket.timeout:
+        # Socket timeout exception
+        return (False, "timeout", -1)
+    except Exception as e:
+        # Exception during connection test - log for debugging
+        print(f"DEBUG: quick_connect_test exception: {e}", file=sys.stderr)
+        return (False, "exception", -1)
+
 # Parse arguments
 ip_address = sys.argv[1]
 device_id = int(sys.argv[2])
@@ -2263,10 +2295,35 @@ mappings_file = sys.argv[3]
 with open(mappings_file, 'r') as f:
     mappings = json.load(f)
 
-# Connect to Modbus device
-client = ModbusTcpClient(host=ip_address, port=502)
-if not client.connect():
-    print(json.dumps({"error": "Failed to connect to Modbus device"}))
+# Quick connection test first (fail fast if connection refused - 1 second)
+# This must come AFTER ip_address is defined
+# Note: We only fail fast for "connection_refused" - other errors still allow Modbus connection attempt
+# Increased timeout from 0.5s to 1s to be less aggressive and avoid false timeouts
+connect_success, error_type, error_code = quick_connect_test(ip_address, 502, timeout=1.0)
+if not connect_success:
+    # Only fail fast for connection_refused (device is definitely offline)
+    # For other errors (timeout, unknown, exception), still try Modbus connection
+    # as the device might be reachable via Modbus even if quick test fails
+    if error_type == "connection_refused":
+        print(json.dumps({"error": "Connection refused - device not reachable", "error_type": "connection_refused"}))
+        sys.exit(1)
+    # For timeout, unknown, or exception - log but continue to Modbus connection attempt
+    # The Modbus client might still be able to connect even if quick test failed
+    print(f"DEBUG: Quick connection test failed with {error_type} (code: {error_code}), but attempting Modbus connection anyway", file=sys.stderr)
+
+# Connect to Modbus device (with 3 second timeout for actual Modbus operations)
+client = ModbusTcpClient(host=ip_address, port=502, timeout=3.0)
+try:
+    if not client.connect():
+        print(json.dumps({"error": "Failed to connect to Modbus device", "error_type": "modbus_connect_failed"}))
+        sys.exit(1)
+except Exception as e:
+    # Handle connection exceptions (timeout, network errors, etc.)
+    error_msg = str(e)
+    if "timeout" in error_msg.lower() or "timed out" in error_msg.lower():
+        print(json.dumps({"error": f"Modbus connection timeout: {error_msg}", "error_type": "timeout"}))
+    else:
+        print(json.dumps({"error": f"Modbus connection error: {error_msg}", "error_type": "connection_error"}))
     sys.exit(1)
 
 # Read all registers - skip parameters that are not available
@@ -2350,10 +2407,36 @@ print(json.dumps(results))
 `;
 
   // Embed mappings in script to avoid file I/O
-  const fullScript = scriptContent.replace(
-    '# Parse arguments\nip_address = sys.argv[1]\ndevice_id = int(sys.argv[2])\nmappings_file = sys.argv[3]\n\n# Read mappings from JSON file (to avoid command line length limits)\nwith open(mappings_file, \'r\') as f:\n    mappings = json.load(f)',
-    `# Parse arguments and load mappings\nip_address = ${JSON.stringify(ipAddress)}\ndevice_id = ${slaveAddress || 1}\nmappings = ${JSON.stringify(registerMappings)}`
-  );
+  // Replace the argument parsing section, including the connection test that comes after it
+  // Embed mappings in script to avoid file I/O
+  // Replace the argument parsing section - match exactly what's in the template
+  const oldPattern = `# Parse arguments
+ip_address = sys.argv[1]
+device_id = int(sys.argv[2])
+mappings_file = sys.argv[3]
+
+# Read mappings from JSON file (to avoid command line length limits)
+with open(mappings_file, 'r') as f:
+    mappings = json.load(f)
+
+# Quick connection test first (fail fast if connection refused - 1 second)
+# This must come AFTER ip_address is defined
+# Note: We only fail fast for "connection_refused" - other errors still allow Modbus connection attempt
+# Increased timeout from 0.5s to 1s to be less aggressive and avoid false timeouts
+connect_success, error_type, error_code = quick_connect_test(ip_address, 502, timeout=1.0)`;
+
+  const newPattern = `# Parse arguments and load mappings
+ip_address = ${JSON.stringify(ipAddress)}
+device_id = ${slaveAddress || 1}
+mappings = ${JSON.stringify(registerMappings)}
+
+# Quick connection test first (fail fast if connection refused - 1 second)
+# This must come AFTER ip_address is defined
+# Note: We only fail fast for "connection_refused" - other errors still allow Modbus connection attempt
+# Increased timeout from 0.5s to 1s to be less aggressive and avoid false timeouts
+connect_success, error_type, error_code = quick_connect_test(ip_address, 502, timeout=1.0)`;
+
+  const fullScript = scriptContent.replace(oldPattern, newPattern);
 
   try {
     // Execute Python script using worker pool
@@ -2366,7 +2449,12 @@ print(json.dumps(results))
     }
     
     if (result.error) {
-      throw new Error(result.error);
+      // Create error with error_type if available
+      const error = new Error(result.error);
+      if (result.error_type) {
+        (error as any).error_type = result.error_type;
+      }
+      throw error;
     }
 
     // Filter out NaN/Infinity; schema-aware clamping happens at DB insert time.
@@ -2384,7 +2472,17 @@ print(json.dumps(results))
     console.log(`[Modbus] Successfully read ${Object.keys(cleanedResult).length} parameters from ${ipAddress}`);
     return cleanedResult;
   } catch (error: any) {
-    console.error(`[Modbus] Error reading from ${ipAddress}:`, error.message || error);
+    const errorMsg = error.message || String(error);
+    console.error(`[Modbus] Error reading from ${ipAddress}:`, errorMsg);
+    
+    // Log more details if available
+    if (error.stderr) {
+      console.error(`[Modbus] Python stderr for ${ipAddress}:`, error.stderr.substring(0, 1000));
+    }
+    if (error.stdout) {
+      console.error(`[Modbus] Python stdout for ${ipAddress}:`, error.stdout.substring(0, 500));
+    }
+    
     throw error;
   }
 }
@@ -2630,6 +2728,25 @@ const insertQueue: PendingInsert[] = [];
 let insertBatchTimeout: NodeJS.Timeout | null = null;
 let isFlushing = false;
 
+// Safe query wrapper to handle pool closed errors
+async function safeQuery(query: string, params?: any[]): Promise<any> {
+  try {
+    // Check if pool is ended
+    if ((db as any).ended) {
+      throw new Error('Database pool is closed');
+    }
+    return await db.query(query, params);
+  } catch (error: any) {
+    const errorMsg = error?.message || String(error);
+    if (errorMsg.includes('Cannot use a pool after calling end') || 
+        errorMsg.includes('pool is closed') ||
+        (db as any).ended) {
+      throw new Error('Database pool is closed - operation cancelled');
+    }
+    throw error;
+  }
+}
+
 // Metrics tracking
 interface CollectionMetrics {
   totalCollections: number;
@@ -2656,6 +2773,20 @@ const metrics: CollectionMetrics = {
 // Batch insert flush function
 async function flushInsertQueue(): Promise<void> {
   if (insertQueue.length === 0 || isFlushing) return;
+  
+  // Check if pool is still active (not closed)
+  try {
+    if ((db as any).ended) {
+      console.warn('Database pool is closed, skipping insert flush');
+      insertQueue.length = 0; // Clear queue
+      return;
+    }
+  } catch (e) {
+    // Pool might be in invalid state
+    console.warn('Database pool check failed, skipping insert flush');
+    insertQueue.length = 0; // Clear queue
+    return;
+  }
 
   isFlushing = true;
   const startTime = Date.now();
@@ -2672,125 +2803,191 @@ async function flushInsertQueue(): Promise<void> {
       byTable.get(tableName)!.push(item);
     }
 
-    // Process each table's batch
-    await Promise.allSettled(
+    // Process each table's batch - capture results to log errors
+    const results = await Promise.allSettled(
       Array.from(byTable.entries()).map(async ([tableName, items]) => {
         if (items.length === 0) return;
 
-        const columnSpecs = await loadColumnSpecs(tableName);
-        const allRows: Array<{ columns: string[]; values: any[] }> = [];
-        const allColumns = new Set<string>(['timestamp']);
+        try {
+          const columnSpecs = await loadColumnSpecs(tableName);
+          const allRows: Array<{ columns: string[]; values: any[] }> = [];
+          const allColumns = new Set<string>(['timestamp']);
 
-        // Process each item to build rows
-        for (const item of items) {
-          const columns: string[] = ['timestamp'];
-          const values: any[] = [item.timestamp];
-          const seenColumns = new Set<string>(['timestamp']);
+          // Process each item to build rows
+          for (const item of items) {
+            // Ensure timestamp is valid
+            if (!item.timestamp) {
+              console.warn(`[Batch Insert] Skipping item with null/undefined timestamp for table ${tableName}`);
+              continue;
+            }
+            
+            const columns: string[] = [quoteIdentifier('timestamp')];
+            const values: any[] = [item.timestamp];
+            const seenColumns = new Set<string>(['timestamp']);
 
-          for (const [key, value] of Object.entries(item.data)) {
-            if ((typeof value === 'number' && !isNaN(value) && isFinite(value)) || 
-                (typeof value === 'string' && value.length > 0)) {
-              const originalColumnName = key.toLowerCase();
-              let columnName = sanitizeColumnName(originalColumnName);
-              
-              let uniqueColumnName = columnName;
-              let suffix = 1;
-              while (seenColumns.has(uniqueColumnName)) {
-                uniqueColumnName = `${columnName}_${suffix}`;
-                suffix++;
-              }
-              seenColumns.add(uniqueColumnName);
-              allColumns.add(uniqueColumnName);
-              
-              const isString = typeof value === 'string';
-              let isDateTime = false;
-              let dbValue: any = value;
-              
-              if (isString) {
-                const isoDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/;
-                if (isoDateTimeRegex.test(value)) {
-                  isDateTime = true;
-                  dbValue = new Date(value);
-                }
-              }
-              
-              // Ensure column exists
-              await ensureColumnExists(tableName, uniqueColumnName, isString && !isDateTime, isDateTime);
-
-              if (isDateTime) {
-                const verifyColumn = await db.query(`
-                  SELECT data_type 
-                  FROM information_schema.columns 
-                  WHERE table_name = $1 AND column_name = $2
-                `, [tableName, sanitizeColumnName(uniqueColumnName)]);
+            for (const [key, value] of Object.entries(item.data)) {
+              if ((typeof value === 'number' && !isNaN(value) && isFinite(value)) || 
+                  (typeof value === 'string' && value.length > 0)) {
+                const originalColumnName = key.toLowerCase();
+                let columnName = sanitizeColumnName(originalColumnName);
                 
-                if (verifyColumn.rows.length > 0) {
-                  const actualType = verifyColumn.rows[0].data_type;
-                  if (actualType !== 'timestamp' && actualType !== 'timestamp without time zone') {
-                    continue;
+                let uniqueColumnName = columnName;
+                let suffix = 1;
+                while (seenColumns.has(uniqueColumnName)) {
+                  uniqueColumnName = `${columnName}_${suffix}`;
+                  suffix++;
+                }
+                seenColumns.add(uniqueColumnName);
+                allColumns.add(uniqueColumnName);
+                
+                const isString = typeof value === 'string';
+                let isDateTime = false;
+                let dbValue: any = value;
+                
+                if (isString) {
+                  const isoDateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/;
+                  if (isoDateTimeRegex.test(value)) {
+                    isDateTime = true;
+                    dbValue = new Date(value);
                   }
                 }
-              }
+                
+                // Ensure column exists
+                await ensureColumnExists(tableName, uniqueColumnName, isString && !isDateTime, isDateTime);
 
-              if (!isString && !isDateTime && typeof dbValue === 'number') {
-                const colNameForSpec = sanitizeColumnName(uniqueColumnName);
-                dbValue = clampNumberToColumnSpec(dbValue, colNameForSpec, columnSpecs);
+                if (isDateTime) {
+                  try {
+                    const verifyColumn = await safeQuery(`
+                      SELECT data_type 
+                      FROM information_schema.columns 
+                      WHERE table_name = $1 AND column_name = $2
+                    `, [tableName, sanitizeColumnName(uniqueColumnName)]);
+                    
+                    if (verifyColumn.rows.length > 0) {
+                      const actualType = verifyColumn.rows[0].data_type;
+                      if (actualType !== 'timestamp' && actualType !== 'timestamp without time zone') {
+                        continue;
+                      }
+                    }
+                  } catch (error: any) {
+                    // If pool is closed, skip this check
+                    if (error.message?.includes('pool is closed')) {
+                      continue;
+                    }
+                    throw error;
+                  }
+                }
+
+                if (!isString && !isDateTime && typeof dbValue === 'number') {
+                  const colNameForSpec = sanitizeColumnName(uniqueColumnName);
+                  dbValue = clampNumberToColumnSpec(dbValue, colNameForSpec, columnSpecs);
+                }
+                
+                columns.push(quoteIdentifier(uniqueColumnName));
+                values.push(dbValue);
+              }
+            }
+
+            if (columns.length > 1) {
+              allRows.push({ columns, values });
+            }
+          }
+
+          if (allRows.length === 0) {
+            console.warn(`[Batch Insert] No valid rows to insert for table ${tableName} (${items.length} items processed)`);
+            return;
+          }
+
+          // Build multi-row INSERT using first row's columns as template
+          // All rows should have same columns (we'll pad missing ones with NULL)
+          // Ensure 'timestamp' is first in the column list
+          const colList = ['timestamp', ...Array.from(allColumns).filter(c => c !== 'timestamp')];
+          const placeholders: string[] = [];
+          const flatValues: any[] = [];
+          let paramCount = 1;
+
+          for (const row of allRows) {
+            const rowPlaceholders: string[] = [];
+            const rowValues: any[] = [];
+            
+            for (const col of colList) {
+              // For timestamp, check both quoted and unquoted versions
+              const quotedCol = quoteIdentifier(col);
+              let colIndex = row.columns.indexOf(quotedCol);
+              
+              // If not found and it's timestamp, try unquoted
+              if (colIndex < 0 && col === 'timestamp') {
+                colIndex = row.columns.indexOf('timestamp');
               }
               
-              columns.push(quoteIdentifier(uniqueColumnName));
-              values.push(dbValue);
+              if (colIndex >= 0) {
+                rowPlaceholders.push(`$${paramCount++}`);
+                rowValues.push(row.values[colIndex]);
+              } else {
+                // Never allow NULL for timestamp - this is a critical error
+                if (col === 'timestamp') {
+                  console.error(`[Batch Insert] CRITICAL: timestamp column not found in row for table ${tableName}. Row columns:`, row.columns);
+                  throw new Error(`Timestamp column missing in row data for table ${tableName}`);
+                }
+                rowPlaceholders.push(`$${paramCount++}`);
+                rowValues.push(null);
+              }
             }
+            
+            placeholders.push(`(${rowPlaceholders.join(', ')})`);
+            flatValues.push(...rowValues);
           }
 
-          if (columns.length > 1) {
-            allRows.push({ columns, values });
+          const query = `
+            INSERT INTO ${tableName} (${colList.map(c => quoteIdentifier(c)).join(', ')})
+            VALUES ${placeholders.join(', ')}
+            ON CONFLICT DO NOTHING
+          `;
+
+          const result = await safeQuery(query, flatValues);
+          console.log(`[Batch Insert] Inserted ${allRows.length} row(s) into ${tableName} (${result.rowCount} affected)`);
+        } catch (error: any) {
+          const errorMsg = error?.message || String(error);
+          // Don't log pool closed errors as errors - it's expected during shutdown
+          if (errorMsg.includes('pool is closed') || errorMsg.includes('Cannot use a pool after calling end')) {
+            console.warn(`[Batch Insert] Database pool closed, skipping insert into ${tableName}`);
+            return; // Skip this table, don't re-throw
           }
+          console.error(`[Batch Insert] Error inserting into ${tableName}:`, errorMsg);
+          console.error(`[Batch Insert] Stack:`, error.stack);
+          throw error; // Re-throw to be caught by Promise.allSettled
         }
-
-        if (allRows.length === 0) return;
-
-        // Build multi-row INSERT using first row's columns as template
-        // All rows should have same columns (we'll pad missing ones with NULL)
-        const colList = Array.from(allColumns);
-        const placeholders: string[] = [];
-        const flatValues: any[] = [];
-        let paramCount = 1;
-
-        for (const row of allRows) {
-          const rowPlaceholders: string[] = [];
-          const rowValues: any[] = [];
-          
-          for (const col of colList) {
-            const colIndex = row.columns.indexOf(quoteIdentifier(col));
-            if (colIndex >= 0) {
-              rowPlaceholders.push(`$${paramCount++}`);
-              rowValues.push(row.values[colIndex]);
-            } else {
-              rowPlaceholders.push(`$${paramCount++}`);
-              rowValues.push(null);
-            }
-          }
-          
-          placeholders.push(`(${rowPlaceholders.join(', ')})`);
-          flatValues.push(...rowValues);
-        }
-
-        const query = `
-          INSERT INTO ${tableName} (${colList.map(c => quoteIdentifier(c)).join(', ')})
-          VALUES ${placeholders.join(', ')}
-          ON CONFLICT DO NOTHING
-        `;
-
-        await db.query(query, flatValues);
       })
     );
 
+    // Log any failures from Promise.allSettled
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const tableName = Array.from(byTable.keys())[index];
+        console.error(`[Batch Insert] Failed to insert into table ${tableName}:`, result.reason);
+      }
+    });
+
     const insertTime = Date.now() - startTime;
     metrics.averageDbInsertTime = (metrics.averageDbInsertTime * 0.9) + (insertTime * 0.1);
-  } catch (error) {
-    console.error('Batch insert error:', error);
-    // Re-queue failed items
-    insertQueue.unshift(...batch);
+  } catch (error: any) {
+    const errorMsg = error?.message || String(error);
+    // If pool is closed, don't re-queue - just clear the queue
+    if (errorMsg.includes('pool is closed') || errorMsg.includes('Cannot use a pool after calling end')) {
+      console.warn('Database pool closed during batch insert, clearing queue');
+      insertQueue.length = 0;
+    } else {
+      console.error('Batch insert error:', errorMsg);
+      // Re-queue failed items only if pool is still active
+      try {
+        if (!(db as any).ended) {
+          insertQueue.unshift(...batch);
+        }
+      } catch (e) {
+        // Pool might be in invalid state, just clear queue
+        insertQueue.length = 0;
+      }
+    }
   } finally {
     isFlushing = false;
     metrics.queueDepth = insertQueue.length;
@@ -2823,10 +3020,12 @@ async function insertDataPoint(deviceId: string, data: Record<string, number | s
 
   metrics.queueDepth = insertQueue.length;
 
-  // Flush if batch is full
-  if (insertQueue.length >= config.batch.insertBatchSize) {
+  // Don't auto-flush during batch collection - let processBatch handle flushing after all devices complete
+  // Only flush if queue gets very large (safety mechanism for edge cases)
+  if (insertQueue.length >= config.batch.insertBatchSize * 2) {
     await flushInsertQueue();
   } else {
+    // Schedule delayed flush as backup (but processBatch will flush after each batch completes)
     scheduleInsertFlush();
   }
 }
@@ -2999,11 +3198,38 @@ async function collectDeviceData(device: Device): Promise<boolean> {
       console.error(`  [Device ${device.id}] Python stderr:`, error.stderr.substring(0, 500));
     }
     
-    // Update device status to offline if connection fails
-    if (errorMsg.includes('Failed to connect') || errorMsg.includes('timeout') || errorMsg.includes('ECONNREFUSED')) {
+    // Update device status based on error type
+    // Only mark as offline for connection refused, not for timeouts (device might just be slow)
+    // Check for error_type from Python script first (most reliable)
+    const errorType = (error as any)?.error_type;
+    const isConnectionRefused = errorType === 'connection_refused' ||
+                                errorMsg.includes('Connection refused') || 
+                                errorMsg.includes('ECONNREFUSED') || 
+                                errorMsg.includes('connection_refused') ||
+                                (errorMsg.includes('Failed to connect') && !errorMsg.includes('timeout'));
+    
+    const isTimeout = errorType === 'timeout' ||
+                     errorMsg.includes('timeout') || 
+                     errorMsg.includes('Connection timeout');
+    
+    if (isConnectionRefused) {
+      // Connection refused - device is definitely offline
       await db.query(
         'UPDATE devices SET status = $1 WHERE id = $2',
         ['offline', device.id]
+      );
+    } else if (isTimeout) {
+      // Timeout - device might be slow, mark as connecting (don't mark offline)
+      // This prevents false offline status during parallel polling when device is just slow
+      await db.query(
+        'UPDATE devices SET status = $1 WHERE id = $2',
+        ['connecting', device.id]
+      );
+    } else if (errorMsg.includes('Failed to connect')) {
+      // Other connection failures - mark as connecting (not offline) to retry
+      await db.query(
+        'UPDATE devices SET status = $1 WHERE id = $2',
+        ['connecting', device.id]
       );
     }
     
@@ -3068,7 +3294,7 @@ export async function collectAllDevicesData(): Promise<void> {
     );
     const offlineDevices = allDevices.filter(d => d.status === 'offline');
 
-    // Process in batches
+    // Process in batches - collect all devices in batch in parallel, then flush DB
     const processBatch = async (devices: Device[]) => {
       const batches = [];
       for (let i = 0; i < devices.length; i += config.batch.deviceBatchSize) {
@@ -3076,9 +3302,12 @@ export async function collectAllDevicesData(): Promise<void> {
       }
 
       for (const batch of batches) {
+        // Collect all devices in this batch in parallel
         await Promise.allSettled(
           batch.map(device => collectDeviceData(device))
         );
+        // Flush insert queue after each batch completes (all devices collected)
+        await flushInsertQueue();
       }
     };
 
@@ -3171,11 +3400,32 @@ export function getMetrics(): CollectionMetrics {
   return { ...metrics };
 }
 
-export function stopDataCollection(): void {
+export async function stopDataCollection(): Promise<void> {
   if (collectionInterval) {
     clearInterval(collectionInterval);
     collectionInterval = null;
     console.log('Data collection stopped');
+  }
+  
+  // Wait for any pending database operations to complete
+  if (isFlushing) {
+    console.log('Waiting for pending database inserts to complete...');
+    // Wait up to 5 seconds for flush to complete
+    const maxWait = 5000;
+    const startWait = Date.now();
+    while (isFlushing && (Date.now() - startWait) < maxWait) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+  
+  // Flush any remaining inserts before shutdown
+  if (insertQueue.length > 0) {
+    console.log(`Flushing ${insertQueue.length} remaining inserts before shutdown...`);
+    try {
+      await flushInsertQueue();
+    } catch (error: any) {
+      console.error('Error flushing inserts during shutdown:', error.message);
+    }
   }
   if (metricsInterval) {
     clearInterval(metricsInterval);

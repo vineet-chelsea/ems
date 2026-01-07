@@ -3179,7 +3179,7 @@
     "parameter": "Min Total Demand Distortion",
     "address": 27357,
     "dataType": "FLOAT32",
-    "unit": "",
+    "unit": "%",
     "description": "",
     "sampleValues": {
       "address": 27358,
@@ -3629,7 +3629,7 @@
     "parameter": "Max Voltage Unbalance A-B",
     "address": 27731,
     "dataType": "FLOAT32",
-    "unit": "V",
+    "unit": "%",
     "description": "",
     "sampleValues": {
       "address": 27732,
@@ -3644,7 +3644,7 @@
     "parameter": "Max Voltage Unbalance B-C",
     "address": 27733,
     "dataType": "FLOAT32",
-    "unit": "V",
+    "unit": "%",
     "description": "",
     "sampleValues": {
       "address": 27734,
@@ -3659,7 +3659,7 @@
     "parameter": "Max Voltage Unbalance C-A",
     "address": 27735,
     "dataType": "FLOAT32",
-    "unit": "V",
+    "unit": "%",
     "description": "",
     "sampleValues": {
       "address": 27736,
@@ -3689,7 +3689,7 @@
     "parameter": "Max Voltage Unbalance A-N",
     "address": 27739,
     "dataType": "FLOAT32",
-    "unit": "V",
+    "unit": "%",
     "description": "",
     "sampleValues": {
       "address": 27740,
@@ -3704,7 +3704,7 @@
     "parameter": "Max Voltage Unbalance B-N",
     "address": 27741,
     "dataType": "FLOAT32",
-    "unit": "V",
+    "unit": "%",
     "description": "",
     "sampleValues": {
       "address": 27742,
@@ -3719,7 +3719,7 @@
     "parameter": "Max Voltage Unbalance C-N",
     "address": 27743,
     "dataType": "FLOAT32",
-    "unit": "V",
+    "unit": "%",
     "description": "",
     "sampleValues": {
       "address": 27744,

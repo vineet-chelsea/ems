@@ -1376,7 +1376,7 @@ router.get('/:deviceId/power-quality-report', async (req: AuthRequest, res) => {
 
     // Get device info including unit_cost
     const deviceResult = await db.query(
-      `SELECT name, type, unit_cost FROM devices WHERE id = $1`,
+      `SELECT name, type, COALESCE(unit_cost, 0)::numeric as unit_cost FROM devices WHERE id = $1`,
       [deviceId]
     );
     if (deviceResult.rows.length === 0) {
@@ -1384,7 +1384,14 @@ router.get('/:deviceId/power-quality-report', async (req: AuthRequest, res) => {
     }
     const device = deviceResult.rows[0];
     const deviceType = device.type;
-    const unitCost = device.unit_cost || 0;
+    // Ensure unitCost is always a number (PostgreSQL NUMERIC can be returned as string)
+    // Parse it explicitly and handle null/undefined
+    let unitCost = 0;
+    if (device.unit_cost != null) {
+      const parsed = parseFloat(String(device.unit_cost));
+      unitCost = isNaN(parsed) ? 0 : parsed;
+    }
+    console.log(`[PowerQualityReport] Device ${deviceId} unit_cost from DB: ${device.unit_cost} (type: ${typeof device.unit_cost}), parsed: ${unitCost}`);
 
     // Helper function to convert parameter name to column name (matches dataCollector sanitizeColumnName logic)
     // This matches the logic in dataCollector.ts: sanitizeColumnName function
@@ -1864,7 +1871,7 @@ router.get('/:deviceId/power-quality-report', async (req: AuthRequest, res) => {
         ...(energyDataConverted.kVAhDiff && { kVAhDiff: energyDataConverted.kVAhDiff }),
         differences: energyDiff,
         energyCharges,
-        unitCost,
+        unitCost: Number(unitCost), // Ensure it's sent as a number, not string
         units: energyParamMap.units || { Wh: 'kWh', Varh: 'kVARh', kVAh: 'kVAh' },
       },
       maxMinData,

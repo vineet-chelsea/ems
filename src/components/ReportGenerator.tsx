@@ -709,14 +709,31 @@ ${data.length > 100 ? `\n... and ${data.length - 100} more records` : ''}
       doc.text('Energy Charges', marginLeft + 12, y + 18);
       
       doc.setFontSize(13);
-      doc.text(`₹ ${formatNumber(reportData.energyData.energyCharges)}`, marginLeft + 12, y + 38);
+      // Use 'Rs' instead of ₹ symbol to avoid encoding issues
+      // Build text using string concatenation to avoid template literal encoding issues
+      const energyChargesValue = formatNumber(reportData.energyData.energyCharges);
+      doc.text('Rs ' + energyChargesValue, marginLeft + 12, y + 38);
       
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 100, 100);
-      const calcText = `kVAh diff: ${formatNumber(reportData.energyData.differences.kVAh)} × Unit: ₹${reportData.energyData.unitCost}`;
-      const calcLines = doc.splitTextToSize(calcText, contentWidth / 2 - 10);
-      doc.text(calcLines, marginLeft + contentWidth / 2, y + 25, { align: 'right' });
+      // Use 'x' instead of × symbol and 'Rs' instead of ₹ to avoid encoding issues
+      // Handle unitCost - convert to number and check if valid
+      let unitCostValue = 'Not Set';
+      if (reportData.energyData.unitCost != null) {
+        const unitCostNum = typeof reportData.energyData.unitCost === 'string' 
+          ? parseFloat(reportData.energyData.unitCost) 
+          : Number(reportData.energyData.unitCost);
+        if (!isNaN(unitCostNum) && isFinite(unitCostNum) && unitCostNum > 0) {
+          unitCostValue = unitCostNum.toFixed(2);
+        }
+      }
+      console.log('[ReportGenerator] unitCost:', reportData.energyData.unitCost, 'type:', typeof reportData.energyData.unitCost, 'parsed:', unitCostValue);
+      // Build text without using template literals to avoid any encoding issues
+      const kVAhDiff = formatNumber(reportData.energyData.differences.kVAh);
+      const calcText = 'kVAh diff: ' + kVAhDiff + ' x Unit: Rs' + unitCostValue;
+      // Use direct text rendering instead of splitTextToSize to avoid encoding issues
+      doc.text(calcText, marginLeft + contentWidth / 2, y + 25, { align: 'right', maxWidth: contentWidth / 2 - 10 });
       
       doc.setTextColor(0, 0, 0);
       y += chargesBoxHeight + 15;

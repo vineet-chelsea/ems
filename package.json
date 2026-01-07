@@ -7,6 +7,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:electron": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "start:dev": "powershell -ExecutionPolicy Bypass -File scripts/start-dev.ps1",
+    "stop:dev": "powershell -ExecutionPolicy Bypass -File scripts/stop-dev.ps1",
+    "start:pm2": "pm2 start ecosystem.config.json",
+    "start:pm2:dev": "pm2 start ecosystem.config.json",
+    "stop:pm2": "pm2 stop ems-electron-dev",
+    "restart:pm2": "pm2 restart ems-electron-dev",
+    "delete:pm2": "pm2 delete ems-electron-dev",
+    "logs:pm2": "pm2 logs ems-electron-dev",
     "build": "vite build && electron-builder",
     "build:dev": "vite build --mode development",
     "build:win": "vite build && electron-builder --win",
@@ -14,8 +23,14 @@
     "build:linux": "vite build && electron-builder --linux",
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "tsc -p tsconfig.electron.json && vite build",
+    "generate-icons": "node scripts/generate-icons.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "install-services": "powershell -ExecutionPolicy Bypass -File scripts/install-windows-services.ps1",
+    "uninstall-services": "powershell -ExecutionPolicy Bypass -File scripts/uninstall-windows-services.ps1",
+    "start-services": "powershell -ExecutionPolicy Bypass -File scripts/start-services.ps1",
+    "stop-services": "powershell -ExecutionPolicy Bypass -File scripts/stop-services.ps1",
+    "status-services": "powershell -ExecutionPolicy Bypass -File scripts/status-services.ps1"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -77,6 +92,7 @@
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
+    "@types/auto-launch": "^5.0.5",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -86,12 +102,14 @@
     "concurrently": "^8.2.2",
     "electron": "^39.2.6",
     "electron-builder": "^24.9.1",
+    "electron-icon-builder": "^2.0.1",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
@@ -111,8 +129,7 @@
       "package.json",
       "docker-compose.yml",
       "backend/**/*",
-      "!backend/node_modules/**/*",
-      "!backend/dist/**/*",
+      "!backend/node_modules/.cache/**/*",
       "!backend/.env"
     ],
     "extraResources": [
@@ -125,8 +142,7 @@
         "to": "backend",
         "filter": [
           "**/*",
-          "!node_modules/**/*",
-          "!dist/**/*",
+          "!node_modules/.cache/**/*",
           "!.env"
         ]
       }
@@ -167,7 +183,9 @@
       "shortcutName": "Energy Monitoring System",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
-      "installerHeaderIcon": "build/icon.ico"
+      "installerHeaderIcon": "build/icon.ico",
+      "runAfterFinish": false,
+      "deleteAppDataOnUninstall": false
     },
     "publish": {
       "provider": "github",
