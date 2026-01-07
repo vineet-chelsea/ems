@@ -91,19 +91,60 @@ If downloading as ZIP:
 
 ### Step 2: Install Frontend Dependencies
 
+**Important:** Make sure you're in the root `ems` directory (NOT in backend).
+
 ```powershell
+# Verify you're in the root directory
+Get-Location
+# Should show: C:\Users\vemco\EMS\ems (or your path ending in \ems)
+
+# Verify which package.json
+Get-Content package.json | Select-String "name"
+# Should show: "name": "energy-monitoring-system"
+
+# Install frontend dependencies
 npm install
 ```
 
-This will install all frontend dependencies. Wait for completion.
+**What this installs:**
+- React, Vite, UI components (Radix UI)
+- Frontend build tools
+- Electron (for desktop app)
+
+**Output:** Creates `node_modules/` in the root directory with frontend packages.
 
 ### Step 3: Install Backend Dependencies
 
+**Important:** Now navigate to the backend directory.
+
 ```powershell
+# Navigate to backend
 cd backend
+
+# Verify you're in backend directory
+Get-Location
+# Should show: ...\ems\backend
+
+# Verify which package.json
+Get-Content package.json | Select-String "name"
+# Should show: "name": "ems-backend"
+
+# Install backend dependencies
 npm install
+
+# Return to root
 cd ..
 ```
+
+**What this installs:**
+- Express (web server)
+- PostgreSQL driver (pg)
+- TypeScript compiler
+- Backend utilities (bcryptjs, jsonwebtoken, etc.)
+
+**Output:** Creates `backend/node_modules/` with backend packages.
+
+**Note:** These are TWO separate installations. The frontend and backend have different dependencies and must be installed separately.
 
 ---
 
