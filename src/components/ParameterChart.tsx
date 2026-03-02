@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, ReferenceLine } from 'recharts';
-import { TrendingUp, BarChart3, Loader } from "lucide-react";
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, ReferenceLine } from 'recharts';
+import { TrendingUp, Loader } from "lucide-react";
 import { api } from "@/services/api";
 
 interface Parameter {
@@ -10,6 +10,14 @@ interface Parameter {
   unit: string;
   group: string;
   columnName?: string;
+}
+
+/** Refresh interval for chart and key-params updates (ms). Single source of truth. */
+export const CHART_REFRESH_INTERVAL_MS = 60000;
+
+function formatRefreshInterval(ms: number): string {
+  if (ms >= 60000) return ms === 60000 ? '1 minute' : `${Math.round(ms / 60000)} minutes`;
+  return ms === 1000 ? '1 second' : `${Math.round(ms / 1000)} seconds`;
 }
 
 interface ParameterChartProps {
@@ -78,7 +86,6 @@ function getEventColor(eventType: string): string {
 
 export function ParameterChart({ parameter, value, deviceName, deviceId, period = '24-hours', deviceStatus, lastSeen }: ParameterChartProps) {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [chartType, setChartType] = useState<'line' | 'bar'>('line');
   const [loading, setLoading] = useState(true);
   const [lastResponse, setLastResponse] = useState<{ data?: Array<{ timestamp: string; value: number | null }> } | null>(null);
   const [hasFetched, setHasFetched] = useState(false);
@@ -302,8 +309,7 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
     
     fetchHistoricalData();
     
-    // Refresh data every 10 seconds to reduce flicker
-    const interval = setInterval(fetchHistoricalData, 10000);
+    const interval = setInterval(fetchHistoricalData, CHART_REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [deviceId, parameter.key, parameter.columnName, period]);
 
@@ -393,7 +399,7 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
     if (parameter.unit === '%') {
       return `${val.toFixed(1)}${parameter.unit}`;
     }
-    if (parameter.key.startsWith('PF')) {
+    if (parameter.key.startsWith('PF') || parameter.key.startsWith('Power Factor')) {
       return val.toFixed(3);
     }
     return `${val.toFixed(1)} ${parameter.unit}`;
@@ -420,28 +426,6 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
               {parameter.group} • {deviceName}
               {statusNote && <span className="ml-2">{statusNote}</span>}
             </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setChartType('line')}
-              className={`p-2 rounded transition-colors ${
-                chartType === 'line' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-muted hover:bg-muted/80'
-              }`}
-            >
-              <TrendingUp className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setChartType('bar')}
-              className={`p-2 rounded transition-colors ${
-                chartType === 'bar' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'bg-muted hover:bg-muted/80'
-              }`}
-            >
-              <BarChart3 className="w-4 h-4" />
-            </button>
           </div>
         </div>
         <div className="text-2xl font-bold" style={{ color }}>
@@ -473,132 +457,104 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
               null
             )}
           <ResponsiveContainer width="100%" height="100%">
-            {chartType === 'line' ? (
-              <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis 
-                  dataKey="fullTime" 
-                  type="number"
-                  scale="time"
-                  domain={['dataMin', 'dataMax']}
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  tickFormatter={formatTick}
-                  tickCount={6}
+            <LineChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis 
+                dataKey="fullTime" 
+                type="number"
+                scale="time"
+                domain={['dataMin', 'dataMax']}
+                stroke="#64748b"
+                fontSize={12}
+                tickLine={false}
+                tickFormatter={formatTick}
+                tickCount={6}
+              />
+              <YAxis 
+                stroke="#64748b"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickCount={(parameter.unit === 'Hz' || parameter.key.toLowerCase().includes('frequency')) ? 7 : undefined}
+                domain={chartData.length > 0 ? (() => {
+                  const values = chartData.map(d => d.value).filter(v => v !== null && v !== undefined && !isNaN(v));
+                  if (values.length === 0) return [0, 100];
+                  const min = Math.min(...values);
+                  const max = Math.max(...values);
+                  const range = max - min;
+                  const isFrequency = parameter.unit === 'Hz' || parameter.key.toLowerCase().includes('frequency');
+                  if (isFrequency) {
+                    // Frequency: narrow band (1.5 Hz each side) so 49.6 vs 50.1 are clearly distinguishable
+                    const median = values.slice().sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 50;
+                    const nominal = median >= 57 ? 60 : 50;
+                    const band = 1.5;
+                    return [nominal - band, nominal + band];
+                  }
+                  const isPF = (parameter.key.toLowerCase().includes('power factor')|| parameter.key.toLowerCase().includes('pf'));
+                  if (isPF) {
+                    // Frequency: narrow band (1.5 Hz each side) so 49.6 vs 50.1 are clearly distinguishable
+                    const median = values.slice().sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;
+                    const nominal = median >= -2 ? 2 : 0;
+                    const band = 1.5;
+                    return [-1,1];
+                  }
+                  // Dynamic padding: ~5% of range so Y-axis scale fits the data
+                  const padding = range > 0 ? Math.max(range * 0.05, 0.5) : (Math.abs(max) || 1) * 0.1;
+                  if (range === 0) {
+                    const yMin = min < 0 ? min - padding : Math.max(0, min - padding);
+                    return [yMin, max + padding];
+                  }
+                  // Dynamic scale: 0 as floor when no negatives, else use data min; top = max + padding
+                  const yMin = min < 0 ? min - padding : 0;
+                  const yMax = max + padding;
+                  return [yMin, yMax];
+                })() : [0, 100]}
+                allowDataOverflow={false}
+                tickFormatter={(val) => {
+                  if (val === null || val === undefined || isNaN(val) || typeof val !== 'number') return 'N/A';
+                  return parameter.unit === '%' ? `${val}%` : val.toFixed(1);
+                }}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+                formatter={(value: number | null | undefined) => [formatValue(value), parameter.label]}
+                labelFormatter={(label) => {
+                  const d = new Date(label as number);
+                  return d.toLocaleString(undefined, { timeZone });
+                }}
+              />
+              {events.map((ev) => (
+                <ReferenceLine
+                  key={`${ev.eventType}:${ev.fullTime}`}
+                  x={ev.fullTime}
+                  stroke={getEventColor(ev.eventType)}
+                  strokeDasharray="4 4"
+                  ifOverflow="hidden"
                 />
-                <YAxis 
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  domain={chartData.length > 0 ? (() => {
-                    const values = chartData.map(d => d.value).filter(v => v !== null && v !== undefined && !isNaN(v));
-                    if (values.length === 0) return [0, 100];
-                    const min = Math.min(...values);
-                    const max = Math.max(...values);
-                    const range = max - min;
-                    // If all values are the same, add padding to make the line visible
-                    if (range === 0) {
-                      const padding = Math.abs(min) * 0.1 || 1;
-                      return [min - padding, max + padding];
-                    }
-                    return ['dataMin', 'dataMax'];
-                  })() : [0, 100]}
-                  allowDataOverflow={false}
-                  tickFormatter={(val) => {
-                    if (val === null || val === undefined || isNaN(val) || typeof val !== 'number') return 'N/A';
-                    return parameter.unit === '%' ? `${val}%` : val.toFixed(1);
-                  }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                  formatter={(value: number | null | undefined) => [formatValue(value), parameter.label]}
-                  labelFormatter={(label) => {
-                    const d = new Date(label as number);
-                    return d.toLocaleString(undefined, { timeZone });
-                  }}
-                />
-                {events.map((ev) => (
-                  <ReferenceLine
-                    key={`${ev.eventType}:${ev.fullTime}`}
-                    x={ev.fullTime}
-                    stroke={getEventColor(ev.eventType)}
-                    strokeDasharray="4 4"
-                    ifOverflow="hidden"
-                  />
-                ))}
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke={color}
-                  strokeWidth={2}
-                  dot={{ fill: color, strokeWidth: 2, r: 3 }}
-                  activeDot={{ r: 5, fill: color }}
-                  isAnimationActive={true}
-                  connectNulls={false}
-                />
-              </LineChart>
-            ) : (
-              <BarChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis 
-                  dataKey="fullTime" 
-                  type="number"
-                  scale="time"
-                  domain={['dataMin', 'dataMax']}
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  tickFormatter={formatTick}
-                  tickCount={6}
-                />
-                <YAxis 
-                  stroke="#64748b"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  domain={['dataMin', 'dataMax']}
-                  allowDataOverflow={false}
-                  tickFormatter={(val) => {
-                    if (val === null || val === undefined || isNaN(val) || typeof val !== 'number') return 'N/A';
-                    return parameter.unit === '%' ? `${val}%` : val.toFixed(1);
-                  }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                  formatter={(value: number | null | undefined) => [formatValue(value), parameter.label]}
-                  labelFormatter={(label) => `Time: ${label}`}
-                />
-                {events.map((ev) => (
-                  <ReferenceLine
-                    key={`${ev.eventType}:${ev.fullTime}`}
-                    x={ev.fullTime}
-                    stroke={getEventColor(ev.eventType)}
-                    strokeDasharray="4 4"
-                    ifOverflow="hidden"
-                  />
-                ))}
-                <Bar dataKey="value" fill={color} radius={[2, 2, 0, 0]} />
-              </BarChart>
-            )}
+              ))}
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={color}
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4, fill: color }}
+                isAnimationActive={true}
+                connectNulls={false}
+              />
+            </LineChart>
           </ResponsiveContainer>
         </div>
         )}
         
         <div className="mt-4 text-xs text-muted-foreground">
           {chartData.length > 0
-            ? `Real-time data • ${chartData.length} data points • Updates every 5 seconds${events.length ? ` • ${events.length} event(s)` : ''}`
+            ? `Real-time data • ${chartData.length} data points • Updates every ${formatRefreshInterval(CHART_REFRESH_INTERVAL_MS)}${events.length ? ` • ${events.length} event(s)` : ''}`
             : 'No historical data available yet'}
         </div>
       </CardContent>

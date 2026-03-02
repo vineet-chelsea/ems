@@ -7,9 +7,9 @@ This document describes all configurable environment variables for the EMS backe
 ```bash
 DB_HOST=localhost              # PostgreSQL host
 DB_PORT=5432                   # PostgreSQL port
-DB_NAME=ems_db                 # Database name
-DB_USER=ems_user               # Database user
-DB_PASSWORD=ems_password       # Database password
+DB_NAME=postgres                 # Database name
+DB_USER=postgres               # Database user
+DB_PASSWORD=1234       # Database password
 ```
 
 ## Sampling Intervals (in seconds)

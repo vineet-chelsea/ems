@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,6 +46,15 @@ export function ReportGenerator({ device, availableParameters }: ReportGenerator
   const [reportName, setReportName] = useState(`${device.name}_${supportsPowerQuality ? 'power_quality' : 'energy'}_report`);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // When switching to custom range, ensure we have valid dates
+  useEffect(() => {
+    if (dateRange === 'custom' && (!startDate || !endDate)) {
+      const today = new Date();
+      if (!startDate) setStartDate(today);
+      if (!endDate) setEndDate(today);
+    }
+  }, [dateRange]);
+
   const handleParameterToggle = (paramKey: string) => {
     setSelectedParameters(prev => 
       prev.includes(paramKey) 
@@ -80,28 +89,26 @@ export function ReportGenerator({ device, availableParameters }: ReportGenerator
     const today = new Date();
     switch (dateRange) {
       case 'day':
-        return formatDateIST(today);
+        const dayStart = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+        return `${formatDateIST(dayStart)} - ${formatDateIST(today)} (last 24 hours)`;
       case 'week':
-        const weekStart = new Date(today);
-        weekStart.setDate(today.getDate() - 7);
-        return `${formatDateIST(weekStart)} - ${formatDateIST(today)}`;
+        const weekStart = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return `${formatDateIST(weekStart)} - ${formatDateIST(today)} (last 7 days)`;
       case 'month':
-        const monthStart = new Date(today);
-        monthStart.setDate(1);
-        return `${formatDateIST(monthStart)} - ${formatDateIST(today)}`;
+        const monthStart = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return `${formatDateIST(monthStart)} - ${formatDateIST(today)} (last 30 days)`;
       case 'custom':
         if (startDate && endDate) {
-          const startDateTime = formatDateTimeIST(startDate);
-          const endDateTime = formatDateTimeIST(endDate);
-          return `${startDateTime} - ${endDateTime}`;
+          const { startTime: st, endTime: et } = computeRange();
+          return `${formatDateTimeIST(st)} - ${formatDateTimeIST(et)}`;
         }
-        return 'Select custom range';
+        return 'Select start and end date';
       default:
         return '';
     }
   };
 
-  const computeRange = () => {
+  const computeRange = (): { startTime: Date; endTime: Date } => {
     const now = new Date();
     let startTimeDate: Date;
     switch (dateRange) {
@@ -116,10 +123,8 @@ export function ReportGenerator({ device, availableParameters }: ReportGenerator
         break;
       case 'custom':
         if (startDate) {
-          // Combine date with time
-          const [startHour, startMinute] = startTime.split(':').map(Number);
-          startTimeDate = new Date(startDate);
-          startTimeDate.setHours(startHour || 0, startMinute || 0, 0, 0);
+          const [startHour = 0, startMinute = 0] = startTime.split(':').map(Number);
+          startTimeDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startHour, startMinute, 0, 0);
         } else {
           startTimeDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
         }
@@ -129,12 +134,14 @@ export function ReportGenerator({ device, availableParameters }: ReportGenerator
     }
     let endTimeDate: Date;
     if (dateRange === 'custom' && endDate) {
-      // Combine date with time
-      const [endHour, endMinute] = endTime.split(':').map(Number);
-      endTimeDate = new Date(endDate);
-      endTimeDate.setHours(endHour || 23, endMinute || 59, 59, 999);
+      const [endHour = 23, endMinute = 59] = endTime.split(':').map(Number);
+      endTimeDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), endHour, endMinute, 59, 999);
     } else {
       endTimeDate = now;
+    }
+    if (dateRange === 'custom' && endTimeDate < startTimeDate) {
+      endTimeDate = new Date(startTimeDate.getTime());
+      endTimeDate.setHours(23, 59, 59, 999);
     }
     return { startTime: startTimeDate, endTime: endTimeDate };
   };
@@ -1166,7 +1173,14 @@ ${data.length > 100 ? `\n... and ${data.length - 100} more records` : ''}
                         <Calendar
                           mode="single"
                           selected={startDate}
-                          onSelect={setStartDate}
+                          onSelect={(d) => {
+                            if (d) {
+                              const local = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                              setStartDate(local);
+                            } else {
+                              setStartDate(undefined);
+                            }
+                          }}
                           initialFocus
                           className="pointer-events-auto"
                         />
@@ -1205,7 +1219,14 @@ ${data.length > 100 ? `\n... and ${data.length - 100} more records` : ''}
                         <Calendar
                           mode="single"
                           selected={endDate}
-                          onSelect={setEndDate}
+                          onSelect={(d) => {
+                            if (d) {
+                              const local = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                              setEndDate(local);
+                            } else {
+                              setEndDate(undefined);
+                            }
+                          }}
                           initialFocus
                           className="pointer-events-auto"
                         />

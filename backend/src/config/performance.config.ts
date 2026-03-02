@@ -62,9 +62,9 @@ export interface PerformanceConfig {
 
 export const defaultConfig: PerformanceConfig = {
   sampling: {
-    defaultInterval: 0.1,            // 100ms
-    criticalDeviceInterval: 0.05,     // 50ms for Micrologic
-    normalDeviceInterval: 0.2,       // 200ms for others
+    defaultInterval: 2,            // 100ms
+    criticalDeviceInterval: 0.5,     // 50ms for Micrologic
+    normalDeviceInterval: 2,       // 200ms for others
   },
   database: {
     poolSize: 50,

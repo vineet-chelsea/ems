@@ -18,11 +18,11 @@ const config = loadConfig();
 interface WorkerTask {
   id: string;
   script: string;
+  timeoutMs: number;
+  timedOut: boolean;
   resolve: (value: any) => void;
   reject: (error: any) => void;
-  timeout: NodeJS.Timeout;
 }
-
 class PythonWorkerPool {
   private queue: WorkerTask[] = [];
   private activeWorkers = 0;
@@ -37,26 +37,20 @@ class PythonWorkerPool {
   async execute(script: string, timeout: number = config.workers.workerTimeout): Promise<any> {
     return new Promise((resolve, reject) => {
       const taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      const timeoutHandle = setTimeout(() => {
-        this.totalFailed++;
-        reject(new Error(`Worker task ${taskId} timed out after ${timeout}ms`));
-      }, timeout);
 
       const task: WorkerTask = {
         id: taskId,
         script,
+        timeoutMs: timeout,
+        timedOut: false,
         resolve: (value) => {
-          clearTimeout(timeoutHandle);
           this.totalExecuted++;
           resolve(value);
         },
         reject: (error) => {
-          clearTimeout(timeoutHandle);
           this.totalFailed++;
           reject(error);
         },
-        timeout: timeoutHandle,
       };
 
       this.queue.push(task);
@@ -73,19 +67,32 @@ class PythonWorkerPool {
     if (!task) return;
 
     this.activeWorkers++;
-    
+
+    let executionTimeout: NodeJS.Timeout | null = null;
+
     try {
-      const result = await this.runPythonScript(task.script);
-      task.resolve(result);
+      executionTimeout = setTimeout(() => {
+        task.timedOut = true;
+        task.reject(new Error(`Worker task ${task.id} timed out after ${task.timeoutMs}ms`));
+      }, task.timeoutMs);
+
+      const result = await this.runPythonScript(task.script, task.timeoutMs);
+
+      if (!task.timedOut) {
+        task.resolve(result);
+      }
     } catch (error) {
-      task.reject(error);
+      if (!task.timedOut) {
+        task.reject(error);
+      }
     } finally {
+      if (executionTimeout) clearTimeout(executionTimeout);
       this.activeWorkers--;
       this.processQueue(); // Process next task
     }
   }
 
-  private async runPythonScript(script: string): Promise<any> {
+  private async runPythonScript(script: string, timeoutMs: number): Promise<any> {
     // Write script to temporary file to avoid command-line length limits (ENAMETOOLONG)
     // This is especially important on Windows where command-line arguments have strict length limits
     const tempFile = join(tmpdir(), `modbus_script_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.py`);
@@ -100,7 +107,7 @@ class PythonWorkerPool {
         `${pythonCmd} "${tempFile}"`,
         { 
           maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-          timeout: config.workers.workerTimeout 
+          timeout: timeoutMs 
         }
       );
 
@@ -195,7 +202,7 @@ class PythonWorkerPool {
       }
       
       if (error.code === 'ETIMEDOUT') {
-        throw new Error(`Python script execution timed out after ${config.workers.workerTimeout}ms`);
+        throw new Error(`Python script execution timed out after ${timeoutMs}ms`);
       }
       if (error.code === 'ENAMETOOLONG') {
         throw new Error(`Python script execution failed: Command line too long. This should not happen with file-based execution.`);

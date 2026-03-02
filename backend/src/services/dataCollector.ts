@@ -192,7 +192,7 @@ async function recordInterruptionIfAny(device: Device, sampleTime: Date): Promis
   if (!prev) return;
 
   const gapMs = sampleTime.getTime() - prev.getTime();
-  const gapThresholdMs = 30_000; // align with /data/:deviceId/events summary logic
+  const gapThresholdMs = 180_000; // align with /data/:deviceId/events summary logic
   if (gapMs <= gapThresholdMs) return;
 
   const gapSeconds = Math.round(gapMs / 1000);
@@ -2725,6 +2725,7 @@ interface PendingInsert {
 }
 
 const insertQueue: PendingInsert[] = [];
+const INSERT_QUEUE_MAX = 100_000;
 let insertBatchTimeout: NodeJS.Timeout | null = null;
 let isFlushing = false;
 
@@ -3244,7 +3245,15 @@ async function collectDeviceData(device: Device): Promise<boolean> {
  * Collect data from all online devices
  */
 export async function collectAllDevicesData(): Promise<void> {
+  if (isCollecting) {
+    collectionQueued = true;
+    console.log('[DataCollector] Collection already running, queued one follow-up cycle');
+    return;
+  }
+
+  isCollecting = true;
   const cycleStart = Date.now();
+
   try {
     // Ensure schema exists before any reads/inserts (idempotent)
     await ensureSchemaInitialized();
@@ -3294,19 +3303,40 @@ export async function collectAllDevicesData(): Promise<void> {
     );
     const offlineDevices = allDevices.filter(d => d.status === 'offline');
 
-    // Process in batches - collect all devices in batch in parallel, then flush DB
+    // Process in batches: same IP serialized by slave ID, different IPs parallel
     const processBatch = async (devices: Device[]) => {
-      const batches = [];
-      for (let i = 0; i < devices.length; i += config.batch.deviceBatchSize) {
-        batches.push(devices.slice(i, i + config.batch.deviceBatchSize));
+      const devicesByIp = new Map<string, Device[]>();
+
+      for (const device of devices) {
+        const ipKey = (device.ipAddress || '').trim();
+        if (!devicesByIp.has(ipKey)) {
+          devicesByIp.set(ipKey, []);
+        }
+        devicesByIp.get(ipKey)!.push(device);
       }
 
-      for (const batch of batches) {
-        // Collect all devices in this batch in parallel
+      for (const group of devicesByIp.values()) {
+        group.sort((a, b) => {
+          const sa = a.slaveAddress ?? 1;
+          const sb = b.slaveAddress ?? 1;
+          if (sa !== sb) return sa - sb;
+          return a.name.localeCompare(b.name);
+        });
+      }
+
+      const ipGroups = Array.from(devicesByIp.values());
+
+      for (let i = 0; i < ipGroups.length; i += config.batch.deviceBatchSize) {
+        const parallelIpGroups = ipGroups.slice(i, i + config.batch.deviceBatchSize);
+
         await Promise.allSettled(
-          batch.map(device => collectDeviceData(device))
+          parallelIpGroups.map(async (group) => {
+            for (const device of group) {
+              await collectDeviceData(device);
+            }
+          })
         );
-        // Flush insert queue after each batch completes (all devices collected)
+
         await flushInsertQueue();
       }
     };
@@ -3344,6 +3374,14 @@ export async function collectAllDevicesData(): Promise<void> {
     console.log(`Data collection complete: ${totalDevices} devices in ${cycleTime}ms (${metrics.devicesPerSecond.toFixed(2)} devices/sec)`);
   } catch (error) {
     console.error('Error in collectAllDevicesData:', error);
+  } finally {
+    isCollecting = false;
+    if (collectionQueued) {
+      collectionQueued = false;
+      setImmediate(() => {
+        void collectAllDevicesData();
+      });
+    }
   }
 }
 
@@ -3352,6 +3390,8 @@ export async function collectAllDevicesData(): Promise<void> {
  */
 let collectionInterval: NodeJS.Timeout | null = null;
 let metricsInterval: NodeJS.Timeout | null = null;
+let isCollecting = false;
+let collectionQueued = false;
 
 export function startDataCollection(intervalSeconds?: number): void {
   if (collectionInterval) {

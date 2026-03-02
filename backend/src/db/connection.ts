@@ -10,9 +10,9 @@ const config = loadConfig();
 export const db = new Pool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'ems_db',
-  user: process.env.DB_USER || 'ems_user',
-  password: process.env.DB_PASSWORD || 'ems_password',
+  database: process.env.DB_NAME || 'postgres',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || '1234',
   max: config.database.poolSize,
   min: config.database.minConnections,
   idleTimeoutMillis: config.database.idleTimeout,
@@ -27,8 +27,8 @@ export async function testConnection(retries = 15, delay = 3000): Promise<void> 
   const config = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME || 'ems_db',
-    user: process.env.DB_USER || 'ems_user',
+    database: process.env.DB_NAME || 'postgres',
+    user: process.env.DB_USER || 'postgres',
   };
   
   console.log(`Attempting database connection to ${config.host}:${config.port}/${config.database} as ${config.user}...`);

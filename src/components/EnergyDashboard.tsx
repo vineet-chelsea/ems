@@ -59,7 +59,7 @@ export function EnergyDashboard() {
             // Determine last seen and status based on latest data freshness
             const now = new Date();
             const latestTimestamp = latestData?.timestamp ? new Date(latestData.timestamp) : (device.lastSeen ? new Date(device.lastSeen) : null);
-            const isStale = !latestTimestamp || (now.getTime() - latestTimestamp.getTime() > 60_000); // stale if older than 60s
+            const isStale = !latestTimestamp || (now.getTime() - latestTimestamp.getTime() > 130_000); // stale if older than 60s
             const derivedStatus: Device['status'] = latestData && !isStale ? 'online' : 'offline';
 
             if (!latestData) {

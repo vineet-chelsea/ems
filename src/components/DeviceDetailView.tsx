@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, BarChart3, Download, Settings, Activity, Zap, TrendingUp, Trash2, CheckSquare, Square, Info } from "lucide-react";
+import { ArrowLeft, Download, Settings, Activity, Trash2, CheckSquare, Square, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,13 +22,116 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Device } from "./EnergyDashboard";
-import { ParameterChart } from "./ParameterChart";
+import { ParameterChart, CHART_REFRESH_INTERVAL_MS } from "./ParameterChart";
 import { ReportGenerator } from "./ReportGenerator";
 import { PowerQualityDashboard } from "./PowerQualityDashboard";
 import { api } from "@/services/api";
 import pm5320Units from "@/data/pm5320Units.json";
 import pm8000Units from "@/data/pm8000Units.json";
 import { getDeviceTypeDisplayName } from "@/utils/deviceUtils";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
+/** Fixed labels for the Key Parameters table (same for all devices). */
+export const KEY_PARAMETERS_LABELS = [
+  'VR-Y', 'VY-B', 'VB-A', 'IR', 'IY', 'IB',
+  'kW', 'KVA', 'kVAR', 'PF', 'Frequency',
+  'kWh', 'KVAh', 'kVARh',
+] as const;
+
+/** Extra rows only for MICROLOGIC_6E. */
+export const KEY_PARAMETERS_MICROLOGIC_6E_EXTRA = [
+  'Breaker ON/OFF', 'TRIP Status', 'Spring Charged',
+] as const;
+
+/** Table groups: Voltages, Current, Power, Energy, General. */
+export const KEY_PARAMETERS_GROUPS: Record<string, readonly string[]> = {
+  Voltages: ['VR-Y', 'VY-B', 'VB-A'],
+  Current: ['IR', 'IY', 'IB'],
+  Power: ['kW', 'KVA', 'kVAR', 'PF'],
+  Energy: ['kWh', 'KVAh', 'kVARh'],
+  General: ['Frequency'],
+};
+
+/** Per-label display unit for formatting (optional; empty = no unit suffix). */
+export const KEY_PARAMETERS_LABEL_UNITS: Record<string, string> = {
+  'VR-Y': 'V', 'VY-B': 'V', 'VB-A': 'V',
+  'IR': 'A', 'IY': 'A', 'IB': 'A',
+  'kW': 'W', 'KVA': 'kVA', 'kVAR': 'var', 'kWh': 'kWh', 'KVAh': 'kVAh', 'kVARh': 'kVARh',
+  'PF': '', 'Frequency': 'Hz',
+  'Breaker ON/OFF': '', 'TRIP Status': '', 'Spring Charged': '',
+};
+
+/**
+ * Device-specific mapping: label -> API parameter key.
+ * Fill in the parameter key for each label per device (as returned by /data/:deviceId/latest).
+ */
+export type KeyParametersMapping = Partial<Record<string, string>>;
+
+export const KEY_PARAMETERS_BY_DEVICE: Record<string, KeyParametersMapping> = {
+  MICROLOGIC_6E: {
+    'VR-Y': 'V12',
+    'VY-B': 'V23',
+    'VB-A': 'V31',
+    'IR': 'I1_RMS',
+    'IY': 'I2_RMS',
+    'IB': 'I3_RMS',
+    'kW': 'kW_Total',
+    'KVA': 'kVA_Total',
+    'kVAR': 'VAr_Total',
+    'kWh': 'Wh',
+    'KVAh': 'kVAh',
+    'kVARh': 'Varh',
+    'PF': 'Total PF',
+    'Frequency': 'Frequency',
+    'Breaker ON/OFF': 'Breaker ON',
+    'TRIP Status': 'TRIP',
+    'Spring Charged': 'Spring charged',
+  },
+  EM6400: {
+    'VR-Y': 'Voltage A-B',
+    'VY-B': 'Voltage B-C',
+    'VB-A': 'Voltage C-A',
+    'IR': 'Current A',
+    'IY': 'Current B',
+    'IB': 'Current C',
+    'kW': 'Active Power Total',
+    'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered - Received', 'KVAh': 'Apparent Energy Delivered - Received', 'kVARh': 'Reactive Energy Delivered - Received',
+    'PF': 'Power Factor Total',
+    'Frequency': 'Frequency',
+  },
+  PM5320: {
+    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
+    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
+    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
+    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
+  },
+  PM8000: {
+    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
+    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
+    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
+    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
+  },
+  PM5330: {
+    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
+    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
+    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
+    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
+  },
+  PM5350: {
+    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
+    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
+    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
+    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
+  },
+};
+
+/** Default mapping when device type is unknown; you can provide your own keys. */
+export const DEFAULT_KEY_PARAMETERS_MAPPING: KeyParametersMapping = {
+  'VR-Y': 'V1', 'VY-B': 'V2', 'VB-A': 'V3',
+  'IR': 'I1', 'IY': 'I2', 'IB': 'I3',
+  'kW': 'Ptotal', 'KVA': '', 'kVAR': '', 'kWh': 'energy_active', 'KVAh': '', 'kVARh': '',
+  'PF': 'PFavg', 'Frequency': 'frequency',
+};
 
 interface DeviceDetailViewProps {
   device: Device;
@@ -764,45 +867,6 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
         });
 
         setAvailableParameters(finalParams);
-        
-        // Set default selected parameters if none selected
-        if (selectedParameters.length === 0 || selectedParameters.length === 4) {
-          const defaultParams =
-            device.type === 'MICROLOGIC_6E'
-              ? [
-                  'kW_Total',
-                  'I1_RMS',
-                  'V1-N',
-                  'PF1',
-                  'Frequency',
-                  'Breaker ON',
-                  'TRIP',
-                  'Fault',
-                  'Earth Leakage Alarm',
-                  'General Cause of tripping - Short-time protection Isd',
-                ]
-              : device.type === 'EM6400'
-              ? [
-                  'Active Power Total',
-                  'Voltage L-N Avg',
-                  'Frequency',
-                  'Power Factor Total',
-                  'Current A',
-                  'Current B',
-                  'Current C',
-                  'Over Frequency Alarm',
-                  'Under Frequency Alarm',
-                  'PF Total Low',
-                  'OverVoltage Alarm',
-                  'UnderVoltage Alarm',
-                ]
-              : ['Ptotal', 'Active Power Total', 'V1', 'V2', 'V3', 'I1', 'I2', 'I3', 'PFavg', 'Power Factor Total', 'Frequency'];
-          const availableKeys = finalParams.map(p => p.key);
-          const defaults = defaultParams.filter(key => availableKeys.includes(key));
-          if (defaults.length > 0) {
-            setSelectedParameters(defaults);
-          }
-        }
       } catch (error) {
         console.error('Error loading device parameters:', error);
         toast.error('Failed to load device parameters');
@@ -855,24 +919,31 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
               }
             }
             
-            // Extract numeric parameters
+            // Extract numeric parameters (number or string that parses to number - DB/driver may return strings)
+            let numValue: number | null = null;
             if (typeof value === 'number' && isFinite(value)) {
-              params[key] = value;
+              numValue = value;
+            } else if (typeof value === 'string' && value.trim() !== '' && !isNaN(Number(value))) {
+              const parsed = Number(value);
+              if (Number.isFinite(parsed)) numValue = parsed;
+            }
+            if (numValue !== null) {
+              params[key] = numValue;
               const lowerKey = key.toLowerCase();
-              if (lowerKey !== key) params[lowerKey] = value;
+              if (lowerKey !== key) params[lowerKey] = numValue;
               const sanitizedKey = lowerKey.replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
-              if (sanitizedKey !== key && sanitizedKey !== lowerKey) params[sanitizedKey] = value;
+              if (sanitizedKey !== key && sanitizedKey !== lowerKey) params[sanitizedKey] = numValue;
               availableParameters.forEach(param => {
                 const paramKeyLower = param.key.toLowerCase();
                 const paramSanitized = paramKeyLower.replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
                 if (sanitizedKey === paramSanitized || lowerKey === paramSanitized) {
-                  params[param.key] = value;
-                  params[paramKeyLower] = value;
+                  params[param.key] = numValue;
+                  params[paramKeyLower] = numValue;
                 }
                 const paramWithColumn = param as ParameterInfo & { columnName?: string };
                 if (paramWithColumn.columnName && (key === paramWithColumn.columnName || lowerKey === paramWithColumn.columnName.toLowerCase())) {
-                  params[param.key] = value;
-                  params[paramKeyLower] = value;
+                  params[param.key] = numValue;
+                  params[paramKeyLower] = numValue;
                 }
               });
             }
@@ -898,7 +969,7 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
     };
 
     fetchLatestData();
-    const interval = setInterval(fetchLatestData, 3000);
+    const interval = setInterval(fetchLatestData, CHART_REFRESH_INTERVAL_MS);
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -1046,123 +1117,6 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
           </Card>
         )}
 
-        {/* Quick Stats */}
-        {(liveStatus || device.status) === 'online' && Object.keys(currentParameters).length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Power</CardTitle>
-                <Zap className="h-4 w-4 text-accent" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-accent">
-                  {(() => {
-                    // Prefer device-type specific keys, fallback to legacy keys
-                    const pEm = currentParameters['Active Power Total'];
-                    const pMicro = currentParameters['kW_Total'];
-                    const pLegacy = currentParameters.Ptotal || currentParameters.ptotal;
-                    const raw =
-                      device.type === 'EM6400'
-                        ? (typeof pEm === 'number' ? pEm : undefined)
-                        : device.type === 'MICROLOGIC_6E'
-                        ? (typeof pMicro === 'number' ? pMicro : undefined)
-                        : (typeof pLegacy === 'number' ? pLegacy : undefined);
-
-                    if (raw === undefined || !isFinite(raw)) return 'N/A';
-                    // Many meters expose W; show kW in the dashboard card
-                    const kw = raw / 1000;
-                    return `${kw.toFixed(2)} kW`;
-                  })()}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg Voltage</CardTitle>
-                <TrendingUp className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-primary">
-                  {(() => {
-                    if (device.type === 'EM6400') {
-                      const v = currentParameters['Voltage L-N Avg'];
-                      return typeof v === 'number' && isFinite(v) ? `${v.toFixed(1)} V` : 'N/A';
-                    }
-                    if (device.type === 'MICROLOGIC_6E') {
-                      const v = currentParameters['V_L-N_AVG'];
-                      if (typeof v === 'number' && isFinite(v)) return `${v.toFixed(1)} V`;
-                      const v1 = currentParameters['V1-N'];
-                      const v2 = currentParameters['V2-N'];
-                      const v3 = currentParameters['V3-N'];
-                      if ([v1, v2, v3].every(x => typeof x === 'number' && isFinite(x as number))) {
-                        return `${(((v1 as number) + (v2 as number) + (v3 as number)) / 3).toFixed(1)} V`;
-                      }
-                      return 'N/A';
-                    }
-
-                    const v1 = currentParameters.V1 || currentParameters.v1 || 0;
-                    const v2 = currentParameters.V2 || currentParameters.v2 || 0;
-                    const v3 = currentParameters.V3 || currentParameters.v3 || 0;
-                    return `${((v1 + v2 + v3) / 3).toFixed(1)} V`;
-                  })()}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg Current</CardTitle>
-                <Activity className="h-4 w-4 text-secondary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-secondary">
-                  {(() => {
-                    if (device.type === 'EM6400') {
-                      const a = currentParameters['Current A'];
-                      const b = currentParameters['Current B'];
-                      const c = currentParameters['Current C'];
-                      if ([a, b, c].every(x => typeof x === 'number' && isFinite(x as number))) {
-                        return `${(((a as number) + (b as number) + (c as number)) / 3).toFixed(1)} A`;
-                      }
-                      return 'N/A';
-                    }
-                    if (device.type === 'MICROLOGIC_6E') {
-                      const i = currentParameters['I_AVG'];
-                      return typeof i === 'number' && isFinite(i) ? `${i.toFixed(1)} A` : 'N/A';
-                    }
-
-                    const i1 = currentParameters.I1 || currentParameters.i1 || 0;
-                    const i2 = currentParameters.I2 || currentParameters.i2 || 0;
-                    const i3 = currentParameters.I3 || currentParameters.i3 || 0;
-                    return `${((i1 + i2 + i3) / 3).toFixed(1)} A`;
-                  })()}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Power Factor</CardTitle>
-                <BarChart3 className="h-4 w-4 text-success" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-success">
-                  {(() => {
-                    const pf =
-                      device.type === 'EM6400'
-                        ? currentParameters['Power Factor Total']
-                        : device.type === 'MICROLOGIC_6E'
-                        ? currentParameters['PF1']
-                        : currentParameters.PFavg || currentParameters.pfavg;
-                    return typeof pf === 'number' && isFinite(pf) ? pf.toFixed(2) : 'N/A';
-                  })()}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
         {/* Main Content */}
         <Tabs defaultValue="monitoring" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -1172,21 +1126,174 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
           </TabsList>
 
           <TabsContent value="monitoring" className="space-y-6">
-            {/* Power Quality Performance */}
-            <PowerQualityDashboard 
-              device={device} 
-              selectedPeriod={chartPeriod} 
-              onPeriodChange={setChartPeriod} 
-            />
+            {/* Key parameters: 5 tables (Voltages, Current, Power, Energy, General) full width */}
+            <div className="w-full">
+            {(() => {
+              const toNum = (v: unknown): number | undefined => {
+                if (typeof v === 'number' && isFinite(v)) return v;
+                if (typeof v === 'string' && v.trim() !== '' && !isNaN(Number(v))) {
+                  const n = Number(v);
+                  return Number.isFinite(n) ? n : undefined;
+                }
+                return undefined;
+              };
+              const getVal = (key: string): number | undefined => {
+                let v: unknown = currentParameters[key] ?? currentParameters[key.toLowerCase()];
+                let out = toNum(v);
+                if (out !== undefined) return out;
+                const sanitized = key.toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
+                out = toNum(currentParameters[sanitized]);
+                if (out !== undefined) return out;
+                // Fallback: match any stored key whose sanitized form equals this key's sanitized form
+                const matchKey = Object.keys(currentParameters).find(
+                  (k) => k.toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_') === sanitized
+                );
+                return matchKey !== undefined ? toNum(currentParameters[matchKey]) : undefined;
+              };
+              const formatVal = (val: number | undefined, unit: string, label?: string, alreadyScaled = false) => {
+                if (val === undefined) return '—';
+                if (label === 'Breaker ON/OFF' || label === 'TRIP Status' || label === 'Spring Charged') {
+                  return val === 1 ? 'ON' : val === 0 ? 'OFF' : String(val);
+                }
+                if (unit === '%' || unit === '') return val.toFixed(2);
+                if (unit === 'V' || unit === 'A') return `${val.toFixed(1)} ${unit}`;
+                if (unit === 'Hz') return `${val.toFixed(2)} Hz`;
+                if (unit === 'W') return alreadyScaled ? `${val.toFixed(2)} kW` : `${(val).toFixed(2)} kW`;
+                if (unit === 'kVA') return alreadyScaled ? `${val.toFixed(2)} kVA` : `${(val).toFixed(2)} kVA`;
+                if (unit === 'var') return alreadyScaled ? `${val.toFixed(2)} kVAR` : `${(val).toFixed(2)} kVAR`;
+                if (unit === 'kWh' || unit === 'kVAh' || unit === 'kVARh') return `${val.toFixed(1)} ${unit}`;
+                return `${val.toFixed(1)}`;
+              };
+              const keySpec = KEY_PARAMETERS_BY_DEVICE[device.type] ?? {};
+              const mapping: KeyParametersMapping = { ...DEFAULT_KEY_PARAMETERS_MAPPING, ...keySpec };
+              const standardLabels = [...KEY_PARAMETERS_LABELS];
+              const extraLabels = device.type === 'MICROLOGIC_6E' ? [...KEY_PARAMETERS_MICROLOGIC_6E_EXTRA] : [];
+              const allLabels = [...standardLabels, ...extraLabels];
+              const powerEnergyLabels = ['kW', 'KVA', 'kVAR', 'kWh', 'KVAh', 'kVARh'];
+              const powerEnergyLabels2 = ['kW', 'KVA', 'kVAR'];
+              const rows: { label: string; value: number | undefined; unit: string; alreadyScaled?: boolean }[] = allLabels.map((label) => {
+                const paramKey = mapping[label];
+                let value = paramKey && paramKey.trim() ? getVal(paramKey) : undefined;
+                const isMicrologic6EPowerEnergy = device.type === 'MICROLOGIC_6E' && powerEnergyLabels.includes(label);
+                if (isMicrologic6EPowerEnergy && value !== undefined) {
+                  value = value / 1000;
+                }
+                const isPM8000energy = device.type === 'PM8000' && powerEnergyLabels2.includes(label);
+                if (isPM8000energy && value !== undefined) {
+                  value = value / 1000;
+                }
+                const unit = KEY_PARAMETERS_LABEL_UNITS[label] ?? '';
+                return { label, value, unit, alreadyScaled: isMicrologic6EPowerEnergy };
+              });
+              const paramCount = Object.keys(currentParameters).length;
+              const generalLabels = [...KEY_PARAMETERS_GROUPS.General];
+              if (device.type === 'MICROLOGIC_6E') generalLabels.push(...KEY_PARAMETERS_MICROLOGIC_6E_EXTRA);
+              const groupConfigs: { title: string; labels: string[] }[] = [
+                { title: 'Voltages', labels: [...KEY_PARAMETERS_GROUPS.Voltages] },
+                { title: 'Current', labels: [...KEY_PARAMETERS_GROUPS.Current] },
+                { title: 'Power', labels: [...KEY_PARAMETERS_GROUPS.Power] },
+                { title: 'Energy', labels: [...KEY_PARAMETERS_GROUPS.Energy] },
+                { title: 'General', labels: generalLabels },
+              ];
+              return (
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                  {groupConfigs.map(({ title, labels }) => {
+                    const groupRows = rows.filter((r) => labels.includes(r.label));
+                    if (groupRows.length === 0) return null;
+                    return (
+                      <Card key={title} className="overflow-hidden shadow-sm w-full min-w-0">
+                        <CardHeader className="pb-2 pt-3 px-4 border-b border-border/50 bg-muted/20">
+                          <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+                          <CardDescription className="text-xs mt-0.5">
+                            {paramCount === 0 ? 'No data' : device.type}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="px-0 pb-0 pt-0">
+                          <div className="rounded-b-lg overflow-hidden">
+                            <table className="w-full table-auto">
+                              <thead>
+                                <tr className="bg-muted/50">
+                                  <th className="text-left py-2.5 px-4 font-semibold text-foreground/90 text-xs">Parameter</th>
+                                  <th className="text-right py-2.5 px-4 font-semibold text-foreground/90 text-xs">Value</th>
+                                </tr>
+                              </thead>
+                              <tbody className="bg-card divide-y divide-border/60">
+                                {groupRows.map((r, i) => (
+                                  <tr key={i} className="hover:bg-green-100/50 dark:hover:bg-green-900/20 transition-colors even:bg-green-50/80 dark:even:bg-green-950/40 odd:bg-card">
+                                    <td className="py-2 px-4 text-xs font-medium text-foreground/90">{r.label}</td>
+                                    <td className="py-2 px-4 text-right text-sm font-bold font-mono text-foreground tabular-nums tracking-tight">{formatVal(r.value, r.unit, r.label, r.alreadyScaled)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+            </div>
 
-            {/* Parameter Selection */}
+            {/* Charts */}
+            <div className={`w-full ${selectedParameters.length > 0 ? 'grid grid-cols-1 xl:grid-cols-2 gap-6' : ''}`}>
+                {selectedParameters.length > 0 && selectedParameters.map((paramKey) => {
+                  const param = availableParameters.find(p => p.key === paramKey);
+                  if (!param) return null;
+                  const paramKeyLower = paramKey.toLowerCase();
+                  const paramKeySanitized = paramKeyLower.replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
+                  let currentValue = currentParameters[paramKey]
+                    || currentParameters[paramKeyLower]
+                    || currentParameters[paramKeySanitized];
+                  if (currentValue === undefined) {
+                    const matchingKey = Object.keys(currentParameters).find(key => {
+                      const keyLower = key.toLowerCase();
+                      const keySanitized = keyLower.replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
+                      if (keySanitized === paramKeySanitized) return true;
+                      if (keyLower.includes(paramKeyLower) || paramKeyLower.includes(keyLower)) {
+                        if (paramKeyLower.length > 2 && keyLower.length > 2) return true;
+                      }
+                      const keyNormalized = keyLower.replace(/[^a-z0-9]/g, '');
+                      const paramNormalized = paramKeyLower.replace(/[^a-z0-9]/g, '');
+                      if (keyNormalized === paramNormalized && keyNormalized.length > 3) return true;
+                      return false;
+                    });
+                    if (matchingKey) currentValue = currentParameters[matchingKey];
+                  }
+                  if (currentValue === undefined || currentValue === null || isNaN(currentValue)) currentValue = undefined;
+                  return (
+                    <ParameterChart
+                      key={paramKey}
+                      parameter={param}
+                      value={currentValue}
+                      deviceName={device.name}
+                      deviceId={device.id}
+                      period={chartPeriod}
+                      deviceStatus={liveStatus || device.status}
+                      lastSeen={liveLastSeen || device.lastSeen}
+                    />
+                  );
+                })}
+              </div>
+
+            {/* Parameter Selection - whole card collapsible; columns fill width */}
             <Card>
-              <CardHeader>
-                <CardTitle>Parameter Selection</CardTitle>
-                <CardDescription>
-                  Select the parameters you want to monitor in real-time. Parameters are loaded from device configuration.
-                </CardDescription>
-              </CardHeader>
+              <Collapsible defaultOpen={true} className="group">
+                <CollapsibleTrigger asChild>
+                  <button type="button" className="w-full text-left hover:bg-muted/30 transition-colors rounded-t-lg">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                      <div>
+                        <CardTitle>Parameter Selection</CardTitle>
+                        <CardDescription>
+                          Select the parameters you want to monitor in real-time. Parameters are loaded from device configuration.
+                        </CardDescription>
+                      </div>
+                      <ChevronDown className="h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    </CardHeader>
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
               <CardContent>
                 {loadingConfig ? (
                   <div className="flex items-center justify-center py-8">
@@ -1208,170 +1315,80 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
                     No parameters available. Please configure device parameters.
                   </div>
                 ) : (
-                  <div className="space-y-6">
+                  <div
+                    className="grid gap-4 w-full pb-2"
+                    style={{ gridTemplateColumns: `repeat(${Object.keys(groupedParameters).length}, minmax(0, 1fr))` }}
+                  >
                     {Object.entries(groupedParameters).map(([group, params]) => {
                       const groupKeys = params.map(p => p.key);
                       const allSelected = groupKeys.every(key => selectedParameters.includes(key));
-                      const someSelected = groupKeys.some(key => selectedParameters.includes(key));
-                      
                       return (
-                        <div key={group} className="space-y-3">
-                          <div className="flex items-center justify-between border-b pb-2">
-                            <h4 className="font-semibold text-base">{group}</h4>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleSelectAll(group)}
-                              className="h-7 text-xs"
-                            >
-                              {allSelected ? (
-                                <>
-                                  <CheckSquare className="w-3 h-3 mr-1" />
-                                  Deselect All
-                                </>
-                              ) : (
-                                <>
-                                  <Square className="w-3 h-3 mr-1" />
-                                  Select All
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                            {params.map((param, index) => {
-                              const isSelected = selectedParameters.includes(param.key);
-                              const currentValue = currentParameters[param.key] || currentParameters[param.key.toLowerCase()];
-                              
-                              return (
-                                <div
-                                  key={`${param.key}-${index}`}
-                                  className={`flex items-start space-x-2 p-2 rounded-lg border transition-colors ${
-                                    isSelected ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'
-                                  }`}
-                                >
-                                  <Checkbox
-                                    id={`${param.key}-${index}`}
-                                    checked={isSelected}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        setSelectedParameters(prev => [...prev, param.key]);
-                                      } else {
-                                        setSelectedParameters(prev => prev.filter(p => p !== param.key));
-                                      }
-                                    }}
-                                    className="mt-0.5"
-                                  />
-                                  <label
-                                    htmlFor={`${param.key}-${index}`}
-                                    className="flex-1 text-sm font-medium leading-tight cursor-pointer"
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <span>{param.label}</span>
-                                      {device.status === 'online' && currentValue !== undefined && isSelected && (
-                                        <Badge variant="secondary" className="ml-2 text-xs">
-                                          {typeof currentValue === 'number' 
-                                            ? param.unit === '%' 
-                                              ? `${currentValue.toFixed(1)}${param.unit}`
-                                              : param.key.startsWith('PF')
-                                              ? currentValue.toFixed(3)
-                                              : `${currentValue.toFixed(1)} ${param.unit || ''}`
-                                            : 'N/A'}
-                                        </Badge>
-                                      )}
+                        <Collapsible key={group} defaultOpen={true}>
+                          <div className="flex flex-col min-w-0 rounded-lg border bg-card h-[320px] overflow-hidden">
+                            <CollapsibleTrigger asChild>
+                              <button className="group flex items-center justify-between p-3 border-b font-semibold text-sm hover:bg-muted/50 transition-colors text-left w-full">
+                                <span>{group}</span>
+                                <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+                              </button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="flex flex-col flex-1 min-h-0">
+                              <div className="overflow-y-auto flex-1 p-2 space-y-1">
+                                {params.map((param, index) => {
+                                  const isSelected = selectedParameters.includes(param.key);
+                                  const currentValue = currentParameters[param.key] || currentParameters[param.key.toLowerCase()];
+                                  return (
+                                    <div
+                                      key={`${param.key}-${index}`}
+                                      className={`flex items-start gap-2 p-2 rounded border transition-colors ${
+                                        isSelected ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'
+                                      }`}
+                                    >
+                                      <Checkbox
+                                        id={`${param.key}-${index}`}
+                                        checked={isSelected}
+                                        onCheckedChange={(checked) => {
+                                          if (checked) setSelectedParameters(prev => [...prev, param.key]);
+                                          else setSelectedParameters(prev => prev.filter(p => p !== param.key));
+                                        }}
+                                        className="mt-0.5 shrink-0"
+                                      />
+                                      <label htmlFor={`${param.key}-${index}`} className="flex-1 text-xs font-medium leading-tight cursor-pointer min-w-0">
+                                        <span className="truncate block">{param.label}</span>
+                                        {device.status === 'online' && currentValue !== undefined && isSelected && (
+                                          <span className="text-muted-foreground">
+                                            {typeof currentValue === 'number'
+                                              ? param.unit === '%' ? `${currentValue.toFixed(1)}%` : param.key.startsWith('PF') ? currentValue.toFixed(3) : `${currentValue.toFixed(1)} ${param.unit || ''}`
+                                              : 'N/A'}
+                                          </span>
+                                        )}
+                                      </label>
                                     </div>
-                                    {param.unit && (
-                                      <span className="text-xs text-muted-foreground block mt-0.5">
-                                        {param.unit}
-                                      </span>
-                                    )}
-                                    {param.description && (
-                                      <span className="text-xs text-muted-foreground block mt-0.5 line-clamp-1">
-                                        {param.description}
-                                      </span>
-                                    )}
-                                  </label>
-                                </div>
-                              );
-                            })}
+                                  );
+                                })}
+                              </div>
+                              <div className="p-2 border-t">
+                                <Button variant="ghost" size="sm" className="w-full h-7 text-xs" onClick={() => handleSelectAll(group)}>
+                                  {allSelected ? <><CheckSquare className="w-3 h-3 mr-1" /> Deselect All</> : <><Square className="w-3 h-3 mr-1" /> Select All</>}
+                                </Button>
+                              </div>
+                            </CollapsibleContent>
                           </div>
-                        </div>
+                        </Collapsible>
                       );
                     })}
                   </div>
                 )}
               </CardContent>
+                </CollapsibleContent>
+              </Collapsible>
             </Card>
 
-            {/* Charts */}
-            {selectedParameters.length > 0 && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {selectedParameters.map((paramKey) => {
-                  const param = availableParameters.find(p => p.key === paramKey);
-                  if (!param) return null;
-                  
-                  // Try multiple key variations to find the value
-                  const paramKeyLower = paramKey.toLowerCase();
-                  const paramKeySanitized = paramKeyLower.replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
-                  
-                  let currentValue = currentParameters[paramKey] 
-                    || currentParameters[paramKeyLower]
-                    || currentParameters[paramKeySanitized];
-                  
-                  // If still not found, try fuzzy matching with all available keys
-                  if (currentValue === undefined) {
-                    const matchingKey = Object.keys(currentParameters).find(key => {
-                      const keyLower = key.toLowerCase();
-                      const keySanitized = keyLower.replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
-                      
-                      // Exact sanitized match
-                      if (keySanitized === paramKeySanitized) return true;
-                      
-                      // Partial match (contains the parameter name or vice versa)
-                      if (keyLower.includes(paramKeyLower) || paramKeyLower.includes(keyLower)) {
-                        // Make sure it's a meaningful match (not just single character)
-                        if (paramKeyLower.length > 2 && keyLower.length > 2) return true;
-                      }
-                      
-                      // Match without spaces/special chars
-                      const keyNormalized = keyLower.replace(/[^a-z0-9]/g, '');
-                      const paramNormalized = paramKeyLower.replace(/[^a-z0-9]/g, '');
-                      if (keyNormalized === paramNormalized && keyNormalized.length > 3) return true;
-                      
-                      return false;
-                    });
-                    if (matchingKey) {
-                      currentValue = currentParameters[matchingKey];
-                      console.log(`Matched parameter "${paramKey}" to data key "${matchingKey}"`);
-                    }
-                  }
-                  
-                  // Use undefined if no value found so charts won't inject a fake 0
-                  if (currentValue === undefined || currentValue === null || isNaN(currentValue)) {
-                    if (Object.keys(currentParameters).length > 0) {
-                      console.warn(`No value found for parameter: ${paramKey}`, {
-                        availableKeys: Object.keys(currentParameters).slice(0, 10),
-                        paramKey,
-                        param
-                      });
-                    }
-                    currentValue = undefined;
-                  }
-                  
-                  return (
-                    <ParameterChart
-                      key={paramKey}
-                      parameter={param}
-                      value={currentValue}
-                      deviceName={device.name}
-                      deviceId={device.id}
-                      period={chartPeriod}
-                      deviceStatus={liveStatus || device.status}
-                      lastSeen={liveLastSeen || device.lastSeen}
-                    />
-                  );
-                })}
-              </div>
-            )}
+            {/* Events & Alarms - at bottom */}
+            <PowerQualityDashboard
+              device={device}
+              selectedPeriod={chartPeriod}
+              onPeriodChange={setChartPeriod}
+            />
 
             {(liveStatus || device.status) !== 'online' && (
               <Card className="text-center py-12">
