@@ -9,7 +9,7 @@ Write-Host "=== Verifying Offline Bundle ===" -ForegroundColor Green
 Write-Host "Bundle Location: $bundlePath" -ForegroundColor Cyan
 
 if (-not (Test-Path $bundlePath)) {
-    Write-Host "✗ Bundle directory not found: $bundlePath" -ForegroundColor Red
+    Write-Host "ERROR: Bundle directory not found: $bundlePath" -ForegroundColor Red
     Write-Host "Run: .\scripts\prepare-offline-bundle.ps1 first" -ForegroundColor Yellow
     exit 1
 }
@@ -25,31 +25,31 @@ $tsInstaller = Get-ChildItem "$bundlePath\installer\postgresql\timescaledb-*" -E
 $pyInstaller = Get-ChildItem "$bundlePath\installer\python\python-*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
 
 if ($nodeInstaller) {
-    Write-Host "  ✓ Node.js: $($nodeInstaller.Name)" -ForegroundColor Green
+    Write-Host "  OK Node.js: $($nodeInstaller.Name)" -ForegroundColor Green
 } else {
     $errors += "Node.js installer missing"
-    Write-Host "  ✗ Node.js installer not found" -ForegroundColor Red
+    Write-Host "  ERROR: Node.js installer not found" -ForegroundColor Red
 }
 
 if ($pgInstaller) {
-    Write-Host "  ✓ PostgreSQL: $($pgInstaller.Name)" -ForegroundColor Green
+    Write-Host "  OK PostgreSQL: $($pgInstaller.Name)" -ForegroundColor Green
 } else {
     $errors += "PostgreSQL installer missing"
-    Write-Host "  ✗ PostgreSQL installer not found" -ForegroundColor Red
+    Write-Host "  ERROR: PostgreSQL installer not found" -ForegroundColor Red
 }
 
 if ($tsInstaller) {
-    Write-Host "  ✓ TimescaleDB: $($tsInstaller.Name)" -ForegroundColor Green
+    Write-Host "  OK TimescaleDB: $($tsInstaller.Name)" -ForegroundColor Green
 } else {
     $warnings += "TimescaleDB installer missing (optional)"
-    Write-Host "  ⚠ TimescaleDB installer not found (optional)" -ForegroundColor Yellow
+    Write-Host "  WARNING: TimescaleDB installer not found (optional)" -ForegroundColor Yellow
 }
 
 if ($pyInstaller) {
-    Write-Host "  ✓ Python: $($pyInstaller.Name)" -ForegroundColor Green
+    Write-Host "  OK Python: $($pyInstaller.Name)" -ForegroundColor Green
 } else {
     $errors += "Python installer missing"
-    Write-Host "  ✗ Python installer not found" -ForegroundColor Red
+    Write-Host "  ERROR: Python installer not found" -ForegroundColor Red
 }
 
 # Check node_modules
@@ -57,19 +57,21 @@ Write-Host "`n[2/5] Checking node_modules..." -ForegroundColor Yellow
 if (Test-Path "$bundlePath\node_modules") {
     $frontendSize = (Get-ChildItem "$bundlePath\node_modules" -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
     $frontendCount = (Get-ChildItem "$bundlePath\node_modules" -Directory -ErrorAction SilentlyContinue).Count
-    Write-Host "  ✓ Frontend: $frontendCount packages, $([math]::Round($frontendSize / 1MB, 2)) MB" -ForegroundColor Green
+    $frontendSizeMB = [math]::Round($frontendSize / 1MB, 2)
+    Write-Host "  OK Frontend: $frontendCount packages, $frontendSizeMB MB" -ForegroundColor Green
 } else {
     $errors += "Frontend node_modules missing"
-    Write-Host "  ✗ Frontend node_modules not found" -ForegroundColor Red
+    Write-Host "  ERROR: Frontend node_modules not found" -ForegroundColor Red
 }
 
 if (Test-Path "$bundlePath\backend\node_modules") {
     $backendSize = (Get-ChildItem "$bundlePath\backend\node_modules" -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
     $backendCount = (Get-ChildItem "$bundlePath\backend\node_modules" -Directory -ErrorAction SilentlyContinue).Count
-    Write-Host "  ✓ Backend: $backendCount packages, $([math]::Round($backendSize / 1MB, 2)) MB" -ForegroundColor Green
+    $backendSizeMB = [math]::Round($backendSize / 1MB, 2)
+    Write-Host "  OK Backend: $backendCount packages, $backendSizeMB MB" -ForegroundColor Green
 } else {
     $errors += "Backend node_modules missing"
-    Write-Host "  ✗ Backend node_modules not found" -ForegroundColor Red
+    Write-Host "  ERROR: Backend node_modules not found" -ForegroundColor Red
 }
 
 # Check Python wheels
@@ -79,26 +81,27 @@ if (Test-Path $wheelsDir) {
     $wheelFiles = Get-ChildItem "$wheelsDir\*.whl" -ErrorAction SilentlyContinue
     if ($wheelFiles.Count -gt 0) {
         $wheelsSize = ($wheelFiles | Measure-Object -Property Length -Sum).Sum
-        Write-Host "  ✓ Python wheels: $($wheelFiles.Count) files, $([math]::Round($wheelsSize / 1MB, 2)) MB" -ForegroundColor Green
+        $wheelsSizeMB = [math]::Round($wheelsSize / 1MB, 2)
+        Write-Host "  OK Python wheels: $($wheelFiles.Count) files, $wheelsSizeMB MB" -ForegroundColor Green
         
         # Check for key packages
         $keyPackages = @('pymodbus', 'pandas', 'numpy')
         foreach ($pkg in $keyPackages) {
             $found = $wheelFiles | Where-Object { $_.Name -like "*$pkg*" }
             if ($found) {
-                Write-Host "    ✓ $pkg found" -ForegroundColor Green
+                Write-Host "    OK $pkg found" -ForegroundColor Green
             } else {
                 $warnings += "$pkg wheel not found"
-                Write-Host "    ⚠ $pkg not found" -ForegroundColor Yellow
+                Write-Host "    WARNING: $pkg not found" -ForegroundColor Yellow
             }
         }
     } else {
         $warnings += "No Python wheel files found"
-        Write-Host "  ⚠ No wheel files found" -ForegroundColor Yellow
+        Write-Host "  WARNING: No wheel files found" -ForegroundColor Yellow
     }
 } else {
     $warnings += "Python wheels directory missing"
-    Write-Host "  ⚠ Python wheels directory not found" -ForegroundColor Yellow
+    Write-Host "  WARNING: Python wheels directory not found" -ForegroundColor Yellow
 }
 
 # Check key source files
@@ -114,10 +117,10 @@ $requiredFiles = @(
 $missingFiles = @()
 foreach ($file in $requiredFiles) {
     if (Test-Path "$bundlePath\$file") {
-        Write-Host "  ✓ $file" -ForegroundColor Green
+        Write-Host "  OK $file" -ForegroundColor Green
     } else {
         $missingFiles += $file
-        Write-Host "  ✗ $file" -ForegroundColor Red
+        Write-Host "  ERROR: $file" -ForegroundColor Red
     }
 }
 
@@ -130,32 +133,39 @@ Write-Host "`n[5/5] Checking bundle size..." -ForegroundColor Yellow
 $totalSize = (Get-ChildItem $bundlePath -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
 $totalSizeMB = [math]::Round($totalSize / 1MB, 2)
 $totalSizeGB = [math]::Round($totalSize / 1GB, 2)
-Write-Host "  Total Size: $totalSizeMB MB ($totalSizeGB GB)" -ForegroundColor Cyan
+$sizeText = 'Total Size: ' + $totalSizeMB + ' MB (' + $totalSizeGB + ' GB)'
+Write-Host "  $sizeText" -ForegroundColor Cyan
 
 if ($totalSizeMB -lt 100) {
     $warnings += "Bundle seems too small - may be incomplete"
 }
 
 # Summary
-Write-Host "`n=== Verification Summary ===" -ForegroundColor Green
+Write-Host ""
+Write-Host "=== Verification Summary ===" -ForegroundColor Green
 if ($errors.Count -eq 0) {
-    Write-Host "✓ Bundle is complete and ready for offline installation!" -ForegroundColor Green
+    Write-Host "OK Bundle is complete and ready for offline installation!" -ForegroundColor Green
 } else {
-    Write-Host "✗ Errors found:" -ForegroundColor Red
+    Write-Host "ERROR: Errors found:" -ForegroundColor Red
     $errors | ForEach-Object { Write-Host "  - $_" -ForegroundColor Red }
-    Write-Host "`nPlease fix errors before using bundle" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Please fix errors before using bundle" -ForegroundColor Yellow
 }
 
 if ($warnings.Count -gt 0) {
-    Write-Host "`n⚠ Warnings:" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "WARNING: Warnings:" -ForegroundColor Yellow
     $warnings | ForEach-Object { Write-Host "  - $_" -ForegroundColor Yellow }
 }
 
-Write-Host "`nBundle Location: $bundlePath" -ForegroundColor Cyan
-Write-Host "Total Size: $totalSizeMB MB ($totalSizeGB GB)" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Bundle Location: $bundlePath" -ForegroundColor Cyan
+$sizeText2 = 'Total Size: ' + $totalSizeMB + ' MB (' + $totalSizeGB + ' GB)'
+Write-Host $sizeText2 -ForegroundColor Cyan
 
 if ($errors.Count -eq 0) {
-    Write-Host "`n✓ Ready for offline installation!" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "OK Ready for offline installation!" -ForegroundColor Green
     exit 0
 } else {
     exit 1
