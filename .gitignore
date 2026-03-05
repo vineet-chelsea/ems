@@ -36,3 +36,16 @@ build
 *.deb
 *.AppImage
 *.snap
+
+# Offline bundle (too large for git)
+offline-bundle/
+offline-packages/
+*.zip
+*.7z
+*.tar.gz
+
+# Installer files (keep structure, exclude binaries)
+installer/**/*.msi
+installer/**/*.exe
+installer/**/*.zip
+!installer/**/.gitkeep
