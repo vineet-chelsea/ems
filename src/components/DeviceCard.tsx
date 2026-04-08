@@ -78,7 +78,7 @@ export function DeviceCard({ device, onClick }: DeviceCardProps) {
         )}
         
         <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-3">
-          <span>Last seen: {device.lastSeen.toLocaleTimeString()}</span>
+          <span>Last seen: {new Date(device.lastSeen).toLocaleTimeString()}</span>
           <Activity className="w-3 h-3" />
         </div>
       </CardContent>
