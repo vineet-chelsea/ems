@@ -332,8 +332,15 @@ export function EnergyDashboard() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6">
-              <AutoStartSettings />
-              <AutoUpdate />
+              <Card>
+                <CardHeader>
+                  <CardTitle>System Settings</CardTitle>
+                  <CardDescription>Configure system preferences</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">System settings will be available here.</p>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         ) : (
