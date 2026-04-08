@@ -26,6 +26,11 @@ export function EnergyDashboard() {
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deviceTree, setDeviceTree] = useState<TreeNode[]>(() => {
+    const saved = localStorage.getItem('device_tree');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [assignTargetNodeId, setAssignTargetNodeId] = useState<string | null>(null);
   const { user, logout, isAdmin, removeDeviceFromUsers } = useAuth();
   const navigate = useNavigate();
 
