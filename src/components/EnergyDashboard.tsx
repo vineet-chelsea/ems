@@ -375,26 +375,15 @@ export function EnergyDashboard() {
                   <h3 className="text-lg font-medium mb-2">Loading devices...</h3>
                 </CardContent>
               </Card>
-            ) : visibleDevices.length === 0 ? (
-              <Card className="text-center py-12">
-                <CardContent>
-                  <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No devices assigned</h3>
-                  <p className="text-muted-foreground">
-                    Contact your administrator to get access to devices
-                  </p>
-                </CardContent>
-              </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {visibleDevices.map((device) => (
-                  <DeviceCard 
-                    key={device.id} 
-                    device={device} 
-                    onClick={() => setSelectedDevice(device)}
-                  />
-                ))}
-              </div>
+              <DeviceTree
+                tree={deviceTree}
+                devices={visibleDevices}
+                isAdmin={false}
+                onTreeChange={handleTreeChange}
+                onDeviceClick={(device) => setSelectedDevice(device)}
+                onAssignDevice={() => {}}
+              />
             )}
           </div>
         )}
@@ -407,6 +396,20 @@ export function EnergyDashboard() {
             onAddDevice={handleAddDevice}
           />
         )}
+
+        {/* Assign Device Dialog */}
+        <AssignDeviceDialog
+          open={!!assignTargetNodeId}
+          onOpenChange={(open) => { if (!open) setAssignTargetNodeId(null); }}
+          devices={visibleDevices}
+          assignedDeviceIds={assignTargetNodeId ? getNodeAssignedDeviceIds(deviceTree, assignTargetNodeId) : []}
+          onAssign={(deviceId) => {
+            if (assignTargetNodeId) {
+              addDeviceToNode(assignTargetNodeId, deviceId);
+              setAssignTargetNodeId(null);
+            }
+          }}
+        />
       </div>
     </div>
   );
