@@ -9,6 +9,8 @@ import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
 import { AdminPanel } from "./AdminPanel";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
+import { DeviceTree, TreeNode } from "./DeviceTree";
+import { AssignDeviceDialog } from "./AssignDeviceDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, Device as ApiDevice } from "@/services/api";
