@@ -9,14 +9,11 @@ import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
 import { AdminPanel } from "./AdminPanel";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
-import { AutoUpdate } from "./AutoUpdate";
-import { AutoStartSettings } from "./AutoStartSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, Device as ApiDevice } from "@/services/api";
 
 export interface Device extends ApiDevice {
-  lastSeen: Date;
   parameters: {
     [key: string]: number;
   };
@@ -53,7 +50,7 @@ export function EnergyDashboard() {
             const latestData = await api.getLatestData(device.id);
             return {
               ...device,
-              lastSeen: new Date(device.lastSeen),
+              lastSeen: device.lastSeen,
               parameters: {
                 V1: latestData.V1,
                 V2: latestData.V2,
@@ -89,7 +86,7 @@ export function EnergyDashboard() {
             // If no data available, return device without parameters
             return {
               ...device,
-              lastSeen: new Date(device.lastSeen),
+              lastSeen: device.lastSeen,
               parameters: {},
             } as Device;
           }
@@ -335,8 +332,15 @@ export function EnergyDashboard() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6">
-              <AutoStartSettings />
-              <AutoUpdate />
+              <Card>
+                <CardHeader>
+                  <CardTitle>System Settings</CardTitle>
+                  <CardDescription>Configure system preferences</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">System settings will be available here.</p>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         ) : (
