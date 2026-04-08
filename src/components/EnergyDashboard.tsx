@@ -336,30 +336,15 @@ export function EnergyDashboard() {
                       <h3 className="text-lg font-medium mb-2">Loading devices...</h3>
                     </CardContent>
                   </Card>
-                ) : visibleDevices.length === 0 ? (
-                  <Card className="text-center py-12">
-                    <CardContent>
-                      <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No devices connected</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Add your first energy monitoring device to get started
-                      </p>
-                      <Button onClick={() => setIsAddDeviceOpen(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add First Device
-                      </Button>
-                    </CardContent>
-                  </Card>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {visibleDevices.map((device) => (
-                      <DeviceCard 
-                        key={device.id} 
-                        device={device} 
-                        onClick={() => setSelectedDevice(device)}
-                      />
-                    ))}
-                  </div>
+                  <DeviceTree
+                    tree={deviceTree}
+                    devices={visibleDevices}
+                    isAdmin={isAdmin}
+                    onTreeChange={handleTreeChange}
+                    onDeviceClick={(device) => setSelectedDevice(device)}
+                    onAssignDevice={handleAssignDevice}
+                  />
                 )}
               </div>
             </TabsContent>
