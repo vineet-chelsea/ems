@@ -9,6 +9,8 @@ import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
 import { AdminPanel } from "./AdminPanel";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
+import { DeviceTree, TreeNode } from "./DeviceTree";
+import { AssignDeviceDialog } from "./AssignDeviceDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, Device as ApiDevice } from "@/services/api";
@@ -24,6 +26,11 @@ export function EnergyDashboard() {
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deviceTree, setDeviceTree] = useState<TreeNode[]>(() => {
+    const saved = localStorage.getItem('device_tree');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [assignTargetNodeId, setAssignTargetNodeId] = useState<string | null>(null);
   const { user, logout, isAdmin, removeDeviceFromUsers } = useAuth();
   const navigate = useNavigate();
 
@@ -166,6 +173,36 @@ export function EnergyDashboard() {
     }
   };
 
+  const handleTreeChange = (newTree: TreeNode[]) => {
+    setDeviceTree(newTree);
+    localStorage.setItem('device_tree', JSON.stringify(newTree));
+  };
+
+  const handleAssignDevice = (nodeId: string) => {
+    setAssignTargetNodeId(nodeId);
+  };
+
+  const getNodeAssignedDeviceIds = (nodes: TreeNode[], targetId: string): string[] => {
+    for (const node of nodes) {
+      if (node.id === targetId) return node.deviceIds;
+      const found = getNodeAssignedDeviceIds(node.children, targetId);
+      if (found.length > 0) return found;
+    }
+    return [];
+  };
+
+  const addDeviceToNode = (nodeId: string, deviceId: string) => {
+    const addToNode = (nodes: TreeNode[]): TreeNode[] =>
+      nodes.map((n) =>
+        n.id === nodeId
+          ? { ...n, deviceIds: [...n.deviceIds, deviceId] }
+          : { ...n, children: addToNode(n.children) }
+      );
+    const updated = addToNode(deviceTree);
+    handleTreeChange(updated);
+    toast.success("Device assigned to node");
+  };
+
   if (selectedDevice) {
     return (
       <DeviceDetailView 
@@ -299,30 +336,15 @@ export function EnergyDashboard() {
                       <h3 className="text-lg font-medium mb-2">Loading devices...</h3>
                     </CardContent>
                   </Card>
-                ) : visibleDevices.length === 0 ? (
-                  <Card className="text-center py-12">
-                    <CardContent>
-                      <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No devices connected</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Add your first energy monitoring device to get started
-                      </p>
-                      <Button onClick={() => setIsAddDeviceOpen(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add First Device
-                      </Button>
-                    </CardContent>
-                  </Card>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {visibleDevices.map((device) => (
-                      <DeviceCard 
-                        key={device.id} 
-                        device={device} 
-                        onClick={() => setSelectedDevice(device)}
-                      />
-                    ))}
-                  </div>
+                  <DeviceTree
+                    tree={deviceTree}
+                    devices={visibleDevices}
+                    isAdmin={isAdmin}
+                    onTreeChange={handleTreeChange}
+                    onDeviceClick={(device) => setSelectedDevice(device)}
+                    onAssignDevice={handleAssignDevice}
+                  />
                 )}
               </div>
             </TabsContent>
@@ -353,26 +375,15 @@ export function EnergyDashboard() {
                   <h3 className="text-lg font-medium mb-2">Loading devices...</h3>
                 </CardContent>
               </Card>
-            ) : visibleDevices.length === 0 ? (
-              <Card className="text-center py-12">
-                <CardContent>
-                  <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No devices assigned</h3>
-                  <p className="text-muted-foreground">
-                    Contact your administrator to get access to devices
-                  </p>
-                </CardContent>
-              </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {visibleDevices.map((device) => (
-                  <DeviceCard 
-                    key={device.id} 
-                    device={device} 
-                    onClick={() => setSelectedDevice(device)}
-                  />
-                ))}
-              </div>
+              <DeviceTree
+                tree={deviceTree}
+                devices={visibleDevices}
+                isAdmin={false}
+                onTreeChange={handleTreeChange}
+                onDeviceClick={(device) => setSelectedDevice(device)}
+                onAssignDevice={() => {}}
+              />
             )}
           </div>
         )}
@@ -385,6 +396,20 @@ export function EnergyDashboard() {
             onAddDevice={handleAddDevice}
           />
         )}
+
+        {/* Assign Device Dialog */}
+        <AssignDeviceDialog
+          open={!!assignTargetNodeId}
+          onOpenChange={(open) => { if (!open) setAssignTargetNodeId(null); }}
+          devices={visibleDevices}
+          assignedDeviceIds={assignTargetNodeId ? getNodeAssignedDeviceIds(deviceTree, assignTargetNodeId) : []}
+          onAssign={(deviceId) => {
+            if (assignTargetNodeId) {
+              addDeviceToNode(assignTargetNodeId, deviceId);
+              setAssignTargetNodeId(null);
+            }
+          }}
+        />
       </div>
     </div>
   );
