@@ -16,7 +16,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, Device as ApiDevice } from "@/services/api";
 
 export interface Device extends ApiDevice {
-  lastSeen: Date;
   parameters: {
     [key: string]: number;
   };
