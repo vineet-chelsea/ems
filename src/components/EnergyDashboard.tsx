@@ -173,6 +173,36 @@ export function EnergyDashboard() {
     }
   };
 
+  const handleTreeChange = (newTree: TreeNode[]) => {
+    setDeviceTree(newTree);
+    localStorage.setItem('device_tree', JSON.stringify(newTree));
+  };
+
+  const handleAssignDevice = (nodeId: string) => {
+    setAssignTargetNodeId(nodeId);
+  };
+
+  const getNodeAssignedDeviceIds = (nodes: TreeNode[], targetId: string): string[] => {
+    for (const node of nodes) {
+      if (node.id === targetId) return node.deviceIds;
+      const found = getNodeAssignedDeviceIds(node.children, targetId);
+      if (found.length > 0) return found;
+    }
+    return [];
+  };
+
+  const addDeviceToNode = (nodeId: string, deviceId: string) => {
+    const addToNode = (nodes: TreeNode[]): TreeNode[] =>
+      nodes.map((n) =>
+        n.id === nodeId
+          ? { ...n, deviceIds: [...n.deviceIds, deviceId] }
+          : { ...n, children: addToNode(n.children) }
+      );
+    const updated = addToNode(deviceTree);
+    handleTreeChange(updated);
+    toast.success("Device assigned to node");
+  };
+
   if (selectedDevice) {
     return (
       <DeviceDetailView 
