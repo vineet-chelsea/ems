@@ -28,6 +28,10 @@ export interface Device {
   lastSeen: string;
   includeInTotalSummary: boolean;
   parameterMappings?: Record<string, string>;
+  groupId?: string | null;
+  parentDeviceId?: string | null;
+  sortOrder?: number;
+  groupLabel?: string | null;
   // Micrologic 6E protection settings
   protectionIr?: number;
   protectionTr?: number;
@@ -36,6 +40,13 @@ export interface Device {
   protectionIi?: number;
   protectionIg?: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
   protectionTg?: number;
+}
+
+export interface DeviceGroup {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DataPoint {
@@ -241,6 +252,17 @@ class ApiService {
   // Device endpoints
   async getDevices(): Promise<Device[]> {
     return this.request<Device[]>('/devices');
+  }
+
+  async getDeviceGroups(): Promise<DeviceGroup[]> {
+    return this.request<DeviceGroup[]>('/devices/groups');
+  }
+
+  async createDeviceGroup(name: string): Promise<DeviceGroup> {
+    return this.request<DeviceGroup>('/devices/groups', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
   }
 
   async getDevice(id: string): Promise<Device> {

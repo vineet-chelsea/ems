@@ -55,6 +55,10 @@ const deviceSchema = z.object({
   status: z.enum(['online', 'offline', 'connecting']).default('offline'),
   includeInTotalSummary: z.boolean().default(true),
   parameterMappings: z.record(z.string(), z.string()).optional(),
+  groupId: z.string().optional().nullable(),
+  parentDeviceId: z.string().optional().nullable(),
+  sortOrder: z.coerce.number().int().min(0).default(0),
+  groupLabel: z.string().optional().nullable(),
   // Micrologic 6E protection settings - coerce strings to numbers
   protectionIr: numericField(0.1, 1.0, false),
   protectionTr: numericField(0.5, 25.0, false),
@@ -63,6 +67,99 @@ const deviceSchema = z.object({
   protectionIi: numericField(2.0, 10.0, false),
   protectionIg: z.enum(['A', 'B', 'C', 'D', 'E', 'F']).optional().nullable(),
   protectionTg: numericField(0.1, 0.4, false),
+});
+const deviceGroupSchema = z.object({
+  name: z.string().min(1).max(255),
+});
+
+const deviceSelectFields = `
+  id,
+  name,
+  type,
+  ip_address as "ipAddress",
+  subnet_mask as "subnetMask",
+  slave_address as "slaveAddress",
+  breaker_rating as "breakerRating",
+  unit_cost as "unitCost",
+  status,
+  last_seen as "lastSeen",
+  include_in_total_summary as "includeInTotalSummary",
+  parameter_mappings as "parameterMappings",
+  group_id as "groupId",
+  parent_device_id as "parentDeviceId",
+  sort_order as "sortOrder",
+  group_label as "groupLabel",
+  protection_ir as "protectionIr",
+  protection_tr as "protectionTr",
+  protection_isd as "protectionIsd",
+  protection_tsd as "protectionTsd",
+  protection_ii as "protectionIi",
+  protection_ig as "protectionIg",
+  protection_tg as "protectionTg"
+`;
+
+async function assertNoDeviceCycle(deviceId: string, parentDeviceId: string | null) {
+  if (!parentDeviceId) return;
+  if (deviceId === parentDeviceId) {
+    throw new Error('A device cannot be its own parent');
+  }
+
+  let currentParent: string | null = parentDeviceId;
+  while (currentParent) {
+    if (currentParent === deviceId) {
+      throw new Error('Invalid topology: cycle detected in device tree');
+    }
+    const parentResult = await db.query(
+      'SELECT parent_device_id FROM devices WHERE id = $1',
+      [currentParent]
+    );
+    if (parentResult.rows.length === 0) {
+      throw new Error('Parent device does not exist');
+    }
+    currentParent = parentResult.rows[0].parent_device_id;
+  }
+}
+
+async function assertGroupExists(groupId: string | null | undefined) {
+  if (!groupId) return;
+  const result = await db.query('SELECT id FROM device_groups WHERE id = $1', [groupId]);
+  if (result.rows.length === 0) {
+    throw new Error('Group does not exist');
+  }
+}
+
+router.get('/groups', async (_req: AuthRequest, res) => {
+  try {
+    await ensureSchema();
+    const result = await db.query(
+      'SELECT id, name, created_at as "createdAt", updated_at as "updatedAt" FROM device_groups ORDER BY name ASC'
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching device groups:', error);
+    res.status(500).json({ error: 'Failed to fetch device groups' });
+  }
+});
+
+router.post('/groups', requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    await ensureSchema();
+    const data = deviceGroupSchema.parse(req.body);
+    const groupId = `group-${Date.now()}`;
+    const result = await db.query(
+      `INSERT INTO device_groups (id, name)
+       VALUES ($1, $2)
+       RETURNING id, name, created_at as "createdAt", updated_at as "updatedAt"`,
+      [groupId, data.name.trim()]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid group data', details: error.errors });
+    }
+    console.error('Error creating device group:', error);
+    res.status(500).json({ error: 'Failed to create device group' });
+  }
 });
 
 // Test device connection (ping IP and test Modbus TCP)
@@ -134,25 +231,7 @@ router.get('/', async (req: AuthRequest, res) => {
     
     let query = `
       SELECT 
-        id,
-        name,
-        type,
-        ip_address as "ipAddress",
-        subnet_mask as "subnetMask",
-        slave_address as "slaveAddress",
-        breaker_rating as "breakerRating",
-        unit_cost as "unitCost",
-        status,
-        last_seen as "lastSeen",
-        include_in_total_summary as "includeInTotalSummary",
-        parameter_mappings as "parameterMappings",
-        protection_ir as "protectionIr",
-        protection_tr as "protectionTr",
-        protection_isd as "protectionIsd",
-        protection_tsd as "protectionTsd",
-        protection_ii as "protectionIi",
-        protection_ig as "protectionIg",
-        protection_tg as "protectionTg"
+        ${deviceSelectFields}
       FROM devices
     `;
     
@@ -168,7 +247,7 @@ router.get('/', async (req: AuthRequest, res) => {
       params.push(req.userId);
     }
     
-    query += ' ORDER BY created_at DESC';
+    query += ' ORDER BY sort_order ASC, created_at DESC';
     
     const result = await db.query(query, params);
     res.json(result.rows);
@@ -196,25 +275,7 @@ router.get('/:id', async (req: AuthRequest, res) => {
     
     const result = await db.query(`
       SELECT 
-        id,
-        name,
-        type,
-        ip_address as "ipAddress",
-        subnet_mask as "subnetMask",
-        slave_address as "slaveAddress",
-        breaker_rating as "breakerRating",
-        unit_cost as "unitCost",
-        status,
-        last_seen as "lastSeen",
-        include_in_total_summary as "includeInTotalSummary",
-        parameter_mappings as "parameterMappings",
-        protection_ir as "protectionIr",
-        protection_tr as "protectionTr",
-        protection_isd as "protectionIsd",
-        protection_tsd as "protectionTsd",
-        protection_ii as "protectionIi",
-        protection_ig as "protectionIg",
-        protection_tg as "protectionTg"
+        ${deviceSelectFields}
       FROM devices
       WHERE id = $1
     `, [req.params.id]);
@@ -236,11 +297,26 @@ router.post('/', requireAdmin, async (req: AuthRequest, res) => {
     await ensureSchema();
     
     const deviceData = deviceSchema.parse(req.body);
+
+    await assertGroupExists(deviceData.groupId ?? null);
+    if (deviceData.parentDeviceId) {
+      await assertNoDeviceCycle(deviceData.id, deviceData.parentDeviceId);
+      const parentResult = await db.query(
+        'SELECT group_id FROM devices WHERE id = $1',
+        [deviceData.parentDeviceId]
+      );
+      if (parentResult.rows.length === 0) {
+        throw new Error('Parent device does not exist');
+      }
+      if (!deviceData.groupId) {
+        deviceData.groupId = parentResult.rows[0].group_id;
+      }
+    }
     
     // Insert device
     await db.query(`
-      INSERT INTO devices (id, name, type, ip_address, subnet_mask, slave_address, breaker_rating, unit_cost, status, include_in_total_summary, parameter_mappings, protection_ir, protection_tr, protection_isd, protection_tsd, protection_ii, protection_ig, protection_tg)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      INSERT INTO devices (id, name, type, ip_address, subnet_mask, slave_address, breaker_rating, unit_cost, status, include_in_total_summary, parameter_mappings, group_id, parent_device_id, sort_order, group_label, protection_ir, protection_tr, protection_isd, protection_tsd, protection_ii, protection_ig, protection_tg)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
         type = EXCLUDED.type,
@@ -252,6 +328,10 @@ router.post('/', requireAdmin, async (req: AuthRequest, res) => {
         status = EXCLUDED.status,
         include_in_total_summary = EXCLUDED.include_in_total_summary,
         parameter_mappings = EXCLUDED.parameter_mappings,
+        group_id = EXCLUDED.group_id,
+        parent_device_id = EXCLUDED.parent_device_id,
+        sort_order = EXCLUDED.sort_order,
+        group_label = EXCLUDED.group_label,
         protection_ir = EXCLUDED.protection_ir,
         protection_tr = EXCLUDED.protection_tr,
         protection_isd = EXCLUDED.protection_isd,
@@ -272,6 +352,10 @@ router.post('/', requireAdmin, async (req: AuthRequest, res) => {
       deviceData.status,
       deviceData.includeInTotalSummary,
       deviceData.parameterMappings ? JSON.stringify(deviceData.parameterMappings) : null,
+      deviceData.groupId ?? null,
+      deviceData.parentDeviceId ?? null,
+      deviceData.sortOrder ?? 0,
+      deviceData.groupLabel ?? null,
       deviceData.protectionIr ?? null,
       deviceData.protectionTr ?? null,
       deviceData.protectionIsd ?? null,
@@ -287,25 +371,7 @@ router.post('/', requireAdmin, async (req: AuthRequest, res) => {
     // Fetch and return the created device
     const result = await db.query(`
       SELECT 
-        id,
-        name,
-        type,
-        ip_address as "ipAddress",
-        subnet_mask as "subnetMask",
-        slave_address as "slaveAddress",
-        breaker_rating as "breakerRating",
-        unit_cost as "unitCost",
-        status,
-        last_seen as "lastSeen",
-        include_in_total_summary as "includeInTotalSummary",
-        parameter_mappings as "parameterMappings",
-        protection_ir as "protectionIr",
-        protection_tr as "protectionTr",
-        protection_isd as "protectionIsd",
-        protection_tsd as "protectionTsd",
-        protection_ii as "protectionIi",
-        protection_ig as "protectionIg",
-        protection_tg as "protectionTg"
+        ${deviceSelectFields}
       FROM devices
       WHERE id = $1
     `, [deviceData.id]);
@@ -314,6 +380,9 @@ router.post('/', requireAdmin, async (req: AuthRequest, res) => {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Invalid device data', details: error.errors });
+    }
+    if (error instanceof Error && (error.message.includes('Parent device') || error.message.includes('Group') || error.message.includes('cycle') || error.message.includes('own parent'))) {
+      return res.status(400).json({ error: error.message });
     }
     console.error('Error creating device:', error);
     res.status(500).json({ error: 'Failed to create device' });
@@ -333,7 +402,8 @@ router.put('/:id', requireAdmin, async (req: AuthRequest, res) => {
       'name', 'type', 'ipAddress', 'subnetMask', 'slaveAddress',
       'breakerRating', 'unitCost', 'status', 'includeInTotalSummary',
       'parameterMappings', 'protectionIr', 'protectionTr', 'protectionIsd',
-      'protectionTsd', 'protectionIi', 'protectionIg', 'protectionTg'
+      'protectionTsd', 'protectionIi', 'protectionIg', 'protectionTg',
+      'groupId', 'parentDeviceId', 'sortOrder', 'groupLabel'
     ];
     
     const preprocessedBody: any = {};
@@ -401,6 +471,10 @@ router.put('/:id', requireAdmin, async (req: AuthRequest, res) => {
       protectionIi: z.coerce.number().min(2.0).max(10.0).optional(),
       protectionIg: z.enum(['A', 'B', 'C', 'D', 'E', 'F']).optional().nullable(),
       protectionTg: z.coerce.number().min(0.1).max(0.4).optional(),
+      groupId: z.string().optional().nullable(),
+      parentDeviceId: z.string().optional().nullable(),
+      sortOrder: z.coerce.number().int().min(0).optional(),
+      groupLabel: z.string().optional().nullable(),
     }).passthrough(); // Allow extra fields to pass through
     
     let updateData;
@@ -489,6 +563,24 @@ router.put('/:id', requireAdmin, async (req: AuthRequest, res) => {
       updates.push(`protection_tg = $${paramCount++}`);
       values.push(updateData.protectionTg ?? null);
     }
+    if (updateData.parentDeviceId !== undefined) {
+      await assertNoDeviceCycle(req.params.id, updateData.parentDeviceId ?? null);
+      updates.push(`parent_device_id = $${paramCount++}`);
+      values.push(updateData.parentDeviceId ?? null);
+    }
+    if (updateData.groupId !== undefined) {
+      await assertGroupExists(updateData.groupId ?? null);
+      updates.push(`group_id = $${paramCount++}`);
+      values.push(updateData.groupId ?? null);
+    }
+    if (updateData.sortOrder !== undefined) {
+      updates.push(`sort_order = $${paramCount++}`);
+      values.push(updateData.sortOrder);
+    }
+    if (updateData.groupLabel !== undefined) {
+      updates.push(`group_label = $${paramCount++}`);
+      values.push(updateData.groupLabel ?? null);
+    }
     
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' });
@@ -506,25 +598,7 @@ router.put('/:id', requireAdmin, async (req: AuthRequest, res) => {
     // Fetch and return updated device
     const result = await db.query(`
       SELECT 
-        id,
-        name,
-        type,
-        ip_address as "ipAddress",
-        subnet_mask as "subnetMask",
-        slave_address as "slaveAddress",
-        breaker_rating as "breakerRating",
-        unit_cost as "unitCost",
-        status,
-        last_seen as "lastSeen",
-        include_in_total_summary as "includeInTotalSummary",
-        parameter_mappings as "parameterMappings",
-        protection_ir as "protectionIr",
-        protection_tr as "protectionTr",
-        protection_isd as "protectionIsd",
-        protection_tsd as "protectionTsd",
-        protection_ii as "protectionIi",
-        protection_ig as "protectionIg",
-        protection_tg as "protectionTg"
+        ${deviceSelectFields}
       FROM devices
       WHERE id = $1
     `, [req.params.id]);
@@ -537,6 +611,9 @@ router.put('/:id', requireAdmin, async (req: AuthRequest, res) => {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: 'Invalid device data', details: error.errors });
+    }
+    if (error instanceof Error && (error.message.includes('Parent device') || error.message.includes('Group') || error.message.includes('cycle') || error.message.includes('own parent'))) {
+      return res.status(400).json({ error: error.message });
     }
     console.error('Error updating device:', error);
     res.status(500).json({ error: 'Failed to update device' });
@@ -583,25 +660,7 @@ router.patch('/:id/status', async (req, res) => {
     
     const result = await db.query(`
       SELECT 
-        id,
-        name,
-        type,
-        ip_address as "ipAddress",
-        subnet_mask as "subnetMask",
-        slave_address as "slaveAddress",
-        breaker_rating as "breakerRating",
-        unit_cost as "unitCost",
-        status,
-        last_seen as "lastSeen",
-        include_in_total_summary as "includeInTotalSummary",
-        parameter_mappings as "parameterMappings",
-        protection_ir as "protectionIr",
-        protection_tr as "protectionTr",
-        protection_isd as "protectionIsd",
-        protection_tsd as "protectionTsd",
-        protection_ii as "protectionIi",
-        protection_ig as "protectionIg",
-        protection_tg as "protectionTg"
+        ${deviceSelectFields}
       FROM devices
       WHERE id = $1
     `, [req.params.id]);

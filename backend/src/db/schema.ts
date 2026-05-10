@@ -58,6 +58,15 @@ export async function initializeSchema() {
 
     // Create devices table FIRST (before user_device_permissions which references it)
     await db.query(`
+      CREATE TABLE IF NOT EXISTS device_groups (
+        id VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await db.query(`
       CREATE TABLE IF NOT EXISTS devices (
         id VARCHAR(255) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -71,6 +80,10 @@ export async function initializeSchema() {
         last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         include_in_total_summary BOOLEAN DEFAULT true,
         parameter_mappings JSONB,
+        group_id VARCHAR(255) REFERENCES device_groups(id) ON DELETE SET NULL,
+        parent_device_id VARCHAR(255) REFERENCES devices(id) ON DELETE SET NULL,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        group_label VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -96,6 +109,40 @@ export async function initializeSchema() {
           WHERE table_name = 'devices' AND column_name = 'slave_address'
         ) THEN
           ALTER TABLE devices ADD COLUMN slave_address INTEGER NOT NULL DEFAULT 1;
+        END IF;
+      END $$;
+    `);
+
+    // Add topology columns if they don't exist (for existing databases)
+    await db.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'devices' AND column_name = 'group_id'
+        ) THEN
+          ALTER TABLE devices ADD COLUMN group_id VARCHAR(255) REFERENCES device_groups(id) ON DELETE SET NULL;
+        END IF;
+
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'devices' AND column_name = 'parent_device_id'
+        ) THEN
+          ALTER TABLE devices ADD COLUMN parent_device_id VARCHAR(255) REFERENCES devices(id) ON DELETE SET NULL;
+        END IF;
+
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'devices' AND column_name = 'sort_order'
+        ) THEN
+          ALTER TABLE devices ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0;
+        END IF;
+
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'devices' AND column_name = 'group_label'
+        ) THEN
+          ALTER TABLE devices ADD COLUMN group_label VARCHAR(255);
         END IF;
       END $$;
     `);
@@ -198,6 +245,15 @@ export async function initializeSchema() {
     // Create indexes
     await db.query(`
       CREATE INDEX IF NOT EXISTS idx_devices_status ON devices(status)
+    `);
+    await db.query(`
+      CREATE INDEX IF NOT EXISTS idx_devices_group_id ON devices(group_id)
+    `);
+    await db.query(`
+      CREATE INDEX IF NOT EXISTS idx_devices_parent_device_id ON devices(parent_device_id)
+    `);
+    await db.query(`
+      CREATE INDEX IF NOT EXISTS idx_device_groups_name ON device_groups(name)
     `);
     await db.query(`
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)

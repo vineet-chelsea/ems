@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DeviceCard } from "./DeviceCard";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
 import { AdminPanel } from "./AdminPanel";
@@ -15,7 +18,8 @@ import { ChangePasswordDialog } from "./ChangePasswordDialog";
 import { PatchManager } from "./PatchManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { api, Device as ApiDevice } from "@/services/api";
+import { api, Device as ApiDevice, DeviceGroup } from "@/services/api";
+import { DeviceTreeView } from "./DeviceTreeView";
 
 export interface Device extends ApiDevice {
   lastSeen: string;
@@ -28,13 +32,23 @@ export function EnergyDashboard() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
+  const [addParentDeviceId, setAddParentDeviceId] = useState<string | null>(null);
+  const [addParentDeviceName, setAddParentDeviceName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deviceGroups, setDeviceGroups] = useState<DeviceGroup[]>([]);
+  const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
+  const [moveDevice, setMoveDevice] = useState<Device | null>(null);
+  const [moveGroupId, setMoveGroupId] = useState<string>("none");
+  const [moveParentId, setMoveParentId] = useState<string>("none");
   const { user, logout, isAdmin, removeDeviceFromUsers } = useAuth();
   const navigate = useNavigate();
 
   // Initial fetch
   useEffect(() => {
     loadDevices();
+    loadGroups();
   }, []);
 
   // Poll only when not viewing a specific device to avoid re-mounting charts
@@ -112,6 +126,15 @@ export function EnergyDashboard() {
     }
   };
 
+  const loadGroups = async () => {
+    try {
+      const groups = await api.getDeviceGroups();
+      setDeviceGroups(groups);
+    } catch (error) {
+      console.warn("Failed to load device groups:", error);
+    }
+  };
+
   // Filter devices based on user permissions
   const visibleDevices = isAdmin 
     ? devices 
@@ -129,6 +152,8 @@ export function EnergyDashboard() {
     breakerRating?: number;
     unitCost?: number;
     type?: string;
+    parentDeviceId?: string | null;
+    sortOrder?: number;
     parameterMappings?: Record<string, string>;
   }) => {
     try {
@@ -146,6 +171,8 @@ export function EnergyDashboard() {
               unitCost: deviceData.unitCost,
               status: "connecting",
               includeInTotalSummary: true,
+              parentDeviceId: deviceData.parentDeviceId ?? null,
+              sortOrder: deviceData.sortOrder ?? 0,
               parameterMappings: deviceData.parameterMappings,
             });
 
@@ -198,6 +225,51 @@ export function EnergyDashboard() {
     }
   };
 
+  const handleCreateGroup = async () => {
+    if (!newGroupName.trim()) {
+      toast.error("Group name is required");
+      return;
+    }
+    try {
+      await api.createDeviceGroup(newGroupName.trim());
+      toast.success("Group created");
+      setNewGroupName("");
+      setIsCreateGroupOpen(false);
+      await loadGroups();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create group");
+    }
+  };
+
+  const openMoveDialog = (device: Device) => {
+    setMoveDevice(device);
+    setMoveGroupId(device.groupId || "none");
+    setMoveParentId(device.parentDeviceId || "none");
+    setIsMoveDialogOpen(true);
+  };
+
+  const handleMoveDevice = async () => {
+    if (!moveDevice) return;
+    try {
+      await api.updateDevice(moveDevice.id, {
+        groupId: moveGroupId === "none" ? null : moveGroupId,
+        parentDeviceId: moveParentId === "none" ? null : moveParentId,
+      });
+      toast.success("Device assignment updated");
+      setIsMoveDialogOpen(false);
+      setMoveDevice(null);
+      await loadDevices();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update assignment");
+    }
+  };
+
+  const parentCandidates = devices.filter((d) => {
+    if (!moveDevice || d.id === moveDevice.id) return false;
+    if (moveGroupId === "none") return d.groupId == null;
+    return d.groupId === moveGroupId;
+  });
+
   if (selectedDevice) {
     return (
       <DeviceDetailView 
@@ -236,7 +308,7 @@ export function EnergyDashboard() {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="w-full space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -250,7 +322,11 @@ export function EnergyDashboard() {
           <div className="flex gap-2">
             {isAdmin && (
               <Button 
-                onClick={() => setIsAddDeviceOpen(true)}
+                onClick={() => {
+                  setAddParentDeviceId(null);
+                  setAddParentDeviceName(null);
+                  setIsAddDeviceOpen(true);
+                }}
                 className="bg-gradient-to-r from-primary to-primary-glow hover:shadow-lg transition-all duration-300"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -349,15 +425,19 @@ export function EnergyDashboard() {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {visibleDevices.map((device) => (
-                      <DeviceCard 
-                        key={device.id} 
-                        device={device} 
-                        onClick={() => setSelectedDevice(device)}
-                      />
-                    ))}
-                  </div>
+                  <DeviceTreeView
+                    devices={visibleDevices}
+                    groups={deviceGroups}
+                    isAdmin={isAdmin}
+                    onSelectDevice={(device) => setSelectedDevice(device)}
+                    onAddChild={(parentDevice) => {
+                      setAddParentDeviceId(parentDevice.id);
+                      setAddParentDeviceName(parentDevice.name);
+                      setIsAddDeviceOpen(true);
+                    }}
+                    onMoveDevice={openMoveDialog}
+                    onCreateGroup={() => setIsCreateGroupOpen(true)}
+                  />
                 )}
               </div>
             </TabsContent>
@@ -399,26 +479,96 @@ export function EnergyDashboard() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {visibleDevices.map((device) => (
-                  <DeviceCard 
-                    key={device.id} 
-                    device={device} 
-                    onClick={() => setSelectedDevice(device)}
-                  />
-                ))}
-              </div>
+              <DeviceTreeView
+                devices={visibleDevices}
+                groups={deviceGroups}
+                isAdmin={false}
+                onSelectDevice={(device) => setSelectedDevice(device)}
+                onAddChild={() => undefined}
+                onMoveDevice={() => undefined}
+                onCreateGroup={() => undefined}
+              />
             )}
           </div>
         )}
 
         {/* Add Device Dialog */}
         {isAdmin && (
-          <AddDeviceDialog 
-            open={isAddDeviceOpen}
-            onOpenChange={setIsAddDeviceOpen}
-            onAddDevice={handleAddDevice}
-          />
+          <>
+            <AddDeviceDialog 
+              open={isAddDeviceOpen}
+              onOpenChange={setIsAddDeviceOpen}
+              parentDeviceId={addParentDeviceId}
+              parentDeviceName={addParentDeviceName}
+              onAddDevice={handleAddDevice}
+            />
+            <Dialog open={isCreateGroupOpen} onOpenChange={setIsCreateGroupOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Device Group</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <Label htmlFor="group-name">Group Name</Label>
+                  <Input
+                    id="group-name"
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    placeholder="e.g., Utility Switchgear A"
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsCreateGroupOpen(false)}>Cancel</Button>
+                  <Button onClick={handleCreateGroup}>Create</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={isMoveDialogOpen} onOpenChange={setIsMoveDialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Assign Device to Group / Branch</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Group</Label>
+                    <Select value={moveGroupId} onValueChange={(value) => {
+                      setMoveGroupId(value);
+                      setMoveParentId("none");
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select group" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Unassigned</SelectItem>
+                        {deviceGroups.map((group) => (
+                          <SelectItem key={group.id} value={group.id}>{group.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Parent Branch (Optional)</Label>
+                    <Select value={moveParentId} onValueChange={setMoveParentId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select parent node" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No parent (root)</SelectItem>
+                        {parentCandidates.map((candidate) => (
+                          <SelectItem key={candidate.id} value={candidate.id}>
+                            {candidate.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsMoveDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={handleMoveDevice}>Save</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
         )}
       </div>
     </div>

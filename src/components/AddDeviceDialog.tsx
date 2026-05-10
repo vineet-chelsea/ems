@@ -19,6 +19,8 @@ import { api } from "@/services/api";
 interface AddDeviceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  parentDeviceId?: string | null;
+  parentDeviceName?: string | null;
   onAddDevice: (device: { 
     name: string; 
     ipAddress: string; 
@@ -27,11 +29,13 @@ interface AddDeviceDialogProps {
     breakerRating?: number;
     unitCost?: number;
     type: string;
+    parentDeviceId?: string | null;
+    sortOrder?: number;
     parameterMappings?: Record<string, string>;
   }) => void;
 }
 
-export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDialogProps) {
+export function AddDeviceDialog({ open, onOpenChange, onAddDevice, parentDeviceId, parentDeviceName }: AddDeviceDialogProps) {
   const [formData, setFormData] = useState({
     name: "",
     type: "PM5320",
@@ -99,6 +103,8 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
         breakerRating: formData.breakerRating || undefined,
         unitCost: formData.unitCost || undefined,
         type: formData.type,
+        parentDeviceId: parentDeviceId ?? null,
+        sortOrder: 0,
         // Micrologic 6E protection settings (only include if type is MICROLOGIC_6E)
         ...(formData.type === 'MICROLOGIC_6E' ? {
           protectionIr: formData.protectionIr,
@@ -174,6 +180,11 @@ export function AddDeviceDialog({ open, onOpenChange, onAddDevice }: AddDeviceDi
           <DialogDescription>
             Configure a new energy monitoring device.
           </DialogDescription>
+          {parentDeviceId && (
+            <p className="text-xs text-muted-foreground">
+              Adding under parent node: {parentDeviceName || parentDeviceId}
+            </p>
+          )}
         </DialogHeader>
 
         <div className="space-y-6 py-4">
