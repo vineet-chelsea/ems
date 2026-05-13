@@ -1,8 +1,21 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, ReferenceLine } from 'recharts';
-import { TrendingUp, Loader } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Loader, Maximize2 } from "lucide-react";
 import { api } from "@/services/api";
+import type { ChartDataPoint } from "@/components/parameterChartShared";
+import {
+  CHART_MAX_GAP_MS,
+  formatApiRowsToChartData,
+  computeYAxisDomain,
+  insertTimeGapNulls,
+  isNumericPoint,
+  lineDotRenderer,
+} from "@/components/parameterChartShared";
+import { ParameterChartExpandDialog } from "@/components/ParameterChartExpandDialog";
+import type { ChartPeriodOption } from "@/lib/chartPeriod";
+import { getChartPeriodTimeRange, getChartWindowStartMs } from "@/lib/chartPeriod";
 
 interface Parameter {
   key: string;
@@ -25,71 +38,17 @@ interface ParameterChartProps {
   value: number;
   deviceName: string;
   deviceId: string;
-  period?: '24-hours' | '7-days' | '30-days' | '12-months';
+  period?: ChartPeriodOption;
   deviceStatus?: 'online' | 'offline' | 'connecting';
   lastSeen?: string;
-}
-
-interface ChartDataPoint {
-  value: number;
-  fullTime: number; // epoch ms for time-scale axis
-  displayTime: string; // for tooltip/labels
-}
-
-function getEventColor(eventType: string): string {
-  switch (eventType) {
-    case 'dip':
-      return '#ef4444'; // red
-    case 'breaker_trip':
-      return '#dc2626'; // deeper red
-    case 'crest_factor_high':
-      return '#f97316'; // orange
-    case 'k_factor_low':
-      return '#a855f7'; // purple
-    case 'pf_low':
-    case 'pf_total_low':
-      return '#f59e0b'; // amber
-    case 'pf_high':
-    case 'pf_total_high':
-      return '#0ea5e9'; // sky
-    case 'frequency_low':
-    case 'frequency_high':
-      return '#06b6d4'; // cyan
-    case 'thd_voltage_high':
-      return '#8b5cf6'; // violet
-    case 'thd_current_high':
-      return '#ec4899'; // pink
-    case 'phase_loss':
-      return '#7f1d1d'; // dark red
-    case 'interruption':
-      return '#111827'; // near-black
-    case 'voltage_swell_s1':
-    case 'voltage_swell_s2':
-    case 'voltage_swell_s3':
-    case 'voltage_swell_s4':
-      return '#f97316'; // orange for S-type swells (> 120%)
-    case 'voltage_swell_t1':
-    case 'voltage_swell_t2':
-    case 'voltage_swell_t3':
-    case 'voltage_swell_t4':
-      return '#eab308'; // yellow for T-type swells (110-120%)
-    case 'over_voltage_alarm':
-      return '#fb7185'; // rose
-    case 'under_voltage_alarm':
-      return '#60a5fa'; // blue
-    case 'current_imbalance':
-      return '#22c55e'; // green
-    default:
-      return '#ef4444';
-  }
 }
 
 export function ParameterChart({ parameter, value, deviceName, deviceId, period = '24-hours', deviceStatus, lastSeen }: ParameterChartProps) {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastResponse, setLastResponse] = useState<{ data?: Array<{ timestamp: string; value: number | null }> } | null>(null);
-  const [hasFetched, setHasFetched] = useState(false);
-  const [events, setEvents] = useState<Array<{ fullTime: number; description: string; eventType: string }>>([]);
+  const [expandOpen, setExpandOpen] = useState(false);
+  const [expandSnapshot, setExpandSnapshot] = useState<ChartDataPoint[]>([]);
   // 0 is a valid value for many parameters (especially alarm flags / counters)
   const hasData = value !== undefined && value !== null && !isNaN(value);
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -102,6 +61,7 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
 
   // Merge new points into existing series (unique by timestamp), keep chronological, cap length, and drop out-of-window data
   const mergeTimeSeries = (prev: ChartDataPoint[], incoming: ChartDataPoint[], windowStart?: number) => {
+    const gapMs = CHART_MAX_GAP_MS;
     const map = new Map<number, ChartDataPoint>();
     prev.forEach(p => map.set(p.fullTime, p));
     incoming.forEach(p => map.set(p.fullTime, p));
@@ -109,7 +69,7 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
     if (windowStart) {
       merged = merged.filter(p => p.fullTime >= windowStart);
     }
-    // keep last 200 points to avoid growing unbounded
+    merged = insertTimeGapNulls(merged, gapMs, timeZone);
     return merged.slice(Math.max(merged.length - 200, 0));
   };
   
@@ -126,39 +86,27 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
     }
   }, [chartData, parameter.key, lastResponse]);
 
+  // Clear series first so we never briefly show the previous parameter/period window (must run before fetch effect).
+  useEffect(() => {
+    setChartData([]);
+    setLastResponse(null);
+  }, [period, deviceId, parameter.key, parameter.columnName]);
+
   // Fetch historical data from database
   useEffect(() => {
-    const fetchHistoricalData = async () => {
-      try {
-        if (!hasFetched) setLoading(true);
-        
-        // Calculate time range based on selected period
-        const endTime = new Date();
-        let startTime = new Date(endTime);
-        let limit = 200;
+    let cancelled = false;
+    let callIdx = 0;
 
-        switch (period) {
-          case '24-hours':
-            startTime = new Date(endTime.getTime() - 24 * 60 * 60 * 1000);
-            limit = 200;
-            break;
-          case '7-days':
-            startTime = new Date(endTime.getTime() - 7 * 24 * 60 * 60 * 1000);
-            limit = 200;
-            break;
-          case '30-days':
-            startTime = new Date(endTime.getTime() - 30 * 24 * 60 * 60 * 1000);
-            limit = 200;
-            break;
-          case '12-months':
-            startTime = new Date(endTime.getTime() - 365 * 24 * 60 * 60 * 1000);
-            limit = 200;
-            break;
-          default:
-            startTime = new Date(endTime.getTime() - 20 * 60 * 1000);
-            limit = 200;
-        }
-        
+    const fetchHistoricalData = async () => {
+      const isInitialFetch = callIdx === 0;
+      callIdx += 1;
+      if (isInitialFetch) setLoading(true);
+
+      try {
+        const endTime = new Date();
+        const { startTime, endTime: rangeEnd } = getChartPeriodTimeRange(period, endTime);
+        const limit = 200;
+
         // Try to use columnName if available, otherwise use parameter key
         // columnName is the actual database column name, which is what the backend expects
         const paramName = parameter.columnName || parameter.key;
@@ -167,59 +115,12 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
         
         const response = await api.getParameterTimeSeries(deviceId, paramName, {
           startTime: startTime.toISOString(),
-          endTime: endTime.toISOString(),
+          endTime: rangeEnd.toISOString(),
           limit
         });
 
-        // Fetch events for this parameter in the same window (device_events table)
-        try {
-          const evRes = await api.getDeviceEvents(deviceId, {
-            startTime: startTime.toISOString(),
-            endTime: endTime.toISOString(),
-            parameter: parameter.key,
-          });
-          const ev = (evRes.events || [])
-            .map(e => {
-              const t = new Date(e.eventTimestamp).getTime();
-              if (isNaN(t)) return null;
-              return { fullTime: t, description: e.description || 'Event', eventType: e.eventType || 'event' };
-            })
-            .filter((x): x is { fullTime: number; description: string; eventType: string } => x !== null);
+        if (cancelled) return;
 
-          // Also fetch interruption markers (global, shown on every chart)
-          let interruption: Array<{ fullTime: number; description: string; eventType: string }> = [];
-          try {
-            const intRes = await api.getDeviceEvents(deviceId, {
-              startTime: startTime.toISOString(),
-              endTime: endTime.toISOString(),
-              type: 'interruption',
-            });
-            interruption = (intRes.events || [])
-              .map(e => {
-                const t = new Date(e.eventTimestamp).getTime();
-                if (isNaN(t)) return null;
-                return { fullTime: t, description: e.description || 'Interruption', eventType: e.eventType || 'interruption' };
-              })
-              .filter((x): x is { fullTime: number; description: string; eventType: string } => x !== null);
-          } catch {
-            interruption = [];
-          }
-
-          // Merge + de-dupe by (eventType, fullTime)
-          const merged = [...ev, ...interruption];
-          const seen = new Set<string>();
-          const deduped = merged.filter(m => {
-            const k = `${m.eventType}:${m.fullTime}`;
-            if (seen.has(k)) return false;
-            seen.add(k);
-            return true;
-          });
-          setEvents(deduped);
-        } catch {
-          // ignore if no events endpoint or no events
-          setEvents([]);
-        }
-        
         console.log(`[ParameterChart] Received ${response.data?.length || 0} data points for "${parameter.key}"`);
         setLastResponse(response);
         
@@ -227,29 +128,14 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
           // Log sample of raw data to debug
           console.log(`[ParameterChart] Sample raw data points (first 3):`, response.data.slice(0, 3));
           
-          // Convert database data to chart format - filter out null/invalid values
-          const formattedData: ChartDataPoint[] = response.data
-            .map((point: { timestamp: string; value: number | string | null }) => {
-              // Accept numeric strings by parsing them
-              const rawVal = point.value;
-              const numVal = typeof rawVal === 'string' ? Number(rawVal) : rawVal;
-              const isValid = numVal !== null && numVal !== undefined && !isNaN(numVal) && typeof numVal === 'number' && isFinite(numVal);
-              if (!isValid) return null;
-
-            const timestamp = new Date(point.timestamp);
-              return {
-                displayTime: timestamp.toLocaleString(undefined, { hour: '2-digit', minute: '2-digit', timeZone }),
-                value: numVal,
-              fullTime: timestamp.getTime()
-              };
-            })
-            .filter((d): d is ChartDataPoint => d !== null);
+          const formattedData = formatApiRowsToChartData(response.data, timeZone);
           
           console.log(`[ParameterChart] Formatted ${formattedData.length} valid data points out of ${response.data.length} total for "${parameter.key}"`);
           
           if (formattedData.length > 0) {
-            const minValue = Math.min(...formattedData.map(d => d.value));
-            const maxValue = Math.max(...formattedData.map(d => d.value));
+            const numericVals = formattedData.map(d => d.value).filter((v): v is number => typeof v === 'number' && !isNaN(v));
+            const minValue = Math.min(...numericVals);
+            const maxValue = Math.max(...numericVals);
             const valueRange = maxValue - minValue;
             console.log(`[ParameterChart] Sample formatted data point:`, formattedData[0]);
             console.log(`[ParameterChart] Value range: min=${minValue}, max=${maxValue}, range=${valueRange}`);
@@ -260,6 +146,7 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
               console.warn(`[ParameterChart] All values are the same (${minValue}) - chart line may appear flat`);
             }
             
+          if (cancelled) return;
           setChartData(prev => mergeTimeSeries(prev, formattedData, startTime.getTime()));
           } else {
             // Check why all data was filtered
@@ -267,63 +154,41 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
             console.warn(`[ParameterChart] All ${response.data.length} data points were filtered out for "${parameter.key}"`);
             console.warn(`[ParameterChart] Sample values analysis:`, sampleValues);
             // Set empty data so chart still renders
-            setChartData([]);
+            if (!cancelled) setChartData([]);
           }
         } else {
-          if (!hasFetched) {
-            // No historical data yet - create empty chart with current value (only on first load)
-            const emptyData: ChartDataPoint[] = [];
-            for (let i = 20; i >= 0; i--) {
-              const timestamp = new Date();
-              timestamp.setMinutes(timestamp.getMinutes() - i);
-              emptyData.push({
-                displayTime: timestamp.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZone }),
-                value: hasData ? value : 0,
-                fullTime: timestamp.getTime()
-              });
-            }
-            setChartData(emptyData);
-          }
+          // No rows in this time window — do not synthesize a line from the live reading (misleading vs selected period).
+          if (!cancelled) setChartData([]);
         }
       } catch (error) {
         console.error(`Error fetching historical data for ${parameter.key}:`, error);
-        if (!hasFetched) {
-          // Fallback to empty chart only on first load
-          const emptyData: ChartDataPoint[] = [];
-          for (let i = 20; i >= 0; i--) {
-    const timestamp = new Date();
-            timestamp.setMinutes(timestamp.getMinutes() - i);
-            emptyData.push({
-              displayTime: timestamp.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZone }),
-              value: hasData ? value : 0,
-              fullTime: timestamp.getTime()
-            });
-          }
-          setChartData(emptyData);
+        if (!cancelled) {
+          setLastResponse(null);
+          setChartData([]);
         }
       } finally {
-        setHasFetched(true);
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
     
     fetchHistoricalData();
     
     const interval = setInterval(fetchHistoricalData, CHART_REFRESH_INTERVAL_MS);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [deviceId, parameter.key, parameter.columnName, period]);
-
-  // Reset chart data when period changes to avoid mixing old windows
-  useEffect(() => {
-    setHasFetched(false);
-    setChartData([]);
-  }, [period, deviceId, parameter.key, parameter.columnName]);
 
   const formatTick = (val: number) => {
     const d = new Date(val);
     switch (period) {
+      case 'today':
       case '24-hours':
         return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZone });
+      case 'this-week':
       case '7-days':
       case '30-days':
         return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone });
@@ -351,12 +216,21 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
 
     setChartData(prevData => {
       if (prevData.length === 0) return prevData;
-      const lastPoint = prevData[prevData.length - 1];
-      // Only append when we have a newer sample timestamp
-      if (sampleTime <= lastPoint.fullTime) return prevData;
+      const lastNumeric = [...prevData].reverse().find(isNumericPoint);
+      if (!lastNumeric) return prevData;
+      if (sampleTime <= lastNumeric.fullTime) return prevData;
 
-      // Maintain a rolling window size (shift one, push one)
+      const gapMs = CHART_MAX_GAP_MS;
       const newData = prevData.slice(1);
+      const lastInWindow = [...newData].reverse().find(isNumericPoint);
+      if (lastInWindow && sampleTime - lastInWindow.fullTime > gapMs) {
+        const mid = lastInWindow.fullTime + (sampleTime - lastInWindow.fullTime) / 2;
+        newData.push({
+          displayTime: new Date(mid).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZone }),
+          value: null,
+          fullTime: mid,
+        });
+      }
       const newTimestamp = new Date(sampleTime);
       newData.push({
         displayTime: newTimestamp.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZone }),
@@ -365,16 +239,7 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
       });
 
       // Trim to current window (based on period) when live appending
-      const windowStart = (() => {
-        const endTime = Date.now();
-        switch (period) {
-          case '24-hours': return endTime - 24 * 60 * 60 * 1000;
-          case '7-days': return endTime - 7 * 24 * 60 * 60 * 1000;
-          case '30-days': return endTime - 30 * 24 * 60 * 60 * 1000;
-          case '12-months': return endTime - 365 * 24 * 60 * 60 * 1000;
-          default: return endTime - 20 * 60 * 1000;
-        }
-      })();
+      const windowStart = getChartWindowStartMs(period, Date.now());
 
       return newData.filter(p => p.fullTime >= windowStart);
     });
@@ -413,20 +278,53 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
     </span>
   ) : null;
 
-  const latestValue = chartData.length > 0 ? chartData[chartData.length - 1].value : value;
+  const latestValue = (() => {
+    for (let i = chartData.length - 1; i >= 0; i--) {
+      const v = chartData[i].value;
+      if (v !== null && v !== undefined && typeof v === 'number' && !isNaN(v)) return v;
+    }
+    return value;
+  })();
   const hasValueToShow = latestValue !== undefined && latestValue !== null && !isNaN(latestValue);
 
   return (
+    <>
+    <ParameterChartExpandDialog
+      open={expandOpen}
+      onOpenChange={setExpandOpen}
+      initialData={expandSnapshot}
+      deviceId={deviceId}
+      parameter={parameter}
+      color={color}
+      timeZone={timeZone}
+      formatValue={formatValue}
+    />
     <Card className="hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
             <CardTitle className="text-lg">{parameter.label}</CardTitle>
             <CardDescription>
               {parameter.group} • {deviceName}
               {statusNote && <span className="ml-2">{statusNote}</span>}
             </CardDescription>
           </div>
+          {chartData.length > 0 && !loading && (
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="shrink-0"
+              title="Open zoom & drill-down"
+              aria-label="Open zoom and drill-down chart"
+              onClick={() => {
+                setExpandSnapshot(chartData.map(d => ({ ...d })));
+                setExpandOpen(true);
+              }}
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
         <div className="text-2xl font-bold" style={{ color }}>
           {hasValueToShow
@@ -445,9 +343,11 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
             <div className="text-center text-muted-foreground">
               <p className="text-sm">No data available</p>
               <p className="text-xs mt-1">
-                {lastResponse?.data && lastResponse.data.length > 0 
+                {lastResponse?.data && lastResponse.data.length > 0
                   ? `Received ${lastResponse.data.length} points but all were filtered out (null/invalid values)`
-                  : 'Waiting for data...'}
+                  : lastResponse?.data && lastResponse.data.length === 0
+                    ? 'No samples in the selected time range.'
+                    : 'Waiting for data...'}
               </p>
             </div>
           </div>
@@ -476,39 +376,7 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
                 tickLine={false}
                 axisLine={false}
                 tickCount={(parameter.unit === 'Hz' || parameter.key.toLowerCase().includes('frequency')) ? 7 : undefined}
-                domain={chartData.length > 0 ? (() => {
-                  const values = chartData.map(d => d.value).filter(v => v !== null && v !== undefined && !isNaN(v));
-                  if (values.length === 0) return [0, 100];
-                  const min = Math.min(...values);
-                  const max = Math.max(...values);
-                  const range = max - min;
-                  const isFrequency = parameter.unit === 'Hz' || parameter.key.toLowerCase().includes('frequency');
-                  if (isFrequency) {
-                    // Frequency: narrow band (1.5 Hz each side) so 49.6 vs 50.1 are clearly distinguishable
-                    const median = values.slice().sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 50;
-                    const nominal = median >= 57 ? 60 : 50;
-                    const band = 1.5;
-                    return [nominal - band, nominal + band];
-                  }
-                  const isPF = (parameter.key.toLowerCase().includes('power factor')|| parameter.key.toLowerCase().includes('pf'));
-                  if (isPF) {
-                    // Frequency: narrow band (1.5 Hz each side) so 49.6 vs 50.1 are clearly distinguishable
-                    const median = values.slice().sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;
-                    const nominal = median >= -2 ? 2 : 0;
-                    const band = 1.5;
-                    return [-1,1];
-                  }
-                  // Dynamic padding: ~5% of range so Y-axis scale fits the data
-                  const padding = range > 0 ? Math.max(range * 0.05, 0.5) : (Math.abs(max) || 1) * 0.1;
-                  if (range === 0) {
-                    const yMin = min < 0 ? min - padding : Math.max(0, min - padding);
-                    return [yMin, max + padding];
-                  }
-                  // Dynamic scale: 0 as floor when no negatives, else use data min; top = max + padding
-                  const yMin = min < 0 ? min - padding : 0;
-                  const yMax = max + padding;
-                  return [yMin, yMax];
-                })() : [0, 100]}
+                domain={chartData.length > 0 ? computeYAxisDomain(chartData, parameter) : [0, 100]}
                 allowDataOverflow={false}
                 tickFormatter={(val) => {
                   if (val === null || val === undefined || isNaN(val) || typeof val !== 'number') return 'N/A';
@@ -528,23 +396,14 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
                   return d.toLocaleString(undefined, { timeZone });
                 }}
               />
-              {events.map((ev) => (
-                <ReferenceLine
-                  key={`${ev.eventType}:${ev.fullTime}`}
-                  x={ev.fullTime}
-                  stroke={getEventColor(ev.eventType)}
-                  strokeDasharray="4 4"
-                  ifOverflow="hidden"
-                />
-              ))}
               <Line
-                type="monotone"
+                type="linear"
                 dataKey="value"
                 stroke={color}
                 strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, fill: color }}
-                isAnimationActive={true}
+                dot={lineDotRenderer(color)}
+                activeDot={{ r: 5, fill: color, stroke: '#fff', strokeWidth: 1 }}
+                isAnimationActive={false}
                 connectNulls={false}
               />
             </LineChart>
@@ -554,10 +413,11 @@ export function ParameterChart({ parameter, value, deviceName, deviceId, period 
         
         <div className="mt-4 text-xs text-muted-foreground">
           {chartData.length > 0
-            ? `Real-time data • ${chartData.length} data points • Updates every ${formatRefreshInterval(CHART_REFRESH_INTERVAL_MS)}${events.length ? ` • ${events.length} event(s)` : ''}`
+            ? `Real-time data • ${chartData.length} data points • Updates every ${formatRefreshInterval(CHART_REFRESH_INTERVAL_MS)}`
             : 'No historical data available yet'}
         </div>
       </CardContent>
     </Card>
+    </>
   );
 }

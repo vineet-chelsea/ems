@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Device } from "./EnergyDashboard";
 import { api } from "@/services/api";
+import type { ChartPeriodOption } from "@/lib/chartPeriod";
+import { getChartPeriodTimeRange } from "@/lib/chartPeriod";
 import {
   Dialog,
   DialogContent,
@@ -30,12 +32,10 @@ type EventItem = {
   timestamps: string[];
 };
 
-type PeriodOption = '24-hours' | '7-days' | '30-days' | '12-months';
-
 interface PowerQualityDashboardProps {
   device: Device;
-  selectedPeriod?: PeriodOption;
-  onPeriodChange?: (period: PeriodOption) => void;
+  selectedPeriod?: ChartPeriodOption;
+  onPeriodChange?: (period: ChartPeriodOption) => void;
 }
 
 interface PowerQualityEvent {
@@ -169,7 +169,7 @@ const POWER_QUALITY_CARDS = [
 ];
 
 export function PowerQualityDashboard({ device, selectedPeriod: controlledPeriod, onPeriodChange }: PowerQualityDashboardProps) {
-  const [internalPeriod, setInternalPeriod] = useState<PeriodOption>(controlledPeriod || '30-days');
+  const [internalPeriod, setInternalPeriod] = useState<ChartPeriodOption>(controlledPeriod || '30-days');
   const selectedPeriod = controlledPeriod || internalPeriod;
   const [powerQualityData, setPowerQualityData] = useState<Record<string, PowerQualityEvent>>({});
   const [eventData, setEventData] = useState<Record<string, EventItem>>({});
@@ -216,8 +216,8 @@ export function PowerQualityDashboard({ device, selectedPeriod: controlledPeriod
     fetchCardData(cardId, apiEndpoint, selectedPeriod);
   };
 
-  const handlePeriodChange = (period: PeriodOption | string) => {
-    const p = period as PeriodOption;
+  const handlePeriodChange = (period: ChartPeriodOption | string) => {
+    const p = period as ChartPeriodOption;
     setInternalPeriod(p);
     if (onPeriodChange) onPeriodChange(p);
   };
@@ -229,42 +229,22 @@ export function PowerQualityDashboard({ device, selectedPeriod: controlledPeriod
     }
   }, [controlledPeriod]);
 
-  const periodToRange = (period: PeriodOption) => {
-    const end = new Date();
-    let start = new Date();
-    switch (period) {
-      case '24-hours':
-        start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case '7-days':
-        start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case '30-days':
-        start = new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      case '12-months':
-        start = new Date(end.getTime() - 365 * 24 * 60 * 60 * 1000);
-        break;
-    }
-    return { start, end };
-  };
-
   // Auto-refresh events when period changes or on interval
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         setLoadingEvents(true);
-        const { start, end } = periodToRange(selectedPeriod);
+        const { startTime, endTime } = getChartPeriodTimeRange(selectedPeriod);
         
         console.log(`[PowerQualityDashboard] Fetching events for device ${device.id}`, {
-          start: start.toISOString(),
-          end: end.toISOString(),
+          start: startTime.toISOString(),
+          end: endTime.toISOString(),
           period: selectedPeriod
         });
         
         const resp = await api.getDeviceEvents(device.id, {
-          startTime: start.toISOString(),
-          endTime: end.toISOString(),
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
         });
         
         console.log('[PowerQualityDashboard] Events API response:', {
@@ -366,11 +346,25 @@ export function PowerQualityDashboard({ device, selectedPeriod: controlledPeriod
       </CardHeader>
       <CardContent>
         <Tabs value={selectedPeriod} onValueChange={handlePeriodChange} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="24-hours">LAST 24 HOURS</TabsTrigger>
-            <TabsTrigger value="7-days">LAST 7 DAYS</TabsTrigger>
-            <TabsTrigger value="30-days">LAST 30 DAYS</TabsTrigger>
-            <TabsTrigger value="12-months">LAST 12 MONTHS</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-6">
+            <TabsTrigger value="today" className="text-[10px] sm:text-xs px-1">
+              TODAY
+            </TabsTrigger>
+            <TabsTrigger value="24-hours" className="text-[10px] sm:text-xs px-1">
+              LAST 24 HOURS
+            </TabsTrigger>
+            <TabsTrigger value="this-week" className="text-[10px] sm:text-xs px-1">
+              THIS WEEK
+            </TabsTrigger>
+            <TabsTrigger value="7-days" className="text-[10px] sm:text-xs px-1">
+              LAST 7 DAYS
+            </TabsTrigger>
+            <TabsTrigger value="30-days" className="text-[10px] sm:text-xs px-1">
+              LAST 30 DAYS
+            </TabsTrigger>
+            <TabsTrigger value="12-months" className="text-[10px] sm:text-xs px-1">
+              LAST 12 MONTHS
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value={selectedPeriod} className="space-y-6">

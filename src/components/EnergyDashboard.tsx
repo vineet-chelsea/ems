@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Activity, Zap, Settings, LogOut, Users, Code } from "lucide-react";
+import { Plus, Activity, Zap, Settings, LogOut, Users, Code, Columns2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DeviceCard } from "./DeviceCard";
 import { AddDeviceDialog } from "./AddDeviceDialog";
 import { DeviceDetailView } from "./DeviceDetailView";
+import { MultiDeviceKeyParametersCompare } from "./MultiDeviceKeyParametersCompare";
 import { AdminPanel } from "./AdminPanel";
 import { ChangePasswordDialog } from "./ChangePasswordDialog";
 // AutoUpdate and AutoStartSettings are Electron-only features, removed for web deployment
@@ -27,6 +28,8 @@ export interface Device extends ApiDevice {
 export function EnergyDashboard() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+  const [keyCompareOpen, setKeyCompareOpen] = useState(false);
+  const [keyCompareSelectedIds, setKeyCompareSelectedIds] = useState<string[]>([]);
   const [isAddDeviceOpen, setIsAddDeviceOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user, logout, isAdmin, removeDeviceFromUsers } = useAuth();
@@ -190,6 +193,7 @@ export function EnergyDashboard() {
       await api.deleteDevice(deviceId);
       removeDeviceFromUsers(deviceId);
       setSelectedDevice(null);
+      setKeyCompareSelectedIds((prev) => prev.filter((id) => id !== deviceId));
       toast.success('Device and all associated records deleted successfully');
       await loadDevices();
     } catch (error: any) {
@@ -197,6 +201,19 @@ export function EnergyDashboard() {
       toast.error(error.message || 'Failed to delete device');
     }
   };
+
+  if (keyCompareOpen) {
+    return (
+      <MultiDeviceKeyParametersCompare
+        visibleDevices={visibleDevices}
+        selectedIds={keyCompareSelectedIds}
+        onSelectedIdsChange={setKeyCompareSelectedIds}
+        onBack={() => {
+          setKeyCompareOpen(false);
+        }}
+      />
+    );
+  }
 
   if (selectedDevice) {
     return (
@@ -247,7 +264,13 @@ export function EnergyDashboard() {
               Welcome, {user?.email} ({user?.role})
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap justify-end">
+            {visibleDevices.length > 0 && (
+              <Button variant="secondary" onClick={() => setKeyCompareOpen(true)}>
+                <Columns2 className="w-4 h-4 mr-2" />
+                Compare key parameters
+              </Button>
+            )}
             {isAdmin && (
               <Button 
                 onClick={() => setIsAddDeviceOpen(true)}

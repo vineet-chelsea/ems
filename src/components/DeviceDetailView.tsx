@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Device } from "./EnergyDashboard";
 import { ParameterChart, CHART_REFRESH_INTERVAL_MS } from "./ParameterChart";
+import type { ChartPeriodOption } from "@/lib/chartPeriod";
 import { ReportGenerator } from "./ReportGenerator";
 import { PowerQualityDashboard } from "./PowerQualityDashboard";
 import { api } from "@/services/api";
@@ -30,108 +31,7 @@ import pm5320Units from "@/data/pm5320Units.json";
 import pm8000Units from "@/data/pm8000Units.json";
 import { getDeviceTypeDisplayName } from "@/utils/deviceUtils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
-/** Fixed labels for the Key Parameters table (same for all devices). */
-export const KEY_PARAMETERS_LABELS = [
-  'VR-Y', 'VY-B', 'VB-A', 'IR', 'IY', 'IB',
-  'kW', 'KVA', 'kVAR', 'PF', 'Frequency',
-  'kWh', 'KVAh', 'kVARh',
-] as const;
-
-/** Extra rows only for MICROLOGIC_6E. */
-export const KEY_PARAMETERS_MICROLOGIC_6E_EXTRA = [
-  'Breaker ON/OFF', 'TRIP Status', 'Spring Charged',
-] as const;
-
-/** Table groups: Voltages, Current, Power, Energy, General. */
-export const KEY_PARAMETERS_GROUPS: Record<string, readonly string[]> = {
-  Voltages: ['VR-Y', 'VY-B', 'VB-A'],
-  Current: ['IR', 'IY', 'IB'],
-  Power: ['kW', 'KVA', 'kVAR', 'PF'],
-  Energy: ['kWh', 'KVAh', 'kVARh'],
-  General: ['Frequency'],
-};
-
-/** Per-label display unit for formatting (optional; empty = no unit suffix). */
-export const KEY_PARAMETERS_LABEL_UNITS: Record<string, string> = {
-  'VR-Y': 'V', 'VY-B': 'V', 'VB-A': 'V',
-  'IR': 'A', 'IY': 'A', 'IB': 'A',
-  'kW': 'W', 'KVA': 'kVA', 'kVAR': 'var', 'kWh': 'kWh', 'KVAh': 'kVAh', 'kVARh': 'kVARh',
-  'PF': '', 'Frequency': 'Hz',
-  'Breaker ON/OFF': '', 'TRIP Status': '', 'Spring Charged': '',
-};
-
-/**
- * Device-specific mapping: label -> API parameter key.
- * Fill in the parameter key for each label per device (as returned by /data/:deviceId/latest).
- */
-export type KeyParametersMapping = Partial<Record<string, string>>;
-
-export const KEY_PARAMETERS_BY_DEVICE: Record<string, KeyParametersMapping> = {
-  MICROLOGIC_6E: {
-    'VR-Y': 'V12',
-    'VY-B': 'V23',
-    'VB-A': 'V31',
-    'IR': 'I1_RMS',
-    'IY': 'I2_RMS',
-    'IB': 'I3_RMS',
-    'kW': 'kW_Total',
-    'KVA': 'kVA_Total',
-    'kVAR': 'VAr_Total',
-    'kWh': 'Wh',
-    'KVAh': 'kVAh',
-    'kVARh': 'Varh',
-    'PF': 'Total PF',
-    'Frequency': 'Frequency',
-    'Breaker ON/OFF': 'Breaker ON',
-    'TRIP Status': 'TRIP',
-    'Spring Charged': 'Spring charged',
-  },
-  EM6400: {
-    'VR-Y': 'Voltage A-B',
-    'VY-B': 'Voltage B-C',
-    'VB-A': 'Voltage C-A',
-    'IR': 'Current A',
-    'IY': 'Current B',
-    'IB': 'Current C',
-    'kW': 'Active Power Total',
-    'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered - Received', 'KVAh': 'Apparent Energy Delivered - Received', 'kVARh': 'Reactive Energy Delivered - Received',
-    'PF': 'Power Factor Total',
-    'Frequency': 'Frequency',
-  },
-  PM5320: {
-    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
-    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
-    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
-    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
-  },
-  PM8000: {
-    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
-    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
-    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
-    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
-  },
-  PM5330: {
-    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
-    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
-    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
-    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
-  },
-  PM5350: {
-    'VR-Y': 'Voltage A-B', 'VY-B': 'Voltage B-C', 'VB-A': 'Voltage C-A',
-    'IR': 'Current A', 'IY': 'Current B', 'IB': 'Current C',
-    'kW': 'Active Power Total', 'KVA': 'Apparent Power Total', 'kVAR': 'Reactive Power Total', 'kWh': 'Active Energy Delivered (Into Load)', 'KVAh': 'Apparent Energy Delivered', 'kVARh': 'Reactive Energy Delivered',
-    'PF': 'Power Factor Total', 'Frequency': 'Frequency',
-  },
-};
-
-/** Default mapping when device type is unknown; you can provide your own keys. */
-export const DEFAULT_KEY_PARAMETERS_MAPPING: KeyParametersMapping = {
-  'VR-Y': 'V1', 'VY-B': 'V2', 'VB-A': 'V3',
-  'IR': 'I1', 'IY': 'I2', 'IB': 'I3',
-  'kW': 'Ptotal', 'KVA': '', 'kVAR': '', 'kWh': 'energy_active', 'KVAh': '', 'kVARh': '',
-  'PF': 'PFavg', 'Frequency': 'frequency',
-};
+import { KeyParametersTables } from "./KeyParametersTables";
 
 interface DeviceDetailViewProps {
   device: Device;
@@ -416,7 +316,7 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
   const [availableParameters, setAvailableParameters] = useState<ParameterInfo[]>([]);
   const [currentParameters, setCurrentParameters] = useState<Record<string, number>>(device.parameters || {});
   const [loadingConfig, setLoadingConfig] = useState(true);
-  const [chartPeriod, setChartPeriod] = useState<'24-hours' | '7-days' | '30-days' | '12-months'>('24-hours');
+  const [chartPeriod, setChartPeriod] = useState<ChartPeriodOption>('24-hours');
   const [testingConnection, setTestingConnection] = useState(false);
   const [liveStatus, setLiveStatus] = useState<Device['status']>(device.status);
   const [liveLastSeen, setLiveLastSeen] = useState<string | undefined>(device.lastSeen);
@@ -1128,112 +1028,7 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
           <TabsContent value="monitoring" className="space-y-6">
             {/* Key parameters: 5 tables (Voltages, Current, Power, Energy, General) full width */}
             <div className="w-full">
-            {(() => {
-              const toNum = (v: unknown): number | undefined => {
-                if (typeof v === 'number' && isFinite(v)) return v;
-                if (typeof v === 'string' && v.trim() !== '' && !isNaN(Number(v))) {
-                  const n = Number(v);
-                  return Number.isFinite(n) ? n : undefined;
-                }
-                return undefined;
-              };
-              const getVal = (key: string): number | undefined => {
-                let v: unknown = currentParameters[key] ?? currentParameters[key.toLowerCase()];
-                let out = toNum(v);
-                if (out !== undefined) return out;
-                const sanitized = key.toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_');
-                out = toNum(currentParameters[sanitized]);
-                if (out !== undefined) return out;
-                // Fallback: match any stored key whose sanitized form equals this key's sanitized form
-                const matchKey = Object.keys(currentParameters).find(
-                  (k) => k.toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_') === sanitized
-                );
-                return matchKey !== undefined ? toNum(currentParameters[matchKey]) : undefined;
-              };
-              const formatVal = (val: number | undefined, unit: string, label?: string, alreadyScaled = false) => {
-                if (val === undefined) return '—';
-                if (label === 'Breaker ON/OFF' || label === 'TRIP Status' || label === 'Spring Charged') {
-                  return val === 1 ? 'ON' : val === 0 ? 'OFF' : String(val);
-                }
-                if (unit === '%' || unit === '') return val.toFixed(2);
-                if (unit === 'V' || unit === 'A') return `${val.toFixed(1)} ${unit}`;
-                if (unit === 'Hz') return `${val.toFixed(2)} Hz`;
-                if (unit === 'W') return alreadyScaled ? `${val.toFixed(2)} kW` : `${(val).toFixed(2)} kW`;
-                if (unit === 'kVA') return alreadyScaled ? `${val.toFixed(2)} kVA` : `${(val).toFixed(2)} kVA`;
-                if (unit === 'var') return alreadyScaled ? `${val.toFixed(2)} kVAR` : `${(val).toFixed(2)} kVAR`;
-                if (unit === 'kWh' || unit === 'kVAh' || unit === 'kVARh') return `${val.toFixed(1)} ${unit}`;
-                return `${val.toFixed(1)}`;
-              };
-              const keySpec = KEY_PARAMETERS_BY_DEVICE[device.type] ?? {};
-              const mapping: KeyParametersMapping = { ...DEFAULT_KEY_PARAMETERS_MAPPING, ...keySpec };
-              const standardLabels = [...KEY_PARAMETERS_LABELS];
-              const extraLabels = device.type === 'MICROLOGIC_6E' ? [...KEY_PARAMETERS_MICROLOGIC_6E_EXTRA] : [];
-              const allLabels = [...standardLabels, ...extraLabels];
-              const powerEnergyLabels = ['kW', 'KVA', 'kVAR', 'kWh', 'KVAh', 'kVARh'];
-              const powerEnergyLabels2 = ['kW', 'KVA', 'kVAR'];
-              const rows: { label: string; value: number | undefined; unit: string; alreadyScaled?: boolean }[] = allLabels.map((label) => {
-                const paramKey = mapping[label];
-                let value = paramKey && paramKey.trim() ? getVal(paramKey) : undefined;
-                const isMicrologic6EPowerEnergy = device.type === 'MICROLOGIC_6E' && powerEnergyLabels.includes(label);
-                if (isMicrologic6EPowerEnergy && value !== undefined) {
-                  value = value / 1000;
-                }
-                const isPM8000energy = device.type === 'PM8000' && powerEnergyLabels2.includes(label);
-                if (isPM8000energy && value !== undefined) {
-                  value = value / 1000;
-                }
-                const unit = KEY_PARAMETERS_LABEL_UNITS[label] ?? '';
-                return { label, value, unit, alreadyScaled: isMicrologic6EPowerEnergy };
-              });
-              const paramCount = Object.keys(currentParameters).length;
-              const generalLabels = [...KEY_PARAMETERS_GROUPS.General];
-              if (device.type === 'MICROLOGIC_6E') generalLabels.push(...KEY_PARAMETERS_MICROLOGIC_6E_EXTRA);
-              const groupConfigs: { title: string; labels: string[] }[] = [
-                { title: 'Voltages', labels: [...KEY_PARAMETERS_GROUPS.Voltages] },
-                { title: 'Current', labels: [...KEY_PARAMETERS_GROUPS.Current] },
-                { title: 'Power', labels: [...KEY_PARAMETERS_GROUPS.Power] },
-                { title: 'Energy', labels: [...KEY_PARAMETERS_GROUPS.Energy] },
-                { title: 'General', labels: generalLabels },
-              ];
-              return (
-                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                  {groupConfigs.map(({ title, labels }) => {
-                    const groupRows = rows.filter((r) => labels.includes(r.label));
-                    if (groupRows.length === 0) return null;
-                    return (
-                      <Card key={title} className="overflow-hidden shadow-sm w-full min-w-0">
-                        <CardHeader className="pb-2 pt-3 px-4 border-b border-border/50 bg-muted/20">
-                          <CardTitle className="text-sm font-semibold">{title}</CardTitle>
-                          <CardDescription className="text-xs mt-0.5">
-                            {paramCount === 0 ? 'No data' : device.type}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="px-0 pb-0 pt-0">
-                          <div className="rounded-b-lg overflow-hidden">
-                            <table className="w-full table-auto">
-                              <thead>
-                                <tr className="bg-muted/50">
-                                  <th className="text-left py-2.5 px-4 font-semibold text-foreground/90 text-xs">Parameter</th>
-                                  <th className="text-right py-2.5 px-4 font-semibold text-foreground/90 text-xs">Value</th>
-                                </tr>
-                              </thead>
-                              <tbody className="bg-card divide-y divide-border/60">
-                                {groupRows.map((r, i) => (
-                                  <tr key={i} className="hover:bg-green-100/50 dark:hover:bg-green-900/20 transition-colors even:bg-green-50/80 dark:even:bg-green-950/40 odd:bg-card">
-                                    <td className="py-2 px-4 text-xs font-medium text-foreground/90">{r.label}</td>
-                                    <td className="py-2 px-4 text-right text-sm font-bold font-mono text-foreground tabular-nums tracking-tight">{formatVal(r.value, r.unit, r.label, r.alreadyScaled)}</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              );
-            })()}
+              <KeyParametersTables deviceType={device.type} currentParameters={currentParameters} />
             </div>
 
             {/* Charts */}
@@ -1264,7 +1059,7 @@ export function DeviceDetailView({ device, onBack, onUpdateDevice, onDeleteDevic
                   if (currentValue === undefined || currentValue === null || isNaN(currentValue)) currentValue = undefined;
                   return (
                     <ParameterChart
-                      key={paramKey}
+                      key={`${device.id}:${param.columnName || paramKey}:${chartPeriod}`}
                       parameter={param}
                       value={currentValue}
                       deviceName={device.name}
